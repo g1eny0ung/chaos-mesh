@@ -1,11 +1,11 @@
 import { AutocompleteMultipleField, LabelField, SelectField, Submit, TextField } from 'components/FormField'
+import { Env, clearNetworkTargetPods } from 'slices/experiments'
 import { Form, Formik, FormikErrors, FormikTouched, getIn } from 'formik'
 import { Kind, Spec } from '../data/target'
 import { useEffect, useState } from 'react'
 import { useStoreDispatch, useStoreSelector } from 'store'
 
 import AdvancedOptions from 'components/AdvancedOptions'
-import { Env } from '../Step1'
 import { MenuItem } from '@material-ui/core'
 import { ObjectSchema } from 'yup'
 import Scope from './Scope'
@@ -13,7 +13,6 @@ import Space from 'components-mui/Space'
 import T from 'components/T'
 import _snakecase from 'lodash.snakecase'
 import basicData from '../data/basic'
-import { clearNetworkTargetPods } from 'slices/experiments'
 
 interface TargetGeneratedProps {
   env: Env
@@ -37,7 +36,7 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, vali
     return acc
   }, {} as Record<string, any>)
 
-  if (kind === 'NetworkChaos') {
+  if (env === 'k8s' && 'NetworkChaos') {
     const action = initialValues.action
     delete initialValues.action
     const direction = initialValues.direction

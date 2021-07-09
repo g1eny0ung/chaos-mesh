@@ -1,7 +1,13 @@
 import { Box, Card, Divider, Typography } from '@material-ui/core'
+import {
+  Env,
+  setEnv,
+  setKindAction as setKindActionToStore,
+  setStep1,
+  setTarget as setTargetToStore,
+} from 'slices/experiments'
 import _targetData, { Kind, Target, schema, dataPhysic as targetDataPhysic } from './data/target'
 import { iconByKind, transByKind } from 'lib/byKind'
-import { setKindAction as setKindActionToStore, setStep1, setTarget as setTargetToStore } from 'slices/experiments'
 import { useEffect, useState } from 'react'
 import { useStoreDispatch, useStoreSelector } from 'store'
 
@@ -46,20 +52,18 @@ const useStyles = makeStyles((theme) => {
 
 const submitDirectly = ['pod-failure']
 
-export type Env = 'k8s' | 'physic'
-
 const Step1 = () => {
   const classes = useStyles()
 
   const state = useStoreSelector((state) => state)
   const { dnsServerCreate } = state.globalStatus
   const {
+    env,
     kindAction: [_kind, _action],
     step1,
   } = state.experiments
   const dispatch = useStoreDispatch()
 
-  const [env, setEnv] = useState<Env>('k8s')
   const targetData = env === 'k8s' ? _targetData : targetDataPhysic
   let targetDataEntries = Object.entries(targetData) as [Kind, Target][]
   if (!dnsServerCreate) {

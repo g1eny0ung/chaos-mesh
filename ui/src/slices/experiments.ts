@@ -26,6 +26,8 @@ export const getNetworkTargetPodsByNamespaces = createAsyncThunk(
   async (data: Partial<ExperimentScope>) => (await api.common.pods(data)).data
 )
 
+export type Env = 'k8s' | 'physic'
+
 const initialState: {
   namespaces: string[]
   labels: Record<string, string[]>
@@ -35,6 +37,7 @@ const initialState: {
   fromExternal: boolean
   step1: boolean
   step2: boolean
+  env: Env
   kindAction: [Kind | '', string]
   target: any
   basic: any
@@ -49,6 +52,7 @@ const initialState: {
   fromExternal: false,
   step1: false,
   step2: false,
+  env: 'k8s',
   kindAction: ['', ''],
   target: {},
   basic: {},
@@ -67,6 +71,9 @@ const experimentsSlice = createSlice({
     },
     setStep2(state, action: PayloadAction<boolean>) {
       state.step2 = action.payload
+    },
+    setEnv(state, action: PayloadAction<Env>) {
+      state.env = action.payload
     },
     setKindAction(state, action) {
       state.kindAction = action.payload
@@ -122,6 +129,7 @@ export const {
   clearNetworkTargetPods,
   setStep1,
   setStep2,
+  setEnv,
   setKindAction,
   setTarget,
   setBasic,
