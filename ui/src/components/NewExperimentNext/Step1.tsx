@@ -1,7 +1,7 @@
 import { Box, Card, Divider, Typography } from '@material-ui/core'
+import _targetData, { Kind, Target, schema, dataPhysic as targetDataPhysic } from './data/target'
 import { iconByKind, transByKind } from 'lib/byKind'
 import { setKindAction as setKindActionToStore, setStep1, setTarget as setTargetToStore } from 'slices/experiments'
-import targetData, { Kind, Target, schema } from './data/target'
 import { useEffect, useState } from 'react'
 import { useStoreDispatch, useStoreSelector } from 'store'
 
@@ -46,21 +46,25 @@ const useStyles = makeStyles((theme) => {
 
 const submitDirectly = ['pod-failure']
 
+export type Env = 'k8s' | 'physic'
+
 const Step1 = () => {
   const classes = useStyles()
 
   const state = useStoreSelector((state) => state)
   const { dnsServerCreate } = state.globalStatus
-  let targetDataEntries = Object.entries(targetData) as [Kind, Target][]
-  if (!dnsServerCreate) {
-    targetDataEntries = targetDataEntries.filter((d) => d[0] !== 'DNSChaos')
-  }
   const {
     kindAction: [_kind, _action],
     step1,
   } = state.experiments
   const dispatch = useStoreDispatch()
 
+  const [env, setEnv] = useState<Env>('k8s')
+  const targetData = env === 'k8s' ? _targetData : targetDataPhysic
+  let targetDataEntries = Object.entries(targetData) as [Kind, Target][]
+  if (!dnsServerCreate) {
+    targetDataEntries = targetDataEntries.filter((d) => d[0] !== 'DNSChaos')
+  }
   const [kindAction, setKindAction] = useState<[Kind | '', string]>([_kind, _action])
   const [kind, action] = kindAction
 
@@ -102,20 +106,59 @@ const Step1 = () => {
 
   const handleUndo = () => dispatch(setStep1(false))
 
+  const handleSwitchEnv = (env: Env) => () => {
+    setKindAction(['', ''])
+    setEnv(env)
+  }
+
   return (
     <Paper className={step1 ? classes.submit : ''}>
-      <Box display="flex" justifyContent="space-between" mb={step1 ? 0 : 3}>
+      <Box display="flex" justifyContent="space-between">
         <Box display="flex" alignItems="center">
           {step1 && (
             <Box display="flex" mr={3}>
               <CheckIcon className={classes.submitIcon} />
             </Box>
           )}
-          <Typography>{T('newE.titleStep1')}</Typography>
+          <Typography>{T('newE.titleStep0')}</Typography>
         </Box>
         {step1 && <UndoIcon className={classes.asButton} onClick={handleUndo} />}
       </Box>
       <Box hidden={step1}>
+        <Box display="flex">
+          <Card
+            className={clsx(classes.card, env === 'k8s' ? classes.cardActive : '')}
+            variant="outlined"
+            onClick={handleSwitchEnv('k8s')}
+          >
+            <Box display="flex" justifyContent="center" alignItems="center" width={225} height={75}>
+              <Box display="flex" justifyContent="center" flex={1}>
+                {iconByKind('k8s')}
+              </Box>
+              <Box flex={1.5} textAlign="center">
+                <Typography variant="button">K8S</Typography>
+              </Box>
+            </Box>
+          </Card>
+          <Card
+            className={clsx(classes.card, env === 'physic' ? classes.cardActive : '')}
+            variant="outlined"
+            onClick={handleSwitchEnv('physic')}
+          >
+            <Box display="flex" justifyContent="center" alignItems="center" width={225} height={75}>
+              <Box display="flex" justifyContent="center" flex={1}>
+                {iconByKind('physic')}
+              </Box>
+              <Box flex={1.5} textAlign="center">
+                <Typography variant="button">Physic</Typography>
+              </Box>
+            </Box>
+          </Card>
+        </Box>
+        <Divider sx={{ my: 6 }} />
+      </Box>
+      <Box hidden={step1}>
+        <Typography>{T('newE.titleStep1')}</Typography>
         <Box display="flex" flexWrap="wrap">
           {targetDataEntries.map(([key]) => (
             <Card
@@ -124,7 +167,7 @@ const Step1 = () => {
               variant="outlined"
               onClick={handleSelectTarget(key)}
             >
-              <Box display="flex" justifyContent="center" alignItems="center" width={280} height={75}>
+              <Box display="flex" justifyContent="center" alignItems="center" width={225} height={75}>
                 <Box display="flex" justifyContent="center" flex={1}>
                   {iconByKind(key)}
                 </Box>
@@ -137,19 +180,17 @@ const Step1 = () => {
         </Box>
         {kind && (
           <Box overflow="hidden">
-            <Box mt={6} mb={3}>
-              <Divider />
-            </Box>
-            {targetData[kind].categories ? (
+            <Divider sx={{ mt: 6, mb: 3 }} />
+            {(targetData as any)[kind].categories ? (
               <Box display="flex" flexWrap="wrap">
-                {targetData[kind].categories!.map((d: any) => (
+                {(targetData as any)[kind].categories!.map((d: any) => (
                   <Card
                     key={d.key}
                     className={clsx(classes.card, action === d.key ? classes.cardActive : '')}
                     variant="outlined"
                     onClick={handleSelectAction(d.key)}
                   >
-                    <Box display="flex" justifyContent="center" alignItems="center" width={210} height={50}>
+                    <Box display="flex" justifyContent="center" alignItems="center" width={200} height={50}>
                       <Box display="flex" justifyContent="center" alignItems="center" flex={0.5}>
                         {action === d.key ? <RadioButtonCheckedOutlinedIcon /> : <RadioButtonUncheckedOutlinedIcon />}
                       </Box>
@@ -167,7 +208,8 @@ const Step1 = () => {
             ) : kind === 'TimeChaos' ? (
               <Box mt={6}>
                 <TargetGenerated
-                  data={targetData[kind].spec!}
+                  env={env}
+                  data={(targetData as any)[kind].spec!}
                   validationSchema={schema.TimeChaos!.default}
                   onSubmit={handleSubmitStep1}
                 />
@@ -181,15 +223,14 @@ const Step1 = () => {
         )}
         {action && !submitDirectly.includes(action) && (
           <>
-            <Box my={6}>
-              <Divider />
-            </Box>
+            <Divider sx={{ my: 6 }} />
             <TargetGenerated
               // Force re-rendered after action changed
               key={kind + action}
+              env={env}
               kind={kind}
-              data={targetData[kind as Kind].categories!.filter(({ key }) => key === action)[0].spec}
-              validationSchema={schema[kind as Kind]![action]}
+              data={(targetData as any)[kind as Kind].categories!.find(({ key }: any) => key === action).spec}
+              validationSchema={env === 'k8s' ? schema[kind as Kind]![action] : undefined}
               onSubmit={handleSubmitStep1}
             />
           </>

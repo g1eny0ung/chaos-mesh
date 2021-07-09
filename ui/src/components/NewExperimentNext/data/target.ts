@@ -175,6 +175,146 @@ const gcpCommon: Spec = {
   },
 }
 
+const networkPhysicCommon: Spec = {
+  correlation: {
+    field: 'text',
+    label: 'Correlation',
+    value: '',
+    helperText: 'The correlation of corrupt',
+  },
+  device: {
+    field: 'text',
+    label: 'Device',
+    value: '',
+    helperText: 'Affected device, e.g., eth0',
+  },
+  hostname: {
+    field: 'text',
+    label: 'Hostname',
+    value: '',
+    helperText: 'Specify the hostname',
+  },
+  ipaddress: {
+    field: 'text',
+    label: 'IP Address',
+    value: '',
+    helperText: 'Specify the IP address',
+  },
+  ipprotocol: {
+    field: 'select',
+    items: ['tcp', 'udp', 'icmp', 'all'],
+    label: 'IP Protocol',
+    value: 'all',
+    helperText: 'Specify the IP protocol',
+  },
+  sourceport: {
+    field: 'text',
+    label: 'Egress Port',
+    value: '',
+    helperText: 'The egress port, split by ,',
+  },
+  egressport: {
+    field: 'text',
+    label: 'Source Port',
+    value: '',
+    helperText: 'The source port, split by ,',
+  },
+  percent: {
+    field: 'text',
+    label: 'Percent',
+    value: '1',
+    helperText: 'Percentage of network packet duplication',
+  },
+}
+
+export const dataPhysic: Record<Extract<Kind, 'StressChaos' | 'NetworkChaos'>, Target> = {
+  StressChaos: {
+    categories: [
+      {
+        name: 'CPU',
+        key: 'cpu',
+        spec: {
+          action: 'cpu' as any,
+          load: {
+            field: 'number',
+            label: 'Load',
+            value: 0,
+            helperText: 'Load',
+          },
+          workers: {
+            field: 'number',
+            label: 'Workers',
+            value: 0,
+            helperText: 'Workers',
+          },
+        },
+      },
+      {
+        name: 'Memory',
+        key: 'mem',
+        spec: {
+          action: 'mem' as any,
+          size: {
+            field: 'text',
+            label: 'Size',
+            value: '',
+            helperText: 'The supported formats of the size are: B, KB/KiB, MB/MiB, GB/GiB, TB/TiB.',
+          },
+        },
+      },
+    ],
+  },
+  NetworkChaos: {
+    categories: [
+      {
+        name: 'Corrupt',
+        key: 'corrupt',
+        spec: {
+          action: 'corrupt' as any,
+          ...networkPhysicCommon,
+        },
+      },
+      {
+        name: 'Duplicate',
+        key: 'duplicate',
+        spec: {
+          action: 'duplicate' as any,
+          ...networkPhysicCommon,
+        },
+      },
+      {
+        name: 'Loss',
+        key: 'loss',
+        spec: {
+          action: 'loss' as any,
+          ...networkPhysicCommon,
+        },
+      },
+      {
+        name: 'Delay',
+        key: 'delay',
+        spec: {
+          action: 'delay' as any,
+          latency: {
+            field: 'text',
+            label: 'Latency',
+            value: '',
+            helperText: 'The latency of delay',
+          },
+          jitter: {
+            field: 'text',
+            label: 'Jitter',
+            value: '',
+            helperText: 'The jitter of delay',
+          },
+          ...networkPhysicCommon,
+          percent: undefined as any,
+        },
+      },
+    ],
+  },
+}
+
 const data: Record<Kind, Target> = {
   // Pod Fault
   PodChaos: {

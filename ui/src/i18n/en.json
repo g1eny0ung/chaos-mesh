@@ -34,6 +34,7 @@
   },
   "newE": {
     "title": "New experiment",
+    "titleStep0": "Choose environment",
     "titleStep1": "Choose a Target",
     "titleStep2": "Fill the experiment info",
     "steps": {

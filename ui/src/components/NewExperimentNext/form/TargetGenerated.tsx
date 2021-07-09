@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useStoreDispatch, useStoreSelector } from 'store'
 
 import AdvancedOptions from 'components/AdvancedOptions'
+import { Env } from '../Step1'
 import { MenuItem } from '@material-ui/core'
 import { ObjectSchema } from 'yup'
 import Scope from './Scope'
@@ -15,13 +16,14 @@ import basicData from '../data/basic'
 import { clearNetworkTargetPods } from 'slices/experiments'
 
 interface TargetGeneratedProps {
+  env: Env
   kind?: Kind | ''
   data: Spec
-  validationSchema: ObjectSchema
+  validationSchema?: ObjectSchema
   onSubmit: (values: Record<string, any>) => void
 }
 
-const TargetGenerated: React.FC<TargetGeneratedProps> = ({ kind, data, validationSchema, onSubmit }) => {
+const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, validationSchema, onSubmit }) => {
   const { namespaces, target } = useStoreSelector((state) => state.experiments)
   const dispatch = useStoreDispatch()
 
@@ -145,7 +147,7 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ kind, data, validatio
   }
 
   return (
-    <Formik enableReinitialize initialValues={init} validationSchema={validationSchema} onSubmit={onSubmit}>
+    <Formik enableReinitialize initialValues={init} validationSchema={validationSchema ?? null} onSubmit={onSubmit}>
       {({ values, setFieldValue, errors, touched }) => {
         const beforeTargetOpen = () => {
           if (!getIn(values, 'target_scope')) {
@@ -163,7 +165,7 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ kind, data, validatio
         return (
           <Form>
             <Space>{parseDataToFormFields(errors, touched)}</Space>
-            {kind === 'NetworkChaos' && (
+            {env === 'k8s' && kind === 'NetworkChaos' && (
               <AdvancedOptions
                 title={T('newE.target.network.target.title')}
                 beforeOpen={beforeTargetOpen}
