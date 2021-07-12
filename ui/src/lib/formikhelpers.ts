@@ -9,23 +9,6 @@ import basic from 'components/NewExperimentNext/data/basic'
 import snakeCaseKeys from 'snakecase-keys'
 import yaml from 'js-yaml'
 
-export function parseChaosdSubmit(e: any) {
-  const values = JSON.parse(JSON.stringify(e))
-
-  const addresses = values.scope.addresses.join(',')
-
-  const kind = values.target.kind
-  const expInfo = values.target[_snakecase(kind)]
-
-  return {
-    apiVersion: 'chaos-mesh.org/v1alpha1',
-    kind: 'PhysicalMachineChaos',
-    spec: {
-      expInfo,
-    },
-  }
-}
-
 export function parseSubmit(e: Experiment, env: Env = 'k8s') {
   const values = JSON.parse(JSON.stringify(e))
 
