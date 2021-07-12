@@ -2,6 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { ExperimentScope } from 'components/NewExperiment/types'
 import { Kind } from 'components/NewExperimentNext/data/target'
+import { Node } from 'api/nodes'
 import { ScheduleSpecific } from 'components/Schedule/types'
 import api from 'api'
 
@@ -25,6 +26,7 @@ export const getNetworkTargetPodsByNamespaces = createAsyncThunk(
   'network/target/pods',
   async (data: Partial<ExperimentScope>) => (await api.common.pods(data)).data
 )
+export const getNodes = createAsyncThunk('nodes/nodes', async () => (await api.nodes.nodes()).data)
 
 export type Env = 'k8s' | 'physic'
 
@@ -34,6 +36,7 @@ const initialState: {
   annotations: Record<string, string[]>
   pods: any[]
   networkTargetPods: any[]
+  nodes: Node[]
   fromExternal: boolean
   step1: boolean
   step2: boolean
@@ -48,6 +51,7 @@ const initialState: {
   annotations: {},
   pods: [],
   networkTargetPods: [],
+  nodes: [],
   // New Experiment needed
   fromExternal: false,
   step1: false,
@@ -121,6 +125,9 @@ const experimentsSlice = createSlice({
     })
     builder.addCase(getNetworkTargetPodsByNamespaces.fulfilled, (state, action) => {
       state.networkTargetPods = action.payload as any[]
+    })
+    builder.addCase(getNodes.fulfilled, (state, action) => {
+      state.nodes = action.payload
     })
   },
 })

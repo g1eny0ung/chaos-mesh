@@ -13,6 +13,7 @@ import { useStoreDispatch, useStoreSelector } from 'store'
 
 import AdvancedOptions from 'components/AdvancedOptions'
 import CheckIcon from '@material-ui/icons/Check'
+import Nodes from './form/Nodes'
 import Paper from 'components-mui/Paper'
 import PublishIcon from '@material-ui/icons/Publish'
 import Scheduler from './form/Scheduler'
@@ -40,7 +41,7 @@ interface Step2Props {
 }
 
 const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false }) => {
-  const { namespaces, step2, basic, target, scheduleSpecific } = useStoreSelector((state) => state.experiments)
+  const { namespaces, step2, env, basic, target, scheduleSpecific } = useStoreSelector((state) => state.experiments)
   const scopeDisabled = target.kind === 'AwsChaos' || target.kind === 'GcpChaos'
   const dispatch = useStoreDispatch()
 
@@ -64,7 +65,7 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
   }, [originalInit, basic, scheduleSpecific])
 
   const handleOnSubmitStep2 = (_values: Record<string, any>) => {
-    const values = schema.cast(_values) as Record<string, any>
+    const values = schema(env).cast(_values) as Record<string, any>
 
     if (process.env.NODE_ENV === 'development') {
       console.debug('Debug handleSubmitStep2', values)
@@ -111,11 +112,11 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
           initialValues={init}
           validationSchema={
             inWorkflow
-              ? schema.shape({
+              ? schema(env).shape({
                   deadline: yupString().required('The deadline is required'),
                 })
               : inSchedule
-              ? schema.shape(scheduleSpecificSchema)
+              ? schema(env).shape(scheduleSpecificSchema)
               : schema
           }
           validateOnChange={false}
@@ -130,7 +131,15 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
                       {T('newE.steps.scope')}
                       {scopeDisabled && T('newE.steps.scopeDisabled')}
                     </Typography>
-                    {namespaces.length ? <Scope namespaces={namespaces} /> : <SkeletonN n={6} />}
+                    {env === 'k8s' ? (
+                      namespaces.length ? (
+                        <Scope namespaces={namespaces} />
+                      ) : (
+                        <SkeletonN n={6} />
+                      )
+                    ) : (
+                      <Nodes />
+                    )}
                   </Space>
                 </Grid>
                 <Grid item xs={6}>

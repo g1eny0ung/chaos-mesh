@@ -1,6 +1,7 @@
 import { Box, Card, Divider, Typography } from '@material-ui/core'
 import {
   Env,
+  getNodes,
   setEnv,
   setKindAction as setKindActionToStore,
   setStep1,
@@ -112,7 +113,11 @@ const Step1 = () => {
 
   const handleSwitchEnv = (env: Env) => () => {
     setKindAction(['', ''])
-    setEnv(env)
+    dispatch(setEnv(env))
+
+    if (env === 'physic') {
+      dispatch(getNodes())
+    }
   }
 
   return (
@@ -140,7 +145,7 @@ const Step1 = () => {
                 {iconByKind('k8s')}
               </Box>
               <Box flex={1.5} textAlign="center">
-                <Typography variant="button">K8S</Typography>
+                <Typography variant="button">{T('k8s.title')}</Typography>
               </Box>
             </Box>
           </Card>
@@ -154,7 +159,7 @@ const Step1 = () => {
                 {iconByKind('physic')}
               </Box>
               <Box flex={1.5} textAlign="center">
-                <Typography variant="button">Physic</Typography>
+                <Typography variant="button">{T('physic.title')}</Typography>
               </Box>
             </Box>
           </Card>

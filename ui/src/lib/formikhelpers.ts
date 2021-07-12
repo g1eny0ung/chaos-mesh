@@ -1,6 +1,7 @@
 import { CallchainFrame, Experiment, ExperimentScope } from 'components/NewExperiment/types'
 import { arrToObjBySep, toCamelCase, toTitleCase } from './utils'
 
+import { Env } from 'slices/experiments'
 import { Template } from 'slices/workflows'
 import { WorkflowBasic } from 'components/NewWorkflow'
 import _snakecase from 'lodash.snakecase'
@@ -8,11 +9,28 @@ import basic from 'components/NewExperimentNext/data/basic'
 import snakeCaseKeys from 'snakecase-keys'
 import yaml from 'js-yaml'
 
-export function parseSubmit(e: Experiment) {
-  const values: Experiment = JSON.parse(JSON.stringify(e))
+export function parseChaosdSubmit(e: any) {
+  const values = JSON.parse(JSON.stringify(e))
+
+  const addresses = values.scope.addresses.join(',')
+
+  const kind = values.target.kind
+  const expInfo = values.target[_snakecase(kind)]
+
+  return {
+    apiVersion: 'chaos-mesh.org/v1alpha1',
+    kind: 'PhysicalMachineChaos',
+    spec: {
+      expInfo,
+    },
+  }
+}
+
+export function parseSubmit(e: Experiment, env: Env = 'k8s') {
+  const values = JSON.parse(JSON.stringify(e))
 
   // Set default namespace when it's not present
-  if (!values.namespace) {
+  if (env === 'k8s' && !values.namespace) {
     values.namespace = values.scope.namespaces[0]
   }
 
@@ -52,6 +70,37 @@ export function parseSubmit(e: Experiment) {
   helper2(values.scope)
 
   const kind = values.target.kind
+
+  if (env === 'physic') {
+    let action
+    switch (kind) {
+      case 'StressChaos':
+        action = 'stress'
+        break
+      case 'NetworkChaos':
+        action = 'network'
+        break
+    }
+    const addresses = values.scope.addresses.join(',')
+    const expInfo = values.target[_snakecase(kind)]
+
+    return {
+      apiVersion: 'chaos-mesh.org/v1alpha1',
+      kind: 'PhysicalMachineChaos',
+      metadata: {
+        name: values.name,
+        namespace: values.namespace,
+        labels: values.labels,
+        annotations: values.annotations,
+      },
+      spec: {
+        action,
+        address: addresses,
+        expInfo,
+        duration: values.scheduler.duration,
+      },
+    }
+  }
 
   // Handle NetworkChaos target
   if (kind === 'NetworkChaos') {

@@ -36,7 +36,7 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, vali
     return acc
   }, {} as Record<string, any>)
 
-  if (env === 'k8s' && 'NetworkChaos') {
+  if (env === 'k8s' && kind === 'NetworkChaos') {
     const action = initialValues.action
     delete initialValues.action
     const direction = initialValues.direction
@@ -71,7 +71,7 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, vali
     const rendered = Object.entries(data)
       .filter(([_, v]) => v && v instanceof Object && v.field)
       .map(([k, v]) => {
-        if (kind === 'NetworkChaos' && k !== 'direction' && k !== 'external_targets') {
+        if (env === 'k8s' && kind === 'NetworkChaos' && k !== 'direction' && k !== 'external_targets') {
           k = `${data.action}.${k}`
         }
 
@@ -106,6 +106,7 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, vali
                 name={k}
                 label={v.label}
                 helperText={getIn(touched, k) && getIn(errors, k) ? getIn(errors, k) : v.helperText}
+                value={v.value}
                 error={getIn(errors, k) && getIn(touched, k) ? true : false}
               >
                 {v.items!.map((option: string) => (

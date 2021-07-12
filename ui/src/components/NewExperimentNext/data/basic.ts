@@ -1,5 +1,7 @@
 import * as Yup from 'yup'
 
+import { Env } from 'slices/experiments'
+
 const data = {
   name: '',
   namespace: '',
@@ -13,18 +15,22 @@ const data = {
     mode: 'one',
     value: '',
     pods: [],
+    addresses: [],
+    name: '',
+    address: '',
   },
   scheduler: {
     duration: '',
   },
 }
 
-export const schema: Yup.ObjectSchema = Yup.object({
-  name: Yup.string().trim().required('The name is required'),
-  scope: Yup.object({
-    namespaces: Yup.array().min(1, 'The namespace selectors is required'),
-  }),
-})
+export const schema = (env: Env) =>
+  Yup.object({
+    name: Yup.string().trim().required('The name is required'),
+    scope: Yup.object({
+      namespaces: env === 'k8s' ? Yup.array().min(1, 'The namespace selectors is required') : Yup.array(),
+    }),
+  })
 
 export type dataType = typeof data
 
