@@ -43,8 +43,7 @@ const Step3: React.FC<Step3Props> = ({ onSubmit }) => {
       if (onSubmit) {
         onSubmit({ target, basic })
       } else {
-        api.experiments
-          .newExperiment(parsedValues)
+        api.experiments[env === 'k8s' ? 'newExperiment' : 'applyExperiment'](parsedValues)
           .then(() => {
             dispatch(
               setAlert({

@@ -94,6 +94,9 @@
       },
       "gcp": {
         "title": "GCP Fault"
+      },
+      "physicalmachine": {
+        "title": "Physic Fault"
       }
     },
     "run": {
@@ -358,6 +361,7 @@
     "add": "Add address",
     "nameHelper": "The address' alias",
     "address": "Address",
-    "addressHelper": "Physical machine chaosd address"
+    "addressHelper": "Physical machine chaosd address",
+    "manage": "Manage Addresses"
   }
 }

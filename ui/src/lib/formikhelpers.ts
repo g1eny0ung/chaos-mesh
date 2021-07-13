@@ -65,7 +65,7 @@ export function parseSubmit(e: Experiment, env: Env = 'k8s') {
         break
     }
     const addresses = values.scope.addresses.join(',')
-    const expInfo = values.target[_snakecase(kind)]
+    const expInfo = JSON.stringify(values.target[_snakecase(kind)])
 
     return {
       apiVersion: 'chaos-mesh.org/v1alpha1',

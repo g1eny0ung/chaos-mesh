@@ -39,7 +39,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       onClose={close}
       aria-labelledby="dialog-title"
       aria-describedby="dialog-description"
-      PaperProps={{ style: { minWidth: 300 } }}
+      PaperProps={{ sx: { minWidth: 300 } }}
       {...dialogProps}
     >
       <DialogTitle id="dialog-title">{title}</DialogTitle>

@@ -13,13 +13,17 @@ import { ReactComponent as StressIcon } from 'images/chaos/stress.svg'
 import { SvgIcon } from '@material-ui/core'
 import T from 'components/T'
 
-export function iconByKind(kind: ExperimentKind | 'Schedule' | 'k8s' | 'physic', size: 'small' | 'large' = 'large') {
+export function iconByKind(
+  kind: ExperimentKind | 'PhysicalMachineChaos' | 'Schedule' | 'k8s' | 'physic',
+  size: 'small' | 'large' = 'large'
+) {
   let icon
 
   switch (kind) {
     case 'k8s':
       icon = <K8SIcon />
       break
+    case 'PhysicalMachineChaos':
     case 'physic':
       icon = <PhysicIcon />
       break
@@ -56,7 +60,7 @@ export function iconByKind(kind: ExperimentKind | 'Schedule' | 'k8s' | 'physic',
   return <SvgIcon fontSize={size}>{icon}</SvgIcon>
 }
 
-export function transByKind(kind: ExperimentKind | 'Workflow' | 'Schedule') {
+export function transByKind(kind: ExperimentKind | 'PhysicalMachineChaos' | 'Workflow' | 'Schedule') {
   let id: string
 
   if (kind === 'Workflow') {

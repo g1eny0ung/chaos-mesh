@@ -11,6 +11,7 @@ export const state = (namespace = null) =>
   })
 
 export const newExperiment = (data: Experiment) => http.post('/experiments/new', data)
+export const applyExperiment = (data: any) => http.post('/experiments/apply?kind=PhysicalMachineChaos', data)
 
 export const experiments = (namespace = null, name = null, kind = null) =>
   http.get<ExperimentResponse[]>('/experiments', {

@@ -94,6 +94,9 @@
       },
       "gcp": {
         "title": "GCP 故障"
+      },
+      "physicalmachine": {
+        "title": "物理机故障"
       }
     },
     "run": {
@@ -360,6 +363,7 @@
     "add": "添加地址",
     "nameHelper": "地址别名",
     "address": "地址",
-    "addressHelper": "物理机器 chaosd 地址"
+    "addressHelper": "物理机器 chaosd 地址",
+    "manage": "管理地址"
   }
 }
