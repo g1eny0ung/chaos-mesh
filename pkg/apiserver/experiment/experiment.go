@@ -124,28 +124,27 @@ func (s *Service) list(c *gin.Context) {
 			continue
 		}
 
-		if err := kubeCli.List(context.Background(), list.ChaosList, &client.ListOptions{Namespace: ns}); err != nil {
+		if err := kubeCli.List(context.Background(), list.GenericChaosList, &client.ListOptions{Namespace: ns}); err != nil {
 			u.SetAPImachineryError(c, err)
 
 			return
 		}
 
-		items := reflect.ValueOf(list.ChaosList).Elem().FieldByName("Items")
+		items := reflect.ValueOf(list.GenericChaosList).Elem().FieldByName("Items")
 		for i := 0; i < items.Len(); i++ {
 			item := items.Index(i).Addr().Interface().(v1alpha1.InnerObject)
-			chaos := item.GetChaos()
 
-			if name != "" && chaos.Name != name {
+			if name != "" && item.GetName() != name {
 				continue
 			}
 
 			exps = append(exps, &Experiment{
 				ObjectBase: core.ObjectBase{
-					Namespace: chaos.Namespace,
-					Name:      chaos.Name,
-					Kind:      chaos.Kind,
-					UID:       chaos.UID,
-					Created:   chaos.StartTime.Format(time.RFC3339),
+					Namespace: item.GetNamespace(),
+					Name:      item.GetName(),
+					Kind:      item.GetObjectKind().GroupVersionKind().Kind,
+					UID:       string(item.GetUID()),
+					Created:   item.GetCreationTimestamp().Format(time.RFC3339),
 				},
 				Status: status.GetChaosStatus(item),
 			})
@@ -640,12 +639,12 @@ func (s *Service) state(c *gin.Context) {
 		list := kinds[index]
 
 		g.Go(func() error {
-			if err := kubeCli.List(ctx, list.ChaosList, listOptions...); err != nil {
+			if err := kubeCli.List(ctx, list.GenericChaosList, listOptions...); err != nil {
 				return err
 			}
 			m.Lock()
 
-			items := reflect.ValueOf(list.ChaosList).Elem().FieldByName("Items")
+			items := reflect.ValueOf(list.GenericChaosList).Elem().FieldByName("Items")
 			for i := 0; i < items.Len(); i++ {
 				item := items.Index(i).Addr().Interface().(v1alpha1.InnerObject)
 				s := status.GetChaosStatus(item)
