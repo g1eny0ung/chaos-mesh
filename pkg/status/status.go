@@ -49,7 +49,7 @@ func GetChaosStatus(obj v1alpha1.InnerObject) ChaosStatus {
 	selected := false
 	allInjected := false
 
-	for _, c := range obj.GetChaos().Status.Conditions {
+	for _, c := range obj.GetStatus().Conditions {
 		if c.Status == corev1.ConditionTrue {
 			switch c.Type {
 			case v1alpha1.ConditionPaused:
