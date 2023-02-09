@@ -15,6 +15,7 @@
  *
  */
 import GoogleIcon from '@mui/icons-material/Google'
+import LogoutIcon from '@mui/icons-material/Logout'
 import { Box, Button } from '@mui/material'
 import Cookies from 'js-cookie'
 import _ from 'lodash'
@@ -36,15 +37,21 @@ const Token = () => {
   const intl = useIntl()
 
   const { tokens, tokenName } = useStoreSelector((state) => state.globalStatus)
-  const tokenDesc =
-    tokenName === 'gcp' ? (
-      <Box display="flex" alignItems="center">
-        {i18n('settings.addToken.gcp')}
-        <GoogleIcon sx={{ ml: 1 }} />
-      </Box>
-    ) : (
-      tokenName + ': ' + _.truncate(tokens[0].token)
-    )
+  // const tokenDesc =
+  //   tokenName === 'gcp' ? (
+  //     <Box display="flex" alignItems="center">
+  //       {i18n('settings.addToken.gcp')}
+  //       <GoogleIcon sx={{ ml: 1 }} />
+  //     </Box>
+  //   ) : (
+  //     tokenName + ': ' + _.truncate(tokens[0].token)
+  //   )
+  const tokenDesc = (
+    <Box display="flex" alignItems="center">
+      <GoogleIcon color="primary" sx={{ mr: 1 }} />
+      <Box>{i18n('settings.addToken.gcp')}</Box>
+    </Box>
+  )
   const dispatch = useStoreDispatch()
 
   const handleRemoveToken = () =>
@@ -70,14 +77,8 @@ const Token = () => {
   }
 
   return (
-    <PaperTop title={i18n('settings.addToken.token')} subtitle={tokenDesc}>
-      <Button
-        variant="outlined"
-        size="small"
-        color="secondary"
-        sx={{ width: 64, height: 32 }}
-        onClick={handleRemoveToken}
-      >
+    <PaperTop title={i18n('settings.account.title')} subtitle={tokenDesc}>
+      <Button variant="contained" size="small" disableElevation startIcon={<LogoutIcon />} onClick={handleRemoveToken}>
         {i18n('common.logout')}
       </Button>
     </PaperTop>
