@@ -103,7 +103,7 @@ jobs:
           docker image save ghcr.io/chaos-mesh/chaos-dashboard:latest > ./output/saved-images/chaos-dashboard.tgz
           docker image save ghcr.io/chaos-mesh/chaos-daemon:latest > ./output/saved-images/chaos-daemon.tgz
           docker image save ghcr.io/chaos-mesh/chaos-mesh:latest > ./output/saved-images/chaos-mesh.tgz
-          docker image save ghcr.io/pingcap/e2e-helper:latest > ./output/saved-images/e2e-helper.tgz
+          docker image save ghcr.io/chaos-mesh/e2e-helper:latest > ./output/saved-images/e2e-helper.tgz
 
       - name: upload saved images
         uses: actions/upload-artifact@v2
@@ -198,31 +198,31 @@ jobs:
           minikube image load ./output/saved-images/chaos-mesh.tgz
           minikube image load ./output/saved-images/e2e-helper.tgz
 
-      - name: Setup helm
-        uses: azure/setup-helm@v2.1
+      - name: Restrict access to kubeconfig # https://github.com/helm/helm/issues/9115
+        run: chmod 600 ~/.kube/config
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
 
       - name: Install Chaos Mesh
         run: |
-          helm install --wait --create-namespace chaos-mesh helm/chaos-mesh --namespace=chaos-mesh --set dnsServer.create=true --set dashboard.create=true --set images.tag=latest
+          helm install --wait --create-namespace chaos-mesh helm/chaos-mesh --namespace=chaos-mesh --set images.tag=latest
       - name: e2e tests
         env:
           FOCUS: ${{ matrix.focus }}
         run: |
           # because ginkgo -focus accepts the regex expression, we should use escape to represent the squared brackets and dash
           export ESCAPED_FOCUS=$(echo $FOCUS | sed -e 's/\[/\\\[/g' | sed -e 's/\]/\\\]/g' | sed -e 's/\-/\\\-/g')
-          KUBECONFIG=~/.kube/config ./e2e-test/image/e2e/bin/ginkgo -focus="${ESCAPED_FOCUS}" ./e2e-test/image/e2e/bin/e2e.test -- --e2e-image ghcr.io/pingcap/e2e-helper:latest
+          KUBECONFIG=~/.kube/config ./e2e-test/image/e2e/bin/ginkgo -focus="${ESCAPED_FOCUS}" ./e2e-test/image/e2e/bin/e2e.test -- --e2e-image ghcr.io/chaos-mesh/e2e-helper:latest
       - name: post run - extract profile info from kubernetes
         if: always()
         env:
           PROFILE_DIRECTORY: ./output/chaos-mesh-profile
         run: |
-          mkdir -p $PROFILE_DIRECTORY/logs
-          mkdir -p $PROFILE_DIRECTORY/manifests/pods
-          mkdir -p $PROFILE_DIRECTORY/manifests/services
-          for item in $(kubectl -n chaos-mesh get pods --no-headers | awk '{print $1}'); do kubectl -n chaos-mesh logs $item > $PROFILE_DIRECTORY/logs/$item.log; done;
-          for item in $(kubectl -n chaos-mesh get pods --no-headers | awk '{print $1}'); do kubectl -n chaos-mesh get pod $item -oyaml > $PROFILE_DIRECTORY/manifests/pods/pod-$item.yaml; done;
-          for item in $(kubectl -n chaos-mesh get services --no-headers | awk '{print $1}'); do kubectl -n chaos-mesh get services $item -oyaml > $PROFILE_DIRECTORY/manifests/services/service-$item.yaml; done;
-          for item in $(kubectl -n chaos-mesh get endpoints --no-headers | awk '{print $1}'); do kubectl -n chaos-mesh get endpoints $item -oyaml > $PROFILE_DIRECTORY/manifests/services/endpoint-$item.yaml; done;
+          kubectl cluster-info dump --all-namespaces --output-directory $PROFILE_DIRECTORY/manifests -o yaml
+          kubectl get endpoints -A -o yaml > $PROFILE_DIRECTORY/manifests/endpoints.yaml
+          kubectl get secrets -A -o yaml > $PROFILE_DIRECTORY/manifests/secrets.yaml
+          kubectl get configmaps -A -o yaml > $PROFILE_DIRECTORY/manifests/configmaps.yaml
       - name: post run - upload Chaos Mesh profile info
         if: always()
         uses: actions/upload-artifact@v2
