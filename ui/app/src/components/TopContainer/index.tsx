@@ -15,25 +15,27 @@
  *
  */
 import loadable from '@loadable/component'
+import MenuIcon from '@mui/icons-material/Menu'
 import {
-  Alert,
-  Box,
-  BoxProps,
-  Container,
   CssBaseline,
-  Divider,
-  Portal,
-  Snackbar,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
+  CssVarsProvider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemContent,
+  ListItemDecorator,
+  ListSubheader,
+  Typography,
+} from '@mui/joy'
+import { Alert, Box, BoxProps, Container, Divider, Portal, Snackbar, useMediaQuery, useTheme } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { applyAPIAuthentication, applyNSParam } from 'api/interceptors'
 import { Stale } from 'api/queryUtils'
 import Cookies from 'js-cookie'
 import { useGetCommonConfig } from 'openapi'
 import { useEffect, useState } from 'react'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { NavLink, BrowserRouter as Router } from 'react-router-dom'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import routes from 'routes'
 
@@ -45,13 +47,19 @@ import { useStoreDispatch, useStoreSelector } from 'store'
 import { setAlertOpen, setConfirmOpen, setNameSpace, setTokenName, setTokens } from 'slices/globalStatus'
 
 import Helmet from 'components/Helmet'
+import Layout from 'components/Layout'
 import { TokenFormValues } from 'components/Token'
 
 import insertCommonStyle from 'lib/d3/insertCommonStyle'
 import LS from 'lib/localStorage'
 
+import logoMiniWhite from 'images/logo-mini-white.svg'
+import logoMini from 'images/logo-mini.svg'
+import logoWhite from 'images/logo-white.svg'
+import logo from 'images/logo.svg'
+
 import Navbar from './Navbar'
-import { closedWidth, openedWidth } from './Sidebar'
+import { closedWidth, listItems, openedWidth } from './Sidebar'
 import Sidebar from './Sidebar'
 
 const Auth = loadable(() => import('./Auth'))
@@ -72,6 +80,31 @@ const Root = styled(Box, {
   },
 }))
 
+function SideNav() {
+  return (
+    <List size="sm" sx={{ '--ListItem-radius': '8px', '--List-gap': '4px' }}>
+      <ListItem nested>
+        <ListSubheader>Browse</ListSubheader>
+        <List
+          aria-labelledby="nav-list-browse"
+          sx={{
+            '& .JoyListItemButton-root': { p: '8px' },
+          }}
+        >
+          {listItems.map(({ icon, text }) => (
+            <ListItem>
+              <ListItemButton variant="plain">
+                <ListItemDecorator sx={{ color: 'inherit' }}>{icon}</ListItemDecorator>
+                <ListItemContent>{text}</ListItemContent>
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </ListItem>
+    </List>
+  )
+}
+
 const TopContainer = () => {
   const theme = useTheme()
 
@@ -83,7 +116,7 @@ const TopContainer = () => {
 
   // Sidebar related
   const miniSidebar = LS.get('mini-sidebar') === 'y'
-  const [openDrawer, setOpenDrawer] = useState(!miniSidebar)
+  const [openDrawer, setOpenDrawer] = useState(miniSidebar)
   const handleDrawerToggle = () => {
     setOpenDrawer(!openDrawer)
     LS.set('mini-sidebar', openDrawer ? 'y' : 'n')
@@ -159,8 +192,47 @@ const TopContainer = () => {
 
   return (
     <Router>
-      <CssBaseline />
-      <Root open={openDrawer}>
+      <CssVarsProvider>
+        <CssBaseline />
+
+        {openDrawer && (
+          <Layout.SideDrawer onClose={() => setOpenDrawer(false)}>
+            <SideNav />
+          </Layout.SideDrawer>
+        )}
+
+        <Layout.Root>
+          <Layout.Header>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+              }}
+            >
+              <IconButton
+                variant="outlined"
+                size="sm"
+                onClick={() => setOpenDrawer(true)}
+                sx={{ display: { sm: 'none' } }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <NavLink to="/" style={{ display: 'flex', alignItems: 'center' }}>
+                <img src={logoMini} alt="Chaos Mesh" width={28} />
+              </NavLink>
+              <Typography component="h1" fontWeight="xl">
+                Chaos Mesh
+              </Typography>
+            </Box>
+          </Layout.Header>
+
+          <Layout.SideNav>
+            <SideNav />
+          </Layout.SideNav>
+        </Layout.Root>
+
+        {/* <Root open={openDrawer}>
         <Sidebar open={openDrawer} />
         <Box component="main" sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <Navbar openDrawer={openDrawer} handleDrawerToggle={handleDrawerToggle} />
@@ -170,22 +242,22 @@ const TopContainer = () => {
             {loading ? (
               <Loading />
             ) : (
-              <Routes>
-                <Route path="/" element={<Navigate replace to="/dashboard" />} />
-                {!authOpen &&
-                  routes.map(({ path, element, title }) => (
-                    <Route
-                      key={path}
-                      path={path}
-                      element={
-                        <>
-                          <Helmet title={title} />
-                          {element}
-                        </>
-                      }
-                    />
-                  ))}
-              </Routes>
+                <Routes>
+                  <Route path="/" element={<Navigate replace to="/dashboard" />} />
+                  {!authOpen &&
+                    routes.map(({ path, element, title }) => (
+                      <Route
+                        key={path}
+                        path={path}
+                        element={
+                          <>
+                            <Helmet title={title} />
+                            {element}
+                          </>
+                        }
+                      />
+                    ))}
+                </Routes>
             )}
           </Container>
         </Box>
@@ -217,7 +289,8 @@ const TopContainer = () => {
           description={confirm.description}
           onConfirm={confirm.handle}
         />
-      </Portal>
+      </Portal> */}
+      </CssVarsProvider>
     </Router>
   )
 }

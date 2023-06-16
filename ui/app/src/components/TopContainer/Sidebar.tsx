@@ -113,7 +113,7 @@ const ListItemText = (props: ListItemTextProps) => (
   />
 )
 
-const listItems = [
+export const listItems = [
   { icon: <DashboardOutlinedIcon />, text: 'dashboard' },
   {
     icon: <AccountTreeOutlinedIcon />,

@@ -40,14 +40,13 @@ const App: FC<AppProps> = ({ forTesting, children }) => {
 
   return (
     <StoreProvider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <IntlProvider>
-            {!forTesting ? <RealWorldOnlyProviders>{rendered}</RealWorldOnlyProviders> : rendered}
-          </IntlProvider>
-        </ThemeProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <IntlProvider>
+        <QueryClientProvider client={queryClient}>
+          {!forTesting ? <RealWorldOnlyProviders>{rendered}</RealWorldOnlyProviders> : rendered}
+
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </IntlProvider>
     </StoreProvider>
   )
 }
