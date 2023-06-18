@@ -37,8 +37,8 @@ type CustomRouteProps = RouteProps & { title: string }
 const routes: CustomRouteProps[] = [
   {
     element: <Dashboard />,
-    path: '/dashboard',
-    title: 'Dashboard',
+    path: '/overview',
+    title: 'Overview',
   },
   {
     element: <NewWorkflow />,

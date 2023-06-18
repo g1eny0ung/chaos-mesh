@@ -14,14 +14,7 @@
  * limitations under the License.
  *
  */
-import Timeline from '@mui/lab/Timeline'
-import TimelineConnector from '@mui/lab/TimelineConnector'
-import TimelineContent from '@mui/lab/TimelineContent'
-import TimelineDot from '@mui/lab/TimelineDot'
-import TimelineItem from '@mui/lab/TimelineItem'
-import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent'
-import TimelineSeparator from '@mui/lab/TimelineSeparator'
-import { Box, Typography } from '@mui/material'
+import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Typography } from '@mui/joy'
 import { CoreEvent } from 'openapi/index.schemas'
 
 import { useStoreSelector } from 'store'
@@ -33,41 +26,45 @@ import { iconByKind } from 'lib/byKind'
 import DateTime, { format } from 'lib/luxon'
 
 interface EventsTimelineProps {
-  events: CoreEvent[]
+  events?: CoreEvent[]
+  height?: number
 }
 
-const EventsTimeline: React.FC<EventsTimelineProps> = ({ events }) => {
+const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
   const { lang } = useStoreSelector((state) => state.settings)
 
-  return events.length > 0 ? (
-    <Timeline sx={{ m: 0, p: 0 }}>
-      {events.map((e) => (
-        <TimelineItem key={e.id}>
-          <TimelineOppositeContent style={{ flex: 0.001, padding: 0 }} />
-          <TimelineSeparator>
-            <TimelineConnector sx={{ py: 3 }} />
-            <TimelineDot color="primary">{iconByKind(e.kind as any, 'small')}</TimelineDot>
-          </TimelineSeparator>
-          <TimelineContent>
-            <Box display="flex" justifyContent="space-between" mt={6}>
-              <Box flex={1} ml={3}>
-                <Typography gutterBottom>{e.name}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {e.message}
-                </Typography>
-              </Box>
-              <Typography variant="overline" title={format(e.created_at!)}>
-                {DateTime.fromISO(e.created_at!, {
-                  locale: lang,
-                }).toRelative()}
-              </Typography>
-            </Box>
-          </TimelineContent>
-        </TimelineItem>
-      ))}
-    </Timeline>
-  ) : (
-    <NotFound>{i18n('events.notFound')}</NotFound>
+  return (
+    <Box sx={{ height, overflowY: 'auto' }}>
+      {events && events.length > 0 ? (
+        <List>
+          {events.map((event) => (
+            <ListItem key={event.id}>
+              <ListItemDecorator>{iconByKind(event.kind!, 'small')}</ListItemDecorator>
+              <ListItemContent>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography>{event.name}</Typography>
+                  <Chip variant="soft" size="sm">
+                    {event.reason}
+                  </Chip>
+                </Box>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography level="body2" noWrap maxWidth="75%" textOverflow="ellipsis" title={event.message}>
+                    {event.message}
+                  </Typography>
+                  <Typography level="body3" title={format(event.created_at!)}>
+                    {DateTime.fromISO(event.created_at!, {
+                      locale: lang,
+                    }).toRelative()}
+                  </Typography>
+                </Box>
+              </ListItemContent>
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <NotFound>{i18n('events.notFound')}</NotFound>
+      )}
+    </Box>
   )
 }
 

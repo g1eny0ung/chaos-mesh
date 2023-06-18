@@ -14,12 +14,11 @@
  * limitations under the License.
  *
  */
-import { Box, BoxProps } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
-import { PropertyAccessor } from '@nivo/core'
-import { ComputedDatum, PieTooltipProps, ResponsivePie } from '@nivo/pie'
+import Box, { BoxProps } from '@mui/joy/Box'
+import type { PropertyAccessor } from '@nivo/core'
+import { ComputedDatum, ResponsivePie } from '@nivo/pie'
 import { useGetExperimentsState } from 'openapi'
-import { StatusAllChaosStatus } from 'openapi/index.schemas'
+import type { StatusAllChaosStatus } from 'openapi/index.schemas'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
 
@@ -32,71 +31,55 @@ interface SingleData {
   value: number
 }
 
+const statusColors = {
+  injecting: 'var(--joy-palette-info-softActiveBg)',
+  running: 'var(--joy-palette-success-softActiveBg)',
+  paused: 'var(--joy-palette-warning-softActiveBg)',
+  finished: 'var(--joy-palette-primary-softActiveBg)',
+  deleting: 'var(--joy-palette-neutral-softActiveBg)',
+}
+
 const TotalStatus: React.FC<BoxProps> = (props) => {
   const intl = useIntl()
-  const theme = useTheme()
 
   const [state, setState] = useState<SingleData[]>([])
-
-  const arcLinkLabel: PropertyAccessor<ComputedDatum<SingleData>, string> = (d) =>
-    d.value + ' ' + i18n(`status.${d.id}`, intl)
-
-  const tooltip = ({ datum }: PieTooltipProps<SingleData>) => (
-    <Box
-      display="flex"
-      alignItems="center"
-      p={1.5}
-      style={{ background: theme.palette.background.default, fontSize: theme.typography.caption.fontSize }}
-    >
-      <Box mr={1.5} style={{ width: 12, height: 12, background: datum.color }} />
-      {(datum.value < 1 ? 0 : datum.value) + ' ' + i18n(`status.${datum.id}`, intl)}
-    </Box>
-  )
 
   useGetExperimentsState(undefined, {
     query: {
       onSuccess(data) {
         setState(
-          (Object.entries(data) as [keyof StatusAllChaosStatus, number][]).map(([k, v]) => ({
-            id: k,
-            label: i18n(`status.${k}`, intl),
-            value: v === 0 ? 0.01 : v,
-          }))
+          (Object.entries(data) as [keyof StatusAllChaosStatus, number][])
+            .filter(([_, v]) => v !== 0)
+            .map(([k, v]) => ({
+              id: k,
+              label: i18n(`status.${k}`, intl),
+              value: v,
+            }))
         )
       },
     },
   })
+
+  const arcLinkLabel: PropertyAccessor<ComputedDatum<SingleData>, string> = (d) => d.data.label
 
   return (
     <Box {...props}>
       {state.some((d) => d.value >= 1) ? (
         <ResponsivePie
           data={state}
-          margin={{ top: 15, bottom: 60 }}
+          margin={{ top: 25, bottom: 25 }}
           innerRadius={0.75}
-          padAngle={0.25}
+          padAngle={4}
           cornerRadius={4}
-          enableArcLabels={false}
+          arcLabelsTextColor={(d) => statusColors[d.data.id].replace('ActiveBg', 'Color')}
           arcLinkLabel={arcLinkLabel}
-          arcLinkLabelsSkipAngle={4}
-          arcLinkLabelsDiagonalLength={8}
-          arcLinkLabelsStraightLength={12}
           arcLinkLabelsColor={{
             from: 'color',
           }}
-          arcLinkLabelsTextColor={theme.palette.text.primary}
-          tooltip={tooltip}
-          activeInnerRadiusOffset={2}
-          activeOuterRadiusOffset={2}
-          legends={[
-            {
-              anchor: 'bottom',
-              direction: 'row',
-              itemWidth: 75,
-              itemHeight: 30,
-              translateY: 60,
-            },
-          ]}
+          activeInnerRadiusOffset={4}
+          activeOuterRadiusOffset={4}
+          tooltip={() => null}
+          colors={(d) => statusColors[d.data.id]}
         />
       ) : (
         <NotFound>{i18n('experiments.notFound')}</NotFound>

@@ -14,68 +14,67 @@
  * limitations under the License.
  *
  */
-import { CircularProgress, Typography, styled, useTheme } from '@mui/material'
-
-import Space from '@ui/mui-extends/esm/Space'
+import { PauseCircleOutlined, TaskAltOutlined } from '@mui/icons-material'
+import { Chip, CircularProgress, ColorPaletteProp } from '@mui/joy'
 
 import { T } from 'components/T'
 
-const Circle = styled('div')((props) => ({
-  width: 8,
-  height: 8,
-  backgroundColor: props.color,
-  borderRadius: '50%',
-}))
+const statusColors: Record<string, ColorPaletteProp> = {
+  injecting: 'info',
+  running: 'success',
+  paused: 'warning',
+  finished: 'primary',
+  deleting: 'neutral',
+  failed: 'danger',
+}
 
 interface StatusLabelProps {
-  status: string
+  status: string | [string, number]
 }
 
 const StatusLabel: React.FC<StatusLabelProps> = ({ status }) => {
-  const theme = useTheme()
-
-  const label = <T id={`status.${status}`} />
+  const _status = typeof status === 'string' ? status : status[0]
 
   let color
-  switch (status) {
+  switch (_status) {
     case 'injecting':
     case 'running':
-    case 'deleting':
-      color = theme.palette.primary.main
-
-      break
     case 'paused':
-    case 'unknown':
-      color = theme.palette.grey[500]
-
-      break
+    case 'deleting':
     case 'finished':
-      color = theme.palette.success.main
+    case 'failed':
+      color = statusColors[_status]
 
       break
-    case 'failed':
-      color = theme.palette.error.main
+    case 'unknown':
+    default:
+      color = statusColors['deleting']
 
       break
   }
 
   let icon
-  switch (status) {
+  switch (_status) {
     case 'injecting':
     case 'running':
     case 'deleting':
-      icon = <CircularProgress size={12} disableShrink sx={{ color }} />
+      icon = <TaskAltOutlined />
+
+      break
+    case 'paused':
+      icon = <PauseCircleOutlined />
 
       break
   }
 
-  return (
-    <Space spacing={1} direction="row" alignItems="center">
-      {icon || <Circle color={color} />}
-      <Typography variant="body2" fontWeight="500" sx={{ color }}>
-        {label}
-      </Typography>
-    </Space>
+  return typeof status === 'string' ? (
+    <Chip variant="soft" size="sm" startDecorator={icon} color={color}>
+      <T id={`status.${status}`} />
+    </Chip>
+  ) : (
+    <Chip variant="soft" size="sm" startDecorator={icon} color={color}>
+      {status[1]} <T id={`status.${status[0]}`} />
+    </Chip>
   )
 }
 

@@ -21,7 +21,7 @@
  * It has three ways to use:
  *
  * 1. **DEPRECATED** `i18n(string)` will return a `FormattedMessage` component with the given string as id.
- * 2. `i18n(string, intl)` will use intl object to return a translated string.
+ * 2. `i18n(string, intl)` will use the intl to return a translated string.
  * 3. `T` is an alias of `FormattedMessage`. Mostly you will often use `T` instead of `i18n`.
  *
  */

@@ -17,6 +17,7 @@
 import loadable from '@loadable/component'
 import MenuIcon from '@mui/icons-material/Menu'
 import {
+  Box,
   CssBaseline,
   CssVarsProvider,
   IconButton,
@@ -28,14 +29,13 @@ import {
   ListSubheader,
   Typography,
 } from '@mui/joy'
-import { Alert, Box, BoxProps, Container, Divider, Portal, Snackbar, useMediaQuery, useTheme } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { Alert, Portal, Snackbar, useMediaQuery, useTheme } from '@mui/material'
 import { applyAPIAuthentication, applyNSParam } from 'api/interceptors'
 import { Stale } from 'api/queryUtils'
 import Cookies from 'js-cookie'
 import { useGetCommonConfig } from 'openapi'
 import { useEffect, useState } from 'react'
-import { NavLink, BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter, NavLink } from 'react-router-dom'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import routes from 'routes'
 
@@ -48,55 +48,36 @@ import { setAlertOpen, setConfirmOpen, setNameSpace, setTokenName, setTokens } f
 
 import Helmet from 'components/Helmet'
 import Layout from 'components/Layout'
+import i18n, { T } from 'components/T'
 import { TokenFormValues } from 'components/Token'
 
-import insertCommonStyle from 'lib/d3/insertCommonStyle'
 import LS from 'lib/localStorage'
 
-import logoMiniWhite from 'images/logo-mini-white.svg'
-import logoMini from 'images/logo-mini.svg'
-import logoWhite from 'images/logo-white.svg'
-import logo from 'images/logo.svg'
+import logoWhite from 'images/logo-mini-white.svg'
+import logo from 'images/logo-mini.svg'
 
-import Navbar from './Navbar'
-import { closedWidth, listItems, openedWidth } from './Sidebar'
-import Sidebar from './Sidebar'
+import { topNavItems } from './Sidebar'
 
 const Auth = loadable(() => import('./Auth'))
 
-const Root = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})<BoxProps & { open: boolean }>(({ theme, open }) => ({
-  position: 'relative',
-  width: `calc(100% - ${open ? openedWidth : closedWidth}px)`,
-  height: '100vh',
-  marginLeft: open ? openedWidth : closedWidth,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration[open ? 'enteringScreen' : 'leavingScreen'],
-  }),
-  [theme.breakpoints.down('sm')]: {
-    minWidth: theme.breakpoints.values.md,
-  },
-}))
-
 function SideNav() {
   return (
-    <List size="sm" sx={{ '--ListItem-radius': '8px', '--List-gap': '4px' }}>
+    <List sx={{ '--ListItem-radius': '8px' }}>
       <ListItem nested>
-        <ListSubheader>Browse</ListSubheader>
-        <List
-          aria-labelledby="nav-list-browse"
-          sx={{
-            '& .JoyListItemButton-root': { p: '8px' },
-          }}
-        >
-          {listItems.map(({ icon, text }) => (
-            <ListItem>
-              <ListItemButton variant="plain">
-                <ListItemDecorator sx={{ color: 'inherit' }}>{icon}</ListItemDecorator>
-                <ListItemContent>{text}</ListItemContent>
-              </ListItemButton>
+        <List>
+          <ListSubheader>
+            <T id="dashboard.title" />
+          </ListSubheader>
+          {topNavItems.map(({ icon, text }) => (
+            <ListItem key={text} className={`tutorial-${text}`}>
+              <NavLink to={'/' + text} style={{ width: '100%', textDecoration: 'none' }}>
+                {({ isActive }) => (
+                  <ListItemButton variant={isActive ? 'soft' : 'plain'} color={isActive ? 'primary' : 'neutral'}>
+                    <ListItemDecorator sx={{ color: 'inherit' }}>{icon}</ListItemDecorator>
+                    <ListItemContent>{i18n(`${text}.title`)}</ListItemContent>
+                  </ListItemButton>
+                )}
+              </NavLink>
             </ListItem>
           ))}
         </List>
@@ -179,10 +160,6 @@ const TopContainer = () => {
     },
   })
 
-  useEffect(() => {
-    insertCommonStyle()
-  }, [])
-
   const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'))
   useEffect(() => {
     if (isTabletScreen) {
@@ -191,7 +168,7 @@ const TopContainer = () => {
   }, [isTabletScreen])
 
   return (
-    <Router>
+    <BrowserRouter>
       <CssVarsProvider>
         <CssBaseline />
 
@@ -218,25 +195,48 @@ const TopContainer = () => {
               >
                 <MenuIcon />
               </IconButton>
-              <NavLink to="/" style={{ display: 'flex', alignItems: 'center' }}>
-                <img src={logoMini} alt="Chaos Mesh" width={28} />
+              <NavLink to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                <img src={logo} alt="Chaos Mesh" width={28} />
+
+                <Typography level="h1" component="div" fontSize="md" sx={{ ml: 1.5 }}>
+                  Chaos Mesh
+                </Typography>
               </NavLink>
-              <Typography component="h1" fontWeight="xl">
-                Chaos Mesh
-              </Typography>
             </Box>
           </Layout.Header>
 
           <Layout.SideNav>
             <SideNav />
           </Layout.SideNav>
+
+          <Layout.Main>
+            {loading ? (
+              <Loading />
+            ) : (
+              <Routes>
+                <Route path="/" element={<Navigate replace to="/overview" />} />
+                {!authOpen &&
+                  routes.map(({ path, element, title }) => (
+                    <Route
+                      key={path}
+                      path={path}
+                      element={
+                        <>
+                          <Helmet title={title} />
+                          {element}
+                        </>
+                      }
+                    />
+                  ))}
+              </Routes>
+            )}
+          </Layout.Main>
         </Layout.Root>
 
         {/* <Root open={openDrawer}>
         <Sidebar open={openDrawer} />
         <Box component="main" sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <Navbar openDrawer={openDrawer} handleDrawerToggle={handleDrawerToggle} />
-          <Divider />
 
           <Container maxWidth="xl" disableGutters sx={{ flexGrow: 1, p: 6 }}>
             {loading ? (
@@ -291,7 +291,7 @@ const TopContainer = () => {
         />
       </Portal> */}
       </CssVarsProvider>
-    </Router>
+    </BrowserRouter>
   )
 }
 

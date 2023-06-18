@@ -16,12 +16,12 @@
  */
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
+import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined'
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
+import ViewTimelineOutlinedIcon from '@mui/icons-material/ViewTimelineOutlined'
 import {
   Box,
   CSSObject,
@@ -113,8 +113,8 @@ const ListItemText = (props: ListItemTextProps) => (
   />
 )
 
-export const listItems = [
-  { icon: <DashboardOutlinedIcon />, text: 'dashboard' },
+export const topNavItems = [
+  { icon: <DashboardCustomizeOutlinedIcon />, text: 'overview' },
   {
     icon: <AccountTreeOutlinedIcon />,
     text: 'workflows',
@@ -128,7 +128,7 @@ export const listItems = [
     text: 'experiments',
   },
   {
-    icon: <TimelineOutlinedIcon />,
+    icon: <ViewTimelineOutlinedIcon />,
     text: 'events',
   },
   {
@@ -140,6 +140,8 @@ export const listItems = [
     text: 'settings',
   },
 ]
+
+export const bottomNavItems = []
 
 interface SidebarProps {
   open: boolean
@@ -160,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
       </Box>
       <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
         <SidebarNav>
-          {listItems.map(({ icon, text }) => (
+          {topNavItems.map(({ icon, text }) => (
             <ListItemButton key={text} className={`tutorial-${text}`} component={NavLink} to={'/' + text}>
               <ListItemIcon>{icon}</ListItemIcon>
               <ListItemText primary={i18n(`${text}.title`)} />
