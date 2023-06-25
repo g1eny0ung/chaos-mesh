@@ -122,7 +122,7 @@ const Kernel: React.FC<KernelProps> = ({ onSubmit }) => {
                 type="number"
                 name="failKernRequest.probability"
                 helperText="The fails with probability"
-                endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                endDecorator={<InputAdornment position="end">%</InputAdornment>}
               />
               <TextField type="number" name="failKernRequest.times" helperText="The max times of failures" />
             </Space>

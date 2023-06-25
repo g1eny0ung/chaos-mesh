@@ -75,7 +75,7 @@ export const Fields = ({ errors, touched }: Pick<FormikProps<FormikValues>, 'err
       type="number"
       name="spec.startingDeadlineSeconds"
       label={<T id="newS.basic.startingDeadlineSeconds" />}
-      endAdornment={
+      endDecorator={
         <InputAdornment position="end">
           <T id="common.seconds" />
         </InputAdornment>

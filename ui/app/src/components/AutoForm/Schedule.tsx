@@ -86,7 +86,7 @@ export default function Schedule() {
         type="number"
         name="startingDeadlineSeconds"
         label="startingDeadlineSeconds"
-        endAdornment={
+        endDecorator={
           <InputAdornment position="end">
             <T id="common.seconds" />
           </InputAdornment>

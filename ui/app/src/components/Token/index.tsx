@@ -112,7 +112,7 @@ const Token: React.FC<TokenProps> = ({ onSubmitCallback }) => {
               helperText={errors.name && touched.name ? errors.name : i18n('settings.addToken.nameHelper')}
               error={errors.name && touched.name ? true : false}
             />
-            <TextField
+            {/* <TextField
               name="token"
               label={i18n('settings.addToken.token')}
               multiline
@@ -120,7 +120,7 @@ const Token: React.FC<TokenProps> = ({ onSubmitCallback }) => {
               validate={validateToken}
               helperText={errors.token && touched.token ? errors.token : i18n('settings.addToken.tokenHelper')}
               error={errors.token && touched.token ? true : false}
-            />
+            /> */}
           </Space>
           <Submit fullWidth />
         </Form>

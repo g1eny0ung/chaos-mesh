@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-import { FormControl, FormHelperText, FormLabel } from '@mui/material'
-import type { FormLabelProps, FormControlProps as MuiFormControlProps } from '@mui/material'
+import { FormControl, FormHelperText, FormLabel } from '@mui/joy'
+import type { FormLabelProps, FormControlProps as MuiFormControlProps } from '@mui/joy'
 
 export type FormControlProps = MuiFormControlProps & {
   label?: React.ReactNode
@@ -26,19 +26,9 @@ export type FormControlProps = MuiFormControlProps & {
 export default function ({ label, LabelProps, helperText, children, ...rest }: FormControlProps) {
   return (
     <FormControl {...rest}>
-      {label && (
-        <FormLabel
-          disabled={rest.disabled}
-          error={false}
-          focused={false}
-          sx={{ mb: 1.5, color: 'text.primary', fontSize: 'body2.fontSize', fontWeight: 500 }}
-          {...LabelProps}
-        >
-          {label}
-        </FormLabel>
-      )}
+      {label && <FormLabel {...LabelProps}>{label}</FormLabel>}
       {children}
-      {helperText && <FormHelperText component="div">{helperText}</FormHelperText>}
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   )
 }

@@ -18,20 +18,15 @@ import CheckIcon from '@mui/icons-material/Check'
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined'
 import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined'
 import UndoIcon from '@mui/icons-material/Undo'
-import { Box, Card, Divider, Typography } from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import { Box, Card, Chip, Divider, Grid, ListItemDecorator, Option, Select, SelectOption, Typography } from '@mui/joy'
 import { Stale } from 'api/queryUtils'
-import clsx from 'clsx'
 import { useGetCommonConfig } from 'openapi'
-import React from 'react'
-
-import Paper from '@ui/mui-extends/esm/Paper'
 
 import { useStoreDispatch, useStoreSelector } from 'store'
 
 import { Env, setEnv, setKindAction, setSpec, setStep1 } from 'slices/experiments'
 
-import i18n from 'components/T'
+import i18n, { T } from 'components/T'
 
 import { iconByKind, transByKind } from 'lib/byKind'
 
@@ -40,64 +35,22 @@ import Kernel from './form/Kernel'
 import Stress from './form/Stress'
 import TargetGenerated from './form/TargetGenerated'
 
-const useStyles = makeStyles((theme) => {
-  const cardActive = {
-    color: theme.palette.primary.main,
-    borderColor: theme.palette.primary.main,
-  }
-
-  return {
-    card: {
-      cursor: 'pointer',
-      marginTop: theme.spacing(3),
-      marginRight: theme.spacing(3),
-      '&:hover': cardActive,
-    },
-    cardActive,
-    submit: {
-      borderColor: theme.palette.success.main,
-    },
-    submitIcon: {
-      color: theme.palette.success.main,
-    },
-    asButton: {
-      cursor: 'pointer',
-    },
-  }
-})
-
 const submitDirectly = ['pod-failure']
 
-interface TypeCardProp {
-  name: Env
-  handleSwitchEnv: (env: Env) => () => void
-  env: Env
-}
+function renderEnv(option: SelectOption<Env> | null) {
+  if (!option) {
+    return null
+  }
 
-const TypeCard: React.FC<TypeCardProp> = ({ name, handleSwitchEnv, env }) => {
-  const classes = useStyles()
-  const title = name === 'k8s' ? 'k8s.title' : 'physics.single'
   return (
-    <Card
-      className={clsx(classes.card, env === name ? classes.cardActive : '')}
-      variant="outlined"
-      onClick={handleSwitchEnv(name)}
-    >
-      <Box display="flex" justifyContent="center" alignItems="center" width={225} height={75}>
-        <Box display="flex" justifyContent="center" flex={1}>
-          {iconByKind(name)}
-        </Box>
-        <Box flex={1.5} textAlign="center">
-          <Typography variant="button">{i18n(title)}</Typography>
-        </Box>
-      </Box>
-    </Card>
+    <>
+      <ListItemDecorator sx={{ mr: 1.5 }}>{iconByKind(option.value, 'inherit')}</ListItemDecorator>
+      {option.label}
+    </>
   )
 }
 
 const Step1 = () => {
-  const classes = useStyles()
-
   const state = useStoreSelector((state) => state)
   const {
     env,
@@ -112,6 +65,11 @@ const Step1 = () => {
       staleTime: Stale.DAY,
     },
   })
+
+  const envOptions = [
+    { label: i18n('k8s.title'), value: 'k8s' as Env },
+    { label: i18n('physics.single'), value: 'physic' as Env },
+  ]
 
   const typesData = env === 'k8s' ? _typesData : dataPhysic
   let typesDataEntries = Object.entries(typesData) as [Kind, Definition][]
@@ -149,124 +107,169 @@ const Step1 = () => {
 
   const handleUndo = () => dispatch(setStep1(false))
 
-  const handleSwitchEnv = (env: Env) => () => {
+  const handleSwitchEnv = (_: React.SyntheticEvent | null, env: Env | null) => () => {
     dispatch(setKindAction(['', '']))
-    dispatch(setEnv(env))
+    dispatch(setEnv(env!))
   }
 
   return (
-    <Paper className={step1 ? classes.submit : ''}>
-      <Box display="flex" justifyContent="space-between" mb={step1 ? 0 : 3}>
+    <Card variant="outlined" className={step1 ? 'submit' : ''}>
+      <Box display="flex" justifyContent="space-between" mb={3}>
         <Box display="flex" alignItems="center">
           {step1 && (
-            <Box display="flex" mr={3}>
-              <CheckIcon className={classes.submitIcon} />
-            </Box>
+            <Chip size="sm" color="success" startDecorator={<CheckIcon />} sx={{ mr: 1 }}>
+              Done
+            </Chip>
           )}
-          <Typography>{i18n('newE.titleStep1')}</Typography>
+
+          <Typography level="h2" fontSize="lg">
+            {i18n('newE.titleStep1')}
+          </Typography>
         </Box>
-        {step1 && <UndoIcon className={classes.asButton} onClick={handleUndo} />}
+
+        {step1 ? (
+          <UndoIcon onClick={handleUndo} />
+        ) : (
+          <Select defaultValue="k8s" size="sm" renderValue={renderEnv} sx={{ width: 150 }} onChange={handleSwitchEnv}>
+            {envOptions.map((option) => (
+              <Option key={option.value} value={option.value} label={option.label}>
+                <ListItemDecorator>{iconByKind(option.value, 'inherit')}</ListItemDecorator>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        )}
       </Box>
-      <Box hidden={step1}>
-        <Box display="flex">
-          <TypeCard name="k8s" handleSwitchEnv={handleSwitchEnv} env={env} />
-          <TypeCard name="physic" handleSwitchEnv={handleSwitchEnv} env={env} />
-        </Box>
-        <Divider sx={{ my: 6 }} />
-      </Box>
-      <Box hidden={step1}>
-        <Box display="flex" flexWrap="wrap">
-          {typesDataEntries.map(([key]) => (
+      <Grid container spacing={3}>
+        {typesDataEntries.map(([key]) => (
+          <Grid key={key} xs={12} sm={3}>
             <Card
-              key={key}
-              className={clsx(classes.card, kind === key ? classes.cardActive : '')}
               variant="outlined"
+              sx={{
+                cursor: 'pointer',
+                '&:hover': {
+                  bgcolor: 'primary.softBg',
+                  color: 'primary.softColor',
+                  borderColor: 'primary.outlinedBorder',
+                },
+                ...(key === kind && {
+                  bgcolor: 'primary.softBg',
+                  color: 'primary.softColor',
+                  borderColor: 'primary.outlinedBorder',
+                }),
+              }}
               onClick={handleSelectTarget(key)}
             >
-              <Box display="flex" justifyContent="center" alignItems="center" width={280} height={75}>
-                <Box display="flex" justifyContent="center" flex={1}>
+              <Box display="flex" alignItems="center">
+                <Box display="flex" mr={3}>
                   {iconByKind(key)}
                 </Box>
-                <Box flex={1.5} textAlign="center">
-                  <Typography variant="button">{transByKind(key)}</Typography>
-                </Box>
+                <Typography level="body2" sx={{ color: 'inherit' }}>
+                  {transByKind(key)}
+                </Typography>
               </Box>
             </Card>
-          ))}
-        </Box>
-        {kind && (
-          <Box overflow="hidden">
-            <Box mt={6} mb={3}>
-              <Divider />
-            </Box>
-            {(typesData as any)[kind].categories ? (
-              <Box display="flex" flexWrap="wrap">
+          </Grid>
+        ))}
+      </Grid>
+
+      <Divider sx={{ mt: 3 }} />
+
+      {kind ? (
+        <Box overflow="hidden">
+          {(typesData as any)[kind].categories ? (
+            <>
+              <Typography level="h2" fontSize="md" sx={{ mb: 3 }}>
+                <T id="newE.step1Actions" />
+              </Typography>
+              <Grid container spacing={3}>
                 {(typesData as any)[kind].categories!.map((d: any) => (
-                  <Card
-                    key={d.key}
-                    className={clsx(classes.card, action === d.key ? classes.cardActive : '')}
-                    variant="outlined"
-                    onClick={handleSelectAction(d.key)}
-                  >
-                    <Box display="flex" justifyContent="center" alignItems="center" width={210} height={50}>
-                      <Box display="flex" justifyContent="center" alignItems="center" flex={0.5}>
-                        {action === d.key ? <RadioButtonCheckedOutlinedIcon /> : <RadioButtonUncheckedOutlinedIcon />}
+                  <Grid key={d.key} xs={12} sm={3}>
+                    <Card
+                      variant="outlined"
+                      size="sm"
+                      sx={{
+                        cursor: 'pointer',
+                        '&:hover': {
+                          bgcolor: 'primary.softBg',
+                          color: 'primary.softColor',
+                          borderColor: 'primary.outlinedBorder',
+                        },
+                        ...(d.key === action && {
+                          bgcolor: 'primary.softBg',
+                          color: 'primary.softColor',
+                          borderColor: 'primary.outlinedBorder',
+                        }),
+                      }}
+                      onClick={handleSelectAction(d.key)}
+                    >
+                      <Box display="flex" alignItems="center">
+                        <Box display="flex" ml={1} mr={3}>
+                          {d.key === action ? <RadioButtonCheckedOutlinedIcon /> : <RadioButtonUncheckedOutlinedIcon />}
+                        </Box>
+                        <Typography level="body2" sx={{ color: 'inherit' }}>
+                          {d.name}
+                        </Typography>
                       </Box>
-                      <Box flex={1.5} textAlign="center">
-                        <Typography variant="button">{d.name}</Typography>
-                      </Box>
-                    </Box>
-                  </Card>
+                    </Card>
+                  </Grid>
                 ))}
-              </Box>
-            ) : kind === 'KernelChaos' ? (
-              <Box mt={6}>
-                <Kernel onSubmit={handleSubmitStep1} />
-              </Box>
-            ) : kind === 'TimeChaos' ? (
-              <Box mt={6}>
-                <TargetGenerated
-                  env={env}
-                  kind={kind}
-                  data={(typesData as any)[kind].spec!}
-                  validationSchema={env === 'k8s' ? schema.TimeChaos!.default : undefined}
-                  onSubmit={handleSubmitStep1}
-                />
-              </Box>
-            ) : kind === 'StressChaos' ? (
-              <Box mt={6}>
-                <Stress onSubmit={handleSubmitStep1} />
-              </Box>
-            ) : (kind as any) === 'ProcessChaos' ? (
-              <Box mt={6}>
-                <TargetGenerated
-                  env={env}
-                  kind={kind}
-                  data={(typesData as any)[kind].spec!}
-                  onSubmit={handleSubmitStep1}
-                />
-              </Box>
-            ) : null}
-          </Box>
-        )}
-        {action && !submitDirectly.includes(action) && (
-          <>
-            <Divider sx={{ my: 6 }} />
-            <TargetGenerated
-              // Force re-rendered after action changed
-              key={kind + action}
-              env={env}
-              kind={kind}
-              data={(typesData as any)[kind as Kind].categories!.filter(({ key }: any) => key === action)[0].spec}
-              validationSchema={
-                env === 'k8s' ? (schema[kind as Kind] ? schema[kind as Kind]![action] : undefined) : undefined
-              }
-              onSubmit={handleSubmitStep1}
-            />
-          </>
-        )}
-      </Box>
-    </Paper>
+              </Grid>
+            </>
+          ) : kind === 'KernelChaos' ? (
+            <Box mt={6}>
+              <Kernel onSubmit={handleSubmitStep1} />
+            </Box>
+          ) : kind === 'TimeChaos' ? (
+            <Box mt={6}>
+              <TargetGenerated
+                env={env}
+                kind={kind}
+                data={(typesData as any)[kind].spec!}
+                validationSchema={env === 'k8s' ? schema.TimeChaos!.default : undefined}
+                onSubmit={handleSubmitStep1}
+              />
+            </Box>
+          ) : kind === 'StressChaos' ? (
+            <Box mt={6}>
+              <Stress onSubmit={handleSubmitStep1} />
+            </Box>
+          ) : (kind as any) === 'ProcessChaos' ? (
+            <Box mt={6}>
+              <TargetGenerated
+                env={env}
+                kind={kind}
+                data={(typesData as any)[kind].spec!}
+                onSubmit={handleSubmitStep1}
+              />
+            </Box>
+          ) : null}
+        </Box>
+      ) : (
+        <Box my={3} textAlign="center">
+          <Typography color="neutral">
+            <T id="newE.step1Tip" />
+          </Typography>
+        </Box>
+      )}
+
+      {action && !submitDirectly.includes(action) && (
+        <>
+          <Divider sx={{ my: 3 }} />
+          <TargetGenerated
+            // Force re-rendered after action changed
+            key={kind + action}
+            env={env}
+            kind={kind}
+            data={(typesData as any)[kind as Kind].categories!.filter(({ key }: any) => key === action)[0].spec}
+            validationSchema={
+              env === 'k8s' ? (schema[kind as Kind] ? schema[kind as Kind]![action] : undefined) : undefined
+            }
+            onSubmit={handleSubmitStep1}
+          />
+        </>
+      )}
+    </Card>
   )
 }
 

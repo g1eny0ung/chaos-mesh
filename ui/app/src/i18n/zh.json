@@ -34,15 +34,16 @@
   },
   "newE": {
     "title": "新的实验",
-    "titleStep1": "注入到",
-    "titleStep2": "实验信息",
+    "titleStep1": "选择实验类型",
+    "titleStep2": "填写基本信息",
     "steps": {
       "basic": "元信息",
       "scope": "范围",
       "run": "运行"
     },
-    "loadFrom": "加载自",
-    "byYAML": "通过 YAML",
+    "byStep": "通过指引创建",
+    "loadFrom": "从已有资源加载",
+    "byYAML": "通过 YAML 创建",
     "byYAMLDesc": "通过填写或上传 YAML 的方式创建实验或计划",
     "basic": {
       "nameHelper": "实验的名称",

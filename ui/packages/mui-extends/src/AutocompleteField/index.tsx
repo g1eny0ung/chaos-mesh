@@ -44,14 +44,7 @@ export default function AutocompleteField<T>({
   const { disabled, fullWidth } = props
 
   return (
-    <FormControl
-      disabled={disabled}
-      error={error}
-      label={label}
-      LabelProps={{ htmlFor: name }}
-      helperText={helperText}
-      fullWidth={fullWidth}
-    >
+    <FormControl disabled={disabled} error={error} label={label} LabelProps={{ htmlFor: name }} helperText={helperText}>
       <Autocomplete
         id={name}
         {...props}

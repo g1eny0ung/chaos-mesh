@@ -83,7 +83,6 @@ const Stress: React.FC<StressProps> = ({ onSubmit }) => {
                 getIn(errors, 'stressors.cpu.workers') ? getIn(errors, 'stressors.cpu.workers') : 'CPU workers'
               }
               error={getIn(errors, 'stressors.cpu.workers') ? true : false}
-              inputProps={{ min: 0 }}
             />
             <TextField type="number" name="stressors.cpu.load" label="Load" helperText="CPU load" />
             <LabelField
@@ -101,7 +100,6 @@ const Stress: React.FC<StressProps> = ({ onSubmit }) => {
                 getIn(errors, 'stressors.memory.workers') ? getIn(errors, 'stressors.memory.workers') : 'Memory workers'
               }
               error={getIn(errors, 'stressors.memory.workers') ? true : false}
-              inputProps={{ min: 0 }}
             />
             <TextField
               name="stressors.memory.size"

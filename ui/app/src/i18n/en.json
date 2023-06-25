@@ -1,9 +1,6 @@
 {
   "dashboard": {
-    "title": "dashboard"
-  },
-  "overview": {
-    "title": "Overview",
+    "title": "Dashboard",
     "tutorial": {
       "title": "Tutorial",
       "desc": "📖 Take a quick look at the functions of Chaos Mesh Dashboard",
@@ -28,15 +25,18 @@
   },
   "newE": {
     "title": "New experiment",
-    "titleStep1": "Inject into",
-    "titleStep2": "Experiment Info",
+    "titleStep1": "Select experiment type",
+    "step1Tip": "Select the experiment type to view actions or spec",
+    "step1Actions": "Actions",
+    "titleStep2": "Fill in basic information",
     "steps": {
       "basic": "Metadata",
       "scope": "Scope",
       "run": "Run"
     },
-    "loadFrom": "Load from",
-    "byYAML": "By YAML",
+    "byStep": "Create by step",
+    "loadFrom": "Load from exists",
+    "byYAML": "Create by YAML",
     "byYAMLDesc": "Create an experiment or schedule by filling in or uploading YAML",
     "basic": {
       "nameHelper": "Fill the experiment name.",

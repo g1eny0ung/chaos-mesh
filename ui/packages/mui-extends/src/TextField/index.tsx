@@ -14,22 +14,22 @@
  * limitations under the License.
  *
  */
-import type { TextFieldProps as MuiTextFieldProps, OutlinedInputProps } from '@mui/material'
+import type { InputProps as MuiTextFieldProps } from '@mui/joy'
+import Input from '@mui/joy/Input'
 
 import FormControl from '../FormControl'
-import OutlinedInput from '../OutlinedInput'
 
-export type TextFieldProps = OutlinedInputProps & {
-  label?: MuiTextFieldProps['label']
-  helperText?: MuiTextFieldProps['helperText']
+export type TextFieldProps = MuiTextFieldProps & {
+  label?: React.ReactNode
+  helperText?: React.ReactNode
 }
 
 export default function ({ label, helperText, ...rest }: TextFieldProps) {
-  const { disabled, error, fullWidth } = rest
+  const { disabled, error } = rest
 
   return (
-    <FormControl disabled={disabled} error={error} label={label} helperText={helperText} fullWidth={fullWidth}>
-      <OutlinedInput {...rest} />
+    <FormControl disabled={disabled} error={error} label={label} helperText={helperText}>
+      <Input {...rest} />
     </FormControl>
   )
 }

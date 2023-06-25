@@ -251,7 +251,7 @@ const LoadFrom: React.FC<LoadFromProps> = ({ callback, inSchedule, inWorkflow })
 
           <Divider />
 
-          <Typography>{i18n('overview.predefined')}</Typography>
+          <Typography>{i18n('dashboard.predefined')}</Typography>
 
           {loading ? (
             <SkeletonN n={3} />
@@ -268,7 +268,7 @@ const LoadFrom: React.FC<LoadFromProps> = ({ callback, inSchedule, inWorkflow })
             </Box>
           ) : (
             <Typography variant="body2" color="textSecondary">
-              {i18n('overview.noPredefinedFound')}
+              {i18n('dashboard.noPredefinedFound')}
             </Typography>
           )}
         </Space>

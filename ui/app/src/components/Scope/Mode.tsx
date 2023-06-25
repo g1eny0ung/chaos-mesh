@@ -56,7 +56,7 @@ const Mode: React.FC<ModeProps> = ({ modeScope, scope }) => {
           name={modeScope ? `${modeScope}.value` : 'value'}
           label={<T id="newE.scope.modeValue" />}
           helperText={<T id="newE.scope.modeValueHelper" />}
-          endAdornment={
+          endDecorator={
             modesWithAdornment.includes(getIn(values, scope).mode) && <InputAdornment position="end">%</InputAdornment>
           }
         />

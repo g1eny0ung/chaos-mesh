@@ -19,7 +19,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import CloseIcon from '@mui/icons-material/Close'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
-import { Box, Button, Checkbox, Typography, styled } from '@mui/material'
+import { Box, Button, Checkbox, Typography, styled } from '@mui/joy'
 import _ from 'lodash'
 import {
   useDeleteExperiments,
@@ -46,6 +46,8 @@ import ObjectListItem from 'components/ObjectListItem'
 import i18n from 'components/T'
 
 import { transByKind } from 'lib/byKind'
+
+import DecideSVG from 'images/assets/undraw_decide_re_ixfw.svg'
 
 const StyledCheckBox = styled(Checkbox)({
   position: 'relative',
@@ -161,7 +163,6 @@ export default function Experiments() {
           color="primary"
           checked={batch[data[index].uid] === true}
           onChange={onCheckboxChange(data[index].uid)}
-          disableRipple
         />
       )}
       <Box flex={1}>
@@ -172,40 +173,42 @@ export default function Experiments() {
 
   return (
     <>
-      <Space direction="row" mb={6}>
-        <Button variant="outlined" startIcon={<AddIcon />} onClick={() => navigate('/experiments/new')}>
-          {i18n('newE.title')}
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
-          onClick={handleBatchSelect}
-          disabled={experiments?.length === 0}
-        >
-          {i18n(`common.${isBatchEmpty ? 'batchOperation' : 'cancel'}`)}
-        </Button>
-        {!isBatchEmpty && (
-          <>
-            <Button variant="outlined" startIcon={<PlaylistAddCheckIcon />} onClick={handleBatchSelectAll}>
-              {i18n('common.selectAll')}
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              startIcon={<ArchiveOutlinedIcon />}
-              onClick={handleBatchDelete}
-            >
-              {i18n('archives.single')}
-            </Button>
-          </>
-        )}
-      </Space>
+      {experiments && experiments?.length > 0 && (
+        <Space direction="row" mb={6}>
+          <Button startDecorator={<AddIcon />} onClick={() => navigate('/experiments/new')}>
+            {i18n('newE.title')}
+          </Button>
+          <Button
+            variant="outlined"
+            startDecorator={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
+            onClick={handleBatchSelect}
+            disabled={experiments?.length === 0}
+          >
+            {i18n(`common.${isBatchEmpty ? 'batchOperation' : 'cancel'}`)}
+          </Button>
+          {!isBatchEmpty && (
+            <>
+              <Button variant="outlined" startDecorator={<PlaylistAddCheckIcon />} onClick={handleBatchSelectAll}>
+                {i18n('common.selectAll')}
+              </Button>
+              <Button
+                variant="outlined"
+                color="neutral"
+                startDecorator={<ArchiveOutlinedIcon />}
+                onClick={handleBatchDelete}
+              >
+                {i18n('archives.single')}
+              </Button>
+            </>
+          )}
+        </Space>
+      )}
 
       {experiments &&
         experiments.length > 0 &&
         Object.entries(_.groupBy(experiments, 'kind')).map(([kind, experimentsByKind]) => (
           <Box key={kind} mb={6}>
-            <Typography variant="overline">{transByKind(kind as any)}</Typography>
+            <Typography>{transByKind(kind as any)}</Typography>
             <RWList
               width="100%"
               height={experimentsByKind.length > 3 ? 300 : experimentsByKind.length * 70}
@@ -219,8 +222,15 @@ export default function Experiments() {
         ))}
 
       {!loading && experiments?.length === 0 && (
-        <NotFound illustrated textAlign="center">
-          <Typography>{i18n('experiments.notFound')}</Typography>
+        <NotFound img={DecideSVG}>
+          <Space>
+            <Typography level="h2" fontSize="lg">
+              {i18n('experiments.notFound')}
+            </Typography>
+            <Button startDecorator={<AddIcon />} onClick={() => navigate('/experiments/new')}>
+              {i18n('newE.title')}
+            </Button>
+          </Space>
         </NotFound>
       )}
 

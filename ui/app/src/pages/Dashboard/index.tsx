@@ -154,7 +154,7 @@ export default function Dashboard() {
         <Grid xs={12} lg={4}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
             <Typography level="h2" fontSize="lg">
-              {i18n('overview.totalStatus')}
+              {i18n('dashboard.totalStatus')}
             </Typography>
             <TotalStatus height={300} />
           </Card>
@@ -162,7 +162,7 @@ export default function Dashboard() {
         <Grid xs={12} lg={5}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
             <Typography level="h2" fontSize="lg">
-              {i18n('overview.recentEvents')}
+              {i18n('dashboard.recentEvents')}
             </Typography>
             <EventsTimeline events={events} height={300} />
           </Card>
@@ -173,7 +173,7 @@ export default function Dashboard() {
         <Grid xs={12} lg={9}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
             <Typography level="h2" fontSize="lg">
-              {i18n('overview.timeline')}
+              {i18n('dashboard.timeline')}
             </Typography>
             <Box ref={timelineChartRef} height={275} />
           </Card>

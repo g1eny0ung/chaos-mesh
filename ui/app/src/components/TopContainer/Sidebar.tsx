@@ -114,7 +114,7 @@ const ListItemText = (props: ListItemTextProps) => (
 )
 
 export const topNavItems = [
-  { icon: <DashboardCustomizeOutlinedIcon />, text: 'overview' },
+  { icon: <DashboardCustomizeOutlinedIcon />, text: 'dashboard' },
   {
     icon: <AccountTreeOutlinedIcon />,
     text: 'workflows',

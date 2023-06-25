@@ -15,6 +15,7 @@
  *
  */
 import { MenuItem } from '@mui/material'
+import { Stale } from 'api/queryUtils'
 import { Form, Formik, FormikErrors, FormikTouched, getIn, setIn } from 'formik'
 import { useGetCommonChaosAvailableNamespaces } from 'openapi'
 import { useEffect, useState } from 'react'
@@ -33,7 +34,6 @@ import i18n from 'components/T'
 
 import basicData from '../data/basic'
 import { Kind, Spec } from '../data/types'
-import { Stale } from 'api/queryUtils'
 
 interface TargetGeneratedProps {
   env: Env
@@ -116,19 +116,19 @@ const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, vali
                 {...v.inputProps}
               />
             )
-          case 'textarea':
-            return (
-              <TextField
-                key={k}
-                name={k}
-                label={v.label}
-                helperText={getIn(touched, k) && getIn(errors, k) ? getIn(errors, k) : v.helperText}
-                error={getIn(touched, k) && getIn(errors, k)}
-                multiline
-                rows={6}
-                {...v.inputProps}
-              />
-            )
+          // case 'textarea':
+          //   return (
+          //     <TextField
+          //       key={k}
+          //       name={k}
+          //       label={v.label}
+          //       helperText={getIn(touched, k) && getIn(errors, k) ? getIn(errors, k) : v.helperText}
+          //       error={getIn(touched, k) && getIn(errors, k)}
+          //       multiline
+          //       rows={6}
+          //       {...v.inputProps}
+          //     />
+          //   )
           case 'number':
             return (
               <TextField

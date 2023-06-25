@@ -14,21 +14,24 @@
  * limitations under the License.
  *
  */
-import { Form, Formik } from 'formik'
 import { FormControlLabel, Switch } from '@mui/material'
 import { MenuItem, Typography } from '@mui/material'
-import { SelectField, Submit, TextField } from 'components/FormField'
-import { Template, TemplateType } from 'slices/workflows'
+import { makeStyles } from '@mui/styles'
 import { parseHTTPTask, renderHTTPTask } from 'api/workflows'
+import { RequestForm } from 'api/workflows.type'
+import { Form, Formik } from 'formik'
 import { useEffect, useRef, useState } from 'react'
+import { useIntl } from 'react-intl'
 
 import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
-import { RequestForm } from 'api/workflows.type'
 import Space from '@ui/mui-extends/esm/Space'
+
+import { Template, TemplateType } from 'slices/workflows'
+
+import { SelectField, Submit, TextField } from 'components/FormField'
 import i18n from 'components/T'
-import { makeStyles } from '@mui/styles'
-import { useIntl } from 'react-intl'
+
 import { validateName } from 'lib/formikhelpers'
 
 const useStyles = makeStyles({
@@ -133,7 +136,6 @@ const HTTPTask: React.FC<HTTPTaskProps> = (props) => {
                     validate={validateName(i18n('newW.node.nameValidation', intl))}
                     helperText={errors.name && touched.name ? errors.name : i18n('newW.node.nameHelper')}
                     error={errors.name && touched.name ? true : false}
-                    size="small"
                     fullWidth
                   />
                   <TextField
@@ -141,7 +143,6 @@ const HTTPTask: React.FC<HTTPTaskProps> = (props) => {
                     label={i18n('newW.node.httpRequest.url')}
                     helperText={errors.url && touched.url ? errors.url : i18n('newW.node.httpRequest.urlHelper')}
                     error={errors.url && touched.url ? true : false}
-                    size="small"
                     fullWidth
                   />
 
@@ -165,7 +166,6 @@ const HTTPTask: React.FC<HTTPTaskProps> = (props) => {
                       name="body"
                       label={i18n('newW.node.httpRequest.body')}
                       helperText={errors.body && touched.body ? errors.body : i18n('newW.node.httpRequest.bodyHelper')}
-                      size="small"
                       fullWidth
                     />
                   )}

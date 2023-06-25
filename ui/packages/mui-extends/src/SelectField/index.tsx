@@ -14,45 +14,26 @@
  * limitations under the License.
  *
  */
-import { Box, Chip, Select } from '@mui/material'
-import type { SelectProps, TextFieldProps } from '@mui/material'
+import { Select } from '@mui/joy'
+import type { SelectProps } from '@mui/joy'
 
 import FormControl from '../FormControl'
-import OutlinedInput from '../OutlinedInput'
 
-export type SelectFieldProps<T = string> = SelectProps<T> & {
-  label?: TextFieldProps['label']
-  helperText?: TextFieldProps['helperText']
-  onRenderValueDelete?: (value: string) => (event: any) => void
+export type SelectFieldProps<T extends {}> = SelectProps<T> & {
+  label?: React.ReactNode
+  helperText?: React.ReactNode
+  error?: boolean
 }
 
-export default function SelectField<T>({ label, helperText, onRenderValueDelete, ...props }: SelectFieldProps<T>) {
-  const { disabled, error, fullWidth } = props
+export default function SelectField<T extends {}>({ label, helperText, ...props }: SelectFieldProps<T>) {
+  const { disabled, error } = props
+  if (error) {
+    props.color = 'danger'
+  }
 
   return (
-    <FormControl disabled={disabled} error={error} label={label} helperText={helperText} fullWidth={fullWidth}>
-      <Select
-        {...props}
-        input={<OutlinedInput />}
-        renderValue={
-          props.multiple
-            ? (selected: unknown) => (
-                <Box display="flex" flexWrap="wrap" gap={1}>
-                  {(selected as string[]).map((val) => (
-                    <Chip
-                      key={val}
-                      label={val}
-                      color="primary"
-                      onDelete={onRenderValueDelete ? onRenderValueDelete(val) : undefined}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      sx={{ height: 24 }}
-                    />
-                  ))}
-                </Box>
-              )
-            : undefined
-        }
-      />
+    <FormControl disabled={disabled} label={label} helperText={helperText}>
+      <Select {...props} />
     </FormControl>
   )
 }

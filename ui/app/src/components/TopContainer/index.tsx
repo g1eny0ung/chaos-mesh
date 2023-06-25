@@ -214,7 +214,7 @@ const TopContainer = () => {
               <Loading />
             ) : (
               <Routes>
-                <Route path="/" element={<Navigate replace to="/overview" />} />
+                <Route path="/" element={<Navigate replace to="/dashboard" />} />
                 {!authOpen &&
                   routes.map(({ path, element, title }) => (
                     <Route

@@ -14,29 +14,30 @@
  * limitations under the License.
  *
  */
-
+import Tab from '@mui/joy/Tab'
+import TabList from '@mui/joy/TabList'
+import TabPanel from '@mui/joy/TabPanel'
+import Tabs from '@mui/joy/Tabs'
 import { forwardRef, useImperativeHandle, useState } from 'react'
+
+import Space from '@ui/mui-extends/esm/Space'
+
+import { useStoreDispatch } from 'store'
+
 import { setEnv, setExternalExperiment } from 'slices/experiments'
 
-import { Box } from '@mui/material'
+import i18n from 'components/T'
+
+import { parseYAML } from 'lib/formikhelpers'
+
 import ByYAML from './ByYAML'
 import LoadFrom from './LoadFrom'
-import Space from '@ui/mui-extends/esm/Space'
 import Step1 from './Step1'
 import Step2 from './Step2'
 import Step3 from './Step3'
-import Tab from '@mui/material/Tab'
-import TabContext from '@mui/lab/TabContext'
-import TabList from '@mui/lab/TabList'
-import TabPanel from '@mui/lab/TabPanel'
-import i18n from 'components/T'
-import { parseYAML } from 'lib/formikhelpers'
-import { useStoreDispatch } from 'store'
-
-type PanelType = 'initial' | 'existing' | 'yaml'
 
 export interface NewExperimentHandles {
-  setPanel: React.Dispatch<React.SetStateAction<PanelType>>
+  setPanel: React.Dispatch<React.SetStateAction<number>>
 }
 
 interface NewExperimentProps {
@@ -52,15 +53,11 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
 ) => {
   const dispatch = useStoreDispatch()
 
-  const [panel, setPanel] = useState<PanelType>('initial')
+  const [panel, setPanel] = useState(0)
 
   useImperativeHandle(ref, () => ({
     setPanel,
   }))
-
-  const onChange = (_: any, newValue: PanelType) => {
-    setPanel(newValue)
-  }
 
   const fillExperiment = (original: any) => {
     const { kind, basic, spec } = parseYAML(original)
@@ -76,34 +73,32 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
       })
     )
 
-    setPanel('initial')
+    setPanel(0)
   }
 
   return (
-    <TabContext value={panel}>
+    <Tabs value={panel}>
       {loadFrom && (
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={onChange}>
-            <Tab label={i18n(`${inSchedule ? 'newS' : 'newE'}.title`)} value="initial" />
-            <Tab label={i18n('newE.loadFrom')} value="existing" />
-            <Tab label={i18n('newE.byYAML')} value="yaml" />
-          </TabList>
-        </Box>
+        <TabList sx={{ mb: 3 }}>
+          <Tab>{i18n('newE.byStep')}</Tab>
+          <Tab>{i18n('newE.loadFrom')}</Tab>
+          <Tab>{i18n('newE.byYAML')}</Tab>
+        </TabList>
       )}
-      <TabPanel value="initial" sx={{ p: 0, pt: 6 }}>
+      <TabPanel value={0}>
         <Space spacing={6}>
           <Step1 />
-          <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
-          <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} />
+          {/* <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
+          <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} /> */}
         </Space>
       </TabPanel>
-      <TabPanel value="existing" sx={{ p: 0, pt: 6 }}>
+      <TabPanel value={1}>
         {loadFrom && <LoadFrom callback={fillExperiment} inSchedule={inSchedule} inWorkflow={inWorkflow} />}
       </TabPanel>
-      <TabPanel value="yaml" sx={{ p: 0, pt: 6 }}>
+      <TabPanel value={2}>
         <ByYAML callback={fillExperiment} />
       </TabPanel>
-    </TabContext>
+    </Tabs>
   )
 }
 
