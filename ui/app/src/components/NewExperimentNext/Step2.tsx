@@ -17,21 +17,20 @@
 import CheckIcon from '@mui/icons-material/Check'
 import PublishIcon from '@mui/icons-material/Publish'
 import UndoIcon from '@mui/icons-material/Undo'
-import { Box, Button, Divider, Grid, MenuItem, Typography } from '@mui/material'
+import { Box, Card, Chip, Divider, Grid, IconButton, Option, Typography } from '@mui/joy'
+import { Stale } from 'api/queryUtils'
 import { Form, Formik } from 'formik'
 import _ from 'lodash'
 import { useGetCommonChaosAvailableNamespaces } from 'openapi'
 import { useEffect, useMemo, useState } from 'react'
 
-import Paper from '@ui/mui-extends/esm/Paper'
-import SkeletonN from '@ui/mui-extends/esm/SkeletonN'
 import Space from '@ui/mui-extends/esm/Space'
 
 import { useStoreDispatch, useStoreSelector } from 'store'
 
 import { setBasic, setStep2 } from 'slices/experiments'
 
-import { LabelField, SelectField, TextField } from 'components/FormField'
+import { LabelField, SelectField, Submit, TextField } from 'components/FormField'
 import MoreOptions from 'components/MoreOptions'
 import { Fields as ScheduleSpecificFields, data as scheduleSpecificData } from 'components/Schedule/types'
 import Scope from 'components/Scope'
@@ -39,7 +38,6 @@ import i18n from 'components/T'
 
 import basicData, { schema as basicSchema } from './data/basic'
 import Scheduler from './form/Scheduler'
-import { Stale } from 'api/queryUtils'
 
 interface Step2Props {
   inWorkflow?: boolean
@@ -107,17 +105,31 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
   const handleUndo = () => dispatch(setStep2(false))
 
   return (
-    <Paper sx={{ borderColor: step2 ? 'success.main' : undefined }}>
-      <Box display="flex" justifyContent="space-between" mb={step2 ? 0 : 6}>
+    <Card
+      variant="outlined"
+      sx={{
+        height: step2 ? 66 : 'auto',
+        ...(step2 && { overflow: 'hidden' }),
+      }}
+    >
+      <Box display="flex" justifyContent="space-between" mb={3}>
         <Box display="flex" alignItems="center">
           {step2 && (
-            <Box display="flex" mr={3}>
-              <CheckIcon sx={{ color: 'success.main' }} />
-            </Box>
+            <Chip size="sm" color="success" startDecorator={<CheckIcon />} sx={{ mr: 1 }}>
+              Done
+            </Chip>
           )}
-          <Typography>{i18n(`${inSchedule ? 'newS' : 'newE'}.titleStep2`)}</Typography>
+
+          <Typography level="h2" fontSize="lg">
+            {i18n(`${inSchedule ? 'newS' : 'newE'}.titleStep2`)}
+          </Typography>
         </Box>
-        {step2 && <UndoIcon onClick={handleUndo} sx={{ cursor: 'pointer' }} />}
+
+        {step2 && (
+          <IconButton variant="outlined" size="sm" onClick={handleUndo}>
+            <UndoIcon />
+          </IconButton>
+        )}
       </Box>
       <Box position="relative" hidden={step2}>
         <Formik
@@ -130,17 +142,18 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
           {({ errors, touched }) => (
             <Form>
               <Grid container spacing={6}>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Space>
                     <Typography fontWeight={500}>{i18n('newE.steps.scope')}</Typography>
                     {namespaces ? (
                       <Scope env={env} kind={kind} namespaces={namespaces} scope="spec.selector" modeScope="spec" />
                     ) : (
-                      <SkeletonN n={6} />
+                      // TODO: use skeleton
+                      <div />
                     )}
                   </Space>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Space>
                     <Typography fontWeight={500}>{i18n('newE.steps.basic')}</Typography>
                     <TextField
@@ -176,9 +189,9 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
                           helperText={i18n('newE.basic.namespaceHelper')}
                         >
                           {namespaces.map((n) => (
-                            <MenuItem key={n} value={n}>
+                            <Option key={n} value={n}>
                               {n}
-                            </MenuItem>
+                            </Option>
                           ))}
                         </SelectField>
                       )}
@@ -200,18 +213,14 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
                       </>
                     )}
                   </Space>
-                  <Box mt={6} textAlign="right">
-                    <Button type="submit" variant="contained" color="primary" startIcon={<PublishIcon />}>
-                      {i18n('common.submit')}
-                    </Button>
-                  </Box>
+                  <Submit startDecorator={<PublishIcon />} />
                 </Grid>
               </Grid>
             </Form>
           )}
         </Formik>
       </Box>
-    </Paper>
+    </Card>
   )
 }
 

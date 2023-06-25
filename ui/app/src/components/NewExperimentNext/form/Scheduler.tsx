@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { Box, FormControlLabel, Link, Switch, Typography } from '@mui/material'
+import { Box, Link, Switch, Typography } from '@mui/joy'
 import { FormikErrors, FormikTouched, getIn, useFormikContext } from 'formik'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
@@ -71,14 +71,7 @@ const Scheduler: React.FC<SchedulerProps> = ({ errors, touched, inSchedule = fal
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography fontWeight={500}>{i18n('newE.steps.run')}</Typography>
         {!inSchedule && (
-          <FormControlLabel
-            style={{ marginRight: 0 }}
-            control={
-              <Switch name="continuous" color="primary" size="small" checked={continuous} onChange={handleChecked} />
-            }
-            label={i18n('newE.run.continuous')}
-            disabled={instant}
-          />
+          <Switch endDecorator={i18n('newE.run.continuous')} checked={continuous} onChange={handleChecked} />
         )}
       </Box>
 

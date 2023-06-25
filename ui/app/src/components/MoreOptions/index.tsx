@@ -16,7 +16,7 @@
  */
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import { Box, Button } from '@mui/material'
+import { Box, Button } from '@mui/joy'
 import { useState } from 'react'
 
 import Space from '@ui/mui-extends/esm/Space'
@@ -46,7 +46,7 @@ const MoreOptions: React.FC<MoreOptionsProps> = ({ isOpen = false, beforeOpen, a
   return (
     <Space>
       <Box textAlign="right">
-        <Button color="primary" startIcon={open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} onClick={setOpen}>
+        <Button startDecorator={open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} onClick={setOpen}>
           {title ? title : <T id="common.moreOptions" />}
         </Button>
       </Box>

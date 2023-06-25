@@ -19,6 +19,7 @@ import type { SelectChangeEvent } from '@mui/material'
 import { Stale } from 'api/queryUtils'
 import messages from 'i18n/messages'
 import { useGetCommonConfig } from 'openapi'
+import { SyntheticEvent } from 'react'
 
 import Checkbox from '@ui/mui-extends/esm/Checkbox'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
@@ -59,8 +60,8 @@ const Settings = () => {
   const handleChangeEnableKubeSystemNS = () => dispatch(setEnableKubeSystemNS(!enableKubeSystemNS))
   const handleChangeUseNewPhysicalMachine = () => dispatch(setUseNewPhysicalMachine(!useNewPhysicalMachine))
   const handleChangeUseNextWorkflowInterface = () => dispatch(setUseNextWorkflowInterface(!useNextWorkflowInterface))
-  const handleChangeTheme = (e: SelectChangeEvent) => dispatch(setTheme(e.target.value))
-  const handleChangeLang = (e: SelectChangeEvent) => dispatch(setLang(e.target.value))
+  const handleChangeTheme = (_: SyntheticEvent | null, theme: string | null) => dispatch(setTheme(theme))
+  const handleChangeLang = (_: SyntheticEvent | null, lang: string | null) => dispatch(setLang(lang))
 
   return (
     <Grow in={true} style={{ transformOrigin: '0 0 0' }}>

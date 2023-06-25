@@ -26,8 +26,9 @@
   "newE": {
     "title": "New experiment",
     "titleStep1": "Select experiment type",
-    "step1Tip": "Select the experiment type to view actions or spec",
+    "step1Tip": "Select the experiment type to view actions or spec.",
     "step1Actions": "Actions",
+    "step1NoFill": "This action doesn't need to fill in any information. You can submit it directly.",
     "titleStep2": "Fill in basic information",
     "steps": {
       "basic": "Metadata",

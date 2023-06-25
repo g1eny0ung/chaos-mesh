@@ -18,7 +18,19 @@ import CheckIcon from '@mui/icons-material/Check'
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined'
 import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined'
 import UndoIcon from '@mui/icons-material/Undo'
-import { Box, Card, Chip, Divider, Grid, ListItemDecorator, Option, Select, SelectOption, Typography } from '@mui/joy'
+import {
+  Box,
+  Card,
+  Chip,
+  Divider,
+  Grid,
+  IconButton,
+  ListItemDecorator,
+  Option,
+  Select,
+  SelectOption,
+  Typography,
+} from '@mui/joy'
 import { Stale } from 'api/queryUtils'
 import { useGetCommonConfig } from 'openapi'
 
@@ -26,6 +38,7 @@ import { useStoreDispatch, useStoreSelector } from 'store'
 
 import { Env, setEnv, setKindAction, setSpec, setStep1 } from 'slices/experiments'
 
+import { Submit } from 'components/FormField'
 import i18n, { T } from 'components/T'
 
 import { iconByKind, transByKind } from 'lib/byKind'
@@ -83,10 +96,6 @@ const Step1 = () => {
 
   const handleSelectAction = (newAction: string) => () => {
     dispatch(setKindAction([kind, newAction]))
-
-    if (submitDirectly.includes(newAction)) {
-      handleSubmitStep1({ action: newAction })
-    }
   }
 
   const handleSubmitStep1 = (values: Record<string, any>) => {
@@ -113,7 +122,13 @@ const Step1 = () => {
   }
 
   return (
-    <Card variant="outlined" className={step1 ? 'submit' : ''}>
+    <Card
+      variant="outlined"
+      sx={{
+        height: step1 ? 66 : 'auto',
+        ...(step1 && { overflow: 'hidden' }),
+      }}
+    >
       <Box display="flex" justifyContent="space-between" mb={3}>
         <Box display="flex" alignItems="center">
           {step1 && (
@@ -128,7 +143,9 @@ const Step1 = () => {
         </Box>
 
         {step1 ? (
-          <UndoIcon onClick={handleUndo} />
+          <IconButton variant="outlined" size="sm" onClick={handleUndo}>
+            <UndoIcon />
+          </IconButton>
         ) : (
           <Select defaultValue="k8s" size="sm" renderValue={renderEnv} sx={{ width: 150 }} onChange={handleSwitchEnv}>
             {envOptions.map((option) => (
@@ -140,6 +157,7 @@ const Step1 = () => {
           </Select>
         )}
       </Box>
+
       <Grid container spacing={3}>
         {typesDataEntries.map(([key]) => (
           <Grid key={key} xs={12} sm={3}>
@@ -148,9 +166,9 @@ const Step1 = () => {
               sx={{
                 cursor: 'pointer',
                 '&:hover': {
-                  bgcolor: 'primary.softBg',
-                  color: 'primary.softColor',
-                  borderColor: 'primary.outlinedBorder',
+                  bgcolor: 'neutral.softBg',
+                  color: 'neutral.softColor',
+                  borderColor: 'neutral.outlinedBorder',
                 },
                 ...(key === kind && {
                   bgcolor: 'primary.softBg',
@@ -191,9 +209,9 @@ const Step1 = () => {
                       sx={{
                         cursor: 'pointer',
                         '&:hover': {
-                          bgcolor: 'primary.softBg',
-                          color: 'primary.softColor',
-                          borderColor: 'primary.outlinedBorder',
+                          bgcolor: 'neutral.softBg',
+                          color: 'neutral.softColor',
+                          borderColor: 'neutral.outlinedBorder',
                         },
                         ...(d.key === action && {
                           bgcolor: 'primary.softBg',
@@ -247,26 +265,35 @@ const Step1 = () => {
         </Box>
       ) : (
         <Box my={3} textAlign="center">
-          <Typography color="neutral">
+          <Typography level="body2">
             <T id="newE.step1Tip" />
           </Typography>
         </Box>
       )}
 
-      {action && !submitDirectly.includes(action) && (
+      {action && (
         <>
           <Divider sx={{ my: 3 }} />
-          <TargetGenerated
-            // Force re-rendered after action changed
-            key={kind + action}
-            env={env}
-            kind={kind}
-            data={(typesData as any)[kind as Kind].categories!.filter(({ key }: any) => key === action)[0].spec}
-            validationSchema={
-              env === 'k8s' ? (schema[kind as Kind] ? schema[kind as Kind]![action] : undefined) : undefined
-            }
-            onSubmit={handleSubmitStep1}
-          />
+          {submitDirectly.includes(action) ? (
+            <>
+              <Typography level="body2">
+                <T id="newE.step1NoFill" />
+              </Typography>
+              <Submit onClick={handleSubmitStep1} />
+            </>
+          ) : (
+            <TargetGenerated
+              // Force re-rendered after action changed
+              key={kind + action}
+              env={env}
+              kind={kind}
+              data={(typesData as any)[kind as Kind].categories!.filter(({ key }: any) => key === action)[0].spec}
+              validationSchema={
+                env === 'k8s' ? (schema[kind as Kind] ? schema[kind as Kind]![action] : undefined) : undefined
+              }
+              onSubmit={handleSubmitStep1}
+            />
+          )}
         </>
       )}
     </Card>

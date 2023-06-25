@@ -86,10 +86,10 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
         </TabList>
       )}
       <TabPanel value={0}>
-        <Space spacing={6}>
+        <Space>
           <Step1 />
-          {/* <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
-          <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} /> */}
+          <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
+          {/* <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} /> */}
         </Space>
       </TabPanel>
       <TabPanel value={1}>

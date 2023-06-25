@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { MenuItem, Typography } from '@mui/material'
+import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import { useGetCommonAnnotations, useGetCommonLabels, usePostCommonPhysicalmachines, usePostCommonPods } from 'openapi'
 import { useEffect, useMemo } from 'react'
@@ -159,16 +159,14 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
         />
 
         <SelectField<string[]>
-          multiple
           name={`${scope}.podPhaseSelectors`}
           label={<T id="k8s.podPhaseSelectors" />}
           helperText={<T id="newE.scope.phaseSelectorsHelper" />}
-          fullWidth
         >
           {podPhases.map((option) => (
-            <MenuItem key={option} value={option}>
+            <Option key={option} value={option}>
               {option}
-            </MenuItem>
+            </Option>
           ))}
         </SelectField>
       </MoreOptions>
@@ -179,15 +177,16 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
         <Typography fontWeight="medium">
           {previewTitle || <T id={`newE.scope.target${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}Preview`} />}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+        <Typography level="body2">
           <T id={`newE.scope.target${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}PreviewHelper`} />
         </Typography>
       </div>
 
       {targets ? (
-        <TargetsTable env={env} scope={scope} data={targets} />
+        // <TargetsTable env={env} scope={scope} data={targets} />
+        <div />
       ) : (
-        <Typography variant="body2" fontWeight="medium">
+        <Typography level="body2" fontWeight="medium">
           <T id={`newE.scope.no${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}Found`} />
         </Typography>
       )}
@@ -205,12 +204,7 @@ const ConditionalScope = ({ kind, ...rest }: ConditionalScopeProps) => {
   const { useNewPhysicalMachine } = useStoreSelector((state) => state.settings)
 
   if (disabled) {
-    return (
-      <Typography
-        variant="body2"
-        sx={{ color: 'text.disabled' }}
-      >{`${kind} does not need to define the scope.`}</Typography>
-    )
+    return <Typography level="body2">{`${kind} does not need to define the scope.`}</Typography>
   }
 
   if (rest.env === 'physic' && !useNewPhysicalMachine) {

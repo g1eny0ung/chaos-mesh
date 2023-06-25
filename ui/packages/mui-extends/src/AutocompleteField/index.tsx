@@ -14,69 +14,34 @@
  * limitations under the License.
  *
  */
-import { Autocomplete, Chip, Paper } from '@mui/material'
-import type { AutocompleteProps, TextFieldProps } from '@mui/material'
+import { Autocomplete } from '@mui/joy'
+import type { AutocompleteProps } from '@mui/joy'
 
 import FormControl from '../FormControl'
-import OutlinedInput from '../OutlinedInput'
 
 export interface AutocompleteFieldProps<
   T = string,
   Multiple extends boolean | undefined = boolean,
   DisableClearable extends boolean | undefined = boolean,
   FreeSolo extends boolean | undefined = boolean
-> extends Omit<AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>, 'renderInput'> {
+> extends AutocompleteProps<T, Multiple, DisableClearable, FreeSolo> {
   name?: string
-  label?: TextFieldProps['label']
-  helperText?: TextFieldProps['helperText']
+  label?: React.ReactNode
+  helperText?: React.ReactNode
   error?: boolean
-  onRenderValueDelete?: (value: T) => (event: any) => void
 }
 
 export default function AutocompleteField<T>({
   name,
   label,
   helperText,
+  disabled,
   error,
-  onRenderValueDelete,
   ...props
 }: AutocompleteFieldProps<T>) {
-  const { disabled, fullWidth } = props
-
   return (
     <FormControl disabled={disabled} error={error} label={label} LabelProps={{ htmlFor: name }} helperText={helperText}>
-      <Autocomplete
-        id={name}
-        {...props}
-        renderInput={(params) => (
-          <OutlinedInput
-            name={name}
-            {...params.InputProps}
-            inputProps={params.inputProps}
-            error={error}
-            sx={{ width: '100%' }}
-          />
-        )}
-        renderTags={
-          props.multiple
-            ? (value: T[], getTagProps) =>
-                value.map((val: T, index: number) => {
-                  const tagProps = getTagProps({ index })
-
-                  return (
-                    <Chip
-                      {...tagProps}
-                      label={val}
-                      color="primary"
-                      onDelete={onRenderValueDelete ? onRenderValueDelete(val) : tagProps.onDelete}
-                      sx={{ height: 24 }}
-                    />
-                  )
-                })
-            : undefined
-        }
-        PaperComponent={(props) => <Paper {...props} sx={{ mt: 1 }} />}
-      />
+      <Autocomplete id={name} {...props} />
     </FormControl>
   )
 }

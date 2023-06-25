@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { InputAdornment, MenuItem } from '@mui/material'
+import { Option } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 
 import { SelectField, TextField } from 'components/FormField'
@@ -43,11 +43,11 @@ const Mode: React.FC<ModeProps> = ({ modeScope, scope }) => {
         label={<T id="newE.scope.mode" />}
         helperText={<T id="newE.scope.modeHelper" />}
       >
-        <MenuItem value="all">All</MenuItem>
+        <Option value="all">All</Option>
         {modes.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
+          <Option key={option.value} value={option.value}>
             {option.name}
-          </MenuItem>
+          </Option>
         ))}
       </SelectField>
 
@@ -56,9 +56,7 @@ const Mode: React.FC<ModeProps> = ({ modeScope, scope }) => {
           name={modeScope ? `${modeScope}.value` : 'value'}
           label={<T id="newE.scope.modeValue" />}
           helperText={<T id="newE.scope.modeValueHelper" />}
-          endDecorator={
-            modesWithAdornment.includes(getIn(values, scope).mode) && <InputAdornment position="end">%</InputAdornment>
-          }
+          endDecorator={modesWithAdornment.includes(getIn(values, scope).mode) && '%'}
         />
       )}
     </>

@@ -36,14 +36,15 @@ const AutocompleteField: React.FC<AutocompleteFieldProps> = ({ name, multiple, o
       return
     }
 
+    if (reason === 'removeOption') {
+      setFieldValue(
+        name,
+        value.filter((d: string) => d !== newVal)
+      )
+    }
+
     setFieldValue(name, newVal)
   }
-
-  const onDelete = (val: string) => () =>
-    setFieldValue(
-      name,
-      value.filter((d: string) => d !== val)
-    )
 
   return (
     <MuiExtendsAutocompleteField
@@ -54,7 +55,6 @@ const AutocompleteField: React.FC<AutocompleteFieldProps> = ({ name, multiple, o
       noOptionsText={<T id="common.noOptions" />}
       value={value}
       onChange={onChange}
-      onRenderValueDelete={onDelete}
     />
   )
 }

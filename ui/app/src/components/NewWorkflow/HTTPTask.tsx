@@ -153,7 +153,6 @@ const HTTPTask: React.FC<HTTPTaskProps> = (props) => {
                     helperText={
                       errors.method && touched.method ? errors.method : i18n('newW.node.httpRequest.methodHelper')
                     }
-                    size="small"
                   >
                     {HTTPMethods.map((method) => (
                       <MenuItem key={method} value={method}>
