@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
+import { setAlert } from '@/slices/globalStatus'
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 
-import store from 'store'
-
-import { setAlert } from 'slices/globalStatus'
+import store from '@/store'
 
 interface ErrorData {
   code: number
@@ -48,7 +47,6 @@ http.interceptors.response.use(undefined, (error: AxiosError<ErrorData>) => {
 
           break
         }
-      // eslint-disable-next-line no-fallthrough
       case 'no_cluster_privilege':
       case 'no_namespace_privilege':
       default:

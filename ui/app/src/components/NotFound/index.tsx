@@ -14,10 +14,9 @@
  * limitations under the License.
  *
  */
+import EmptyStreetDark from '@/images/assets/undraw_empty_street-dark.svg'
+import undrawNotFound from '@/images/assets/undraw_not_found.svg'
 import { Box, BoxProps } from '@mui/joy'
-
-import EmptyStreetDark from 'images/assets/undraw_empty_street-dark.svg'
-import undrawNotFound from 'images/assets/undraw_not_found.svg'
 
 interface NotFoundProps extends BoxProps {
   illustrated?: boolean

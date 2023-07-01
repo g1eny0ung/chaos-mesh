@@ -1,4 +1,4 @@
-import i18n from 'components/T'
+import i18n from '@/components/T'
 
 export const steps = [
   {

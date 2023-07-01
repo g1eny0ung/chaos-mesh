@@ -14,23 +14,25 @@
  * limitations under the License.
  *
  */
+import { podPhases } from '@/components/AutoForm/data'
+import { AutocompleteField, SelectField } from '@/components/FormField'
+import MoreOptions from '@/components/MoreOptions'
+import { T } from '@/components/T'
+import { arrToObjBySep, objToArrBySep } from '@/lib/utils'
+import {
+  useGetCommonAnnotations,
+  useGetCommonLabels,
+  usePostCommonPhysicalmachines,
+  usePostCommonPods,
+} from '@/openapi'
+import { Env } from '@/slices/experiments'
 import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
-import { useGetCommonAnnotations, useGetCommonLabels, usePostCommonPhysicalmachines, usePostCommonPods } from 'openapi'
 import { useEffect, useMemo } from 'react'
 
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreSelector } from 'store'
-
-import { Env } from 'slices/experiments'
-
-import { podPhases } from 'components/AutoForm/data'
-import { AutocompleteField, SelectField } from 'components/FormField'
-import MoreOptions from 'components/MoreOptions'
-import { T } from 'components/T'
-
-import { arrToObjBySep, objToArrBySep } from 'lib/utils'
+import { useStoreSelector } from '@/store'
 
 import DeprecatedAddress from './DeprecatedAddress'
 import Mode from './Mode'

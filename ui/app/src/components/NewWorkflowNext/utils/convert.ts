@@ -14,16 +14,13 @@
  * limitations under the License.
  *
  */
+import { Schedule, scheduleInitialValues } from '@/components/AutoForm/data'
+import { arrToObjBySep, isDeepEmpty, objToArrBySep } from '@/lib/utils'
+import type { NodeExperiment } from '@/slices/workflows'
 import yaml from 'js-yaml'
 import _ from 'lodash'
 import { Edge, Node, XYPosition, getIncomers } from 'react-flow-renderer'
 import { v4 as uuidv4 } from 'uuid'
-
-import type { NodeExperiment } from 'slices/workflows'
-
-import { Schedule, scheduleInitialValues } from 'components/AutoForm/data'
-
-import { arrToObjBySep, isDeepEmpty, objToArrBySep } from 'lib/utils'
 
 export enum ExperimentKind {
   AWSChaos = 'AWSChaos',

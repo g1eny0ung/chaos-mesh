@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
+import LS from '@/lib/localStorage'
 import { createSlice } from '@reduxjs/toolkit'
-
-import LS from 'lib/localStorage'
 
 export type Theme = 'light' | 'dark'
 

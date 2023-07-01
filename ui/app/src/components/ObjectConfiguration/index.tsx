@@ -14,18 +14,16 @@
  * limitations under the License.
  *
  */
+import { templateTypeToFieldName } from '@/api/zz_generated.frontend.chaos-mesh'
+import StatusLabel from '@/components/StatusLabel'
+import i18n from '@/components/T'
+import { format } from '@/lib/luxon'
+import { TypesArchiveDetail, TypesExperimentDetail } from '@/openapi/index.schemas'
 import { Grid, Table, TableBody, TableRow, Typography } from '@mui/material'
-import { templateTypeToFieldName } from 'api/zz_generated.frontend.chaos-mesh'
-import { TypesArchiveDetail, TypesExperimentDetail } from 'openapi/index.schemas'
 
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreSelector } from 'store'
-
-import StatusLabel from 'components/StatusLabel'
-import i18n from 'components/T'
-
-import { format } from 'lib/luxon'
+import { useStoreSelector } from '@/store'
 
 import { Experiment, Selector, TableCell } from './common'
 

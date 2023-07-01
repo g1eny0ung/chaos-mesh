@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
+import { Node, WorkflowSingle } from '@/api/workflows.type'
 import { Theme } from '@mui/material'
-import { Node, WorkflowSingle } from 'api/workflows.type'
 import cytoscape, { EdgeDefinition, EventHandler, NodeDefinition, Stylesheet } from 'cytoscape'
 import dagre from 'cytoscape-dagre'
 import _ from 'lodash'

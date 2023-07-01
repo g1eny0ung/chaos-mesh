@@ -14,6 +14,19 @@
  * limitations under the License.
  *
  */
+import { applyAPIAuthentication, applyNSParam } from '@/api/interceptors'
+import { Stale } from '@/api/queryUtils'
+import Helmet from '@/components/Helmet'
+import Layout from '@/components/Layout'
+import i18n, { T } from '@/components/T'
+import { TokenFormValues } from '@/components/Token'
+import logoWhite from '@/images/logo-mini-white.svg'
+import logo from '@/images/logo-mini.svg'
+import LS from '@/lib/localStorage'
+import { useGetCommonConfig } from '@/openapi'
+import routes from '@/routes'
+import { setAlertOpen, setConfirmOpen, setNameSpace, setTokenName, setTokens } from '@/slices/globalStatus'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import loadable from '@loadable/component'
 import MenuIcon from '@mui/icons-material/Menu'
 import {
@@ -29,32 +42,14 @@ import {
   ListSubheader,
   Typography,
 } from '@mui/joy'
-import { Alert, Portal, Snackbar, useMediaQuery, useTheme } from '@mui/material'
-import { applyAPIAuthentication, applyNSParam } from 'api/interceptors'
-import { Stale } from 'api/queryUtils'
+import { Alert, Portal, Snackbar, useMediaQuery } from '@mui/material'
 import Cookies from 'js-cookie'
-import { useGetCommonConfig } from 'openapi'
 import { useEffect, useState } from 'react'
 import { BrowserRouter, NavLink } from 'react-router-dom'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import routes from 'routes'
 
 import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
 import Loading from '@ui/mui-extends/esm/Loading'
-
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { setAlertOpen, setConfirmOpen, setNameSpace, setTokenName, setTokens } from 'slices/globalStatus'
-
-import Helmet from 'components/Helmet'
-import Layout from 'components/Layout'
-import i18n, { T } from 'components/T'
-import { TokenFormValues } from 'components/Token'
-
-import LS from 'lib/localStorage'
-
-import logoWhite from 'images/logo-mini-white.svg'
-import logo from 'images/logo-mini.svg'
 
 import { topNavItems } from './Sidebar'
 
@@ -87,8 +82,6 @@ function SideNav() {
 }
 
 const TopContainer = () => {
-  const theme = useTheme()
-
   const { alert, alertOpen, confirm, confirmOpen } = useStoreSelector((state) => state.globalStatus)
 
   const dispatch = useStoreDispatch()
@@ -159,13 +152,6 @@ const TopContainer = () => {
       },
     },
   })
-
-  const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'))
-  useEffect(() => {
-    if (isTabletScreen) {
-      setOpenDrawer(false)
-    }
-  }, [isTabletScreen])
 
   return (
     <BrowserRouter>

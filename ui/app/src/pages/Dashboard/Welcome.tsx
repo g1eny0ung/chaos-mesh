@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
+import WelcomeSVG from '@/images/assets/undraw_server_down_s-4-lk.svg'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Button, Card, IconButton, Typography } from '@mui/joy'
 import { useTour } from '@reactour/tour'
-
-import WelcomeSVG from 'images/assets/undraw_server_down_s-4-lk.svg'
 
 const Welcome = () => {
   const { setIsOpen } = useTour()

@@ -14,13 +14,12 @@
  * limitations under the License.
  *
  */
+import NewExperiment from '@/components/NewExperiment'
 import { Grid } from '@mui/joy'
-
-import NewExperiment from 'components/NewExperimentNext'
 
 const New = () => (
   <Grid container>
-    <Grid xs={12} lg={9}>
+    <Grid xs={12} lg={8}>
       <NewExperiment />
     </Grid>
   </Grid>

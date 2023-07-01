@@ -14,23 +14,22 @@
  * limitations under the License.
  *
  */
-import Archives from 'pages/Archives'
-import Archive from 'pages/Archives/Single'
-import Dashboard from 'pages/Dashboard'
-import Events from 'pages/Events'
-import Experiments from 'pages/Experiments'
-import NewExperiment from 'pages/Experiments/New'
-import Experiment from 'pages/Experiments/Single'
-import Schedules from 'pages/Schedules'
-import NewSchedule from 'pages/Schedules/New'
-import Schedule from 'pages/Schedules/Single'
-import Settings from 'pages/Settings'
-import Workflows from 'pages/Workflows'
-import Workflow from 'pages/Workflows/Single'
+import NewWorkflow from '@/components/NewWorkflow'
+import NewWorkflowNext from '@/components/NewWorkflowNext'
+import Archives from '@/pages/Archives'
+import Archive from '@/pages/Archives/Single'
+import Dashboard from '@/pages/Dashboard'
+import Events from '@/pages/Events'
+import Experiments from '@/pages/Experiments'
+import NewExperiment from '@/pages/Experiments/New'
+import Experiment from '@/pages/Experiments/Single'
+import Schedules from '@/pages/Schedules'
+import NewSchedule from '@/pages/Schedules/New'
+import Schedule from '@/pages/Schedules/Single'
+import Settings from '@/pages/Settings'
+import Workflows from '@/pages/Workflows'
+import Workflow from '@/pages/Workflows/Single'
 import { RouteProps } from 'react-router-dom'
-
-import NewWorkflow from 'components/NewWorkflow'
-import NewWorkflowNext from 'components/NewWorkflowNext'
 
 type CustomRouteProps = RouteProps & { title: string }
 

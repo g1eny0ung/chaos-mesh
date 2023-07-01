@@ -14,10 +14,9 @@
  * limitations under the License.
  *
  */
+import { T } from '@/components/T'
 import { Box, Button } from '@mui/joy'
 import type { ButtonProps } from '@mui/joy'
-
-import { T } from 'components/T'
 
 export default function Submit(props: ButtonProps) {
   return (

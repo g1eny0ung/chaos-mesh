@@ -14,13 +14,18 @@
  * limitations under the License.
  *
  */
+import i18n from '@/components/T'
+import YAML from '@/components/YAML'
+import { iconByKind } from '@/lib/byKind'
+import { PreDefinedValue, getDB } from '@/lib/idb'
+import { postExperiments, postSchedules } from '@/openapi'
+import { setAlert, setConfirm } from '@/slices/globalStatus'
 import loadable from '@loadable/component'
 import { Box, Button, Card, Modal, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { Ace } from 'ace-builds'
 import clsx from 'clsx'
 import yaml from 'js-yaml'
-import { postExperiments, postSchedules } from 'openapi'
 import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 
@@ -28,17 +33,9 @@ import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch } from 'store'
+import { useStoreDispatch } from '@/store'
 
-import { setAlert, setConfirm } from 'slices/globalStatus'
-
-import i18n from 'components/T'
-import YAML from 'components/YAML'
-
-import { iconByKind } from 'lib/byKind'
-import { PreDefinedValue, getDB } from 'lib/idb'
-
-const YAMLEditor = loadable(() => import('components/YAMLEditor'))
+const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 
 const useStyles = makeStyles((theme) => ({
   card: {

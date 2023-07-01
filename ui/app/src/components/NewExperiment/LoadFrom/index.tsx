@@ -14,7 +14,8 @@
  * limitations under the License.
  *
  */
-import { Box, Divider, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
+import i18n from '@/components/T'
+import { PreDefinedValue, getDB } from '@/lib/idb'
 import {
   useGetArchives,
   useGetArchivesSchedules,
@@ -24,22 +25,17 @@ import {
   useGetExperimentsUid,
   useGetSchedules,
   useGetSchedulesUid,
-} from 'openapi'
-import { TypesArchiveDetail, TypesExperimentDetail, TypesScheduleDetail } from 'openapi/index.schemas'
+} from '@/openapi'
+import { TypesArchiveDetail, TypesExperimentDetail, TypesScheduleDetail } from '@/openapi/index.schemas'
+import { setAlert } from '@/slices/globalStatus'
+import { useStoreDispatch } from '@/store'
+import { Box, Divider, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 
 import Paper from '@ui/mui-extends/esm/Paper'
 import SkeletonN from '@ui/mui-extends/esm/SkeletonN'
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch } from 'store'
-
-import { setAlert } from 'slices/globalStatus'
-
-import i18n from 'components/T'
-
-import { PreDefinedValue, getDB } from 'lib/idb'
 
 import RadioLabel from './RadioLabel'
 

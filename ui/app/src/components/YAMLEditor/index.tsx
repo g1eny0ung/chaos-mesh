@@ -14,27 +14,26 @@
  * limitations under the License.
  *
  */
-
-import 'ace-builds'
-import 'ace-builds/src-min-noconflict/theme-tomorrow_night_eighties'
-import 'ace-builds/src-min-noconflict/mode-yaml'
-import 'ace-builds/src-min-noconflict/theme-tomorrow'
-
-import AceEditor, { IAceEditorProps } from 'react-ace'
-import { Box, Button } from '@mui/material'
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { Ace } from 'ace-builds'
+import i18n from '@/components/T'
+import { setConfirm } from '@/slices/globalStatus'
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import PublishIcon from '@mui/icons-material/Publish'
-import Space from '@ui/mui-extends/esm/Space'
+import { Box, Button } from '@mui/material'
+import 'ace-builds'
+import { Ace } from 'ace-builds'
+import 'ace-builds/src-min-noconflict/mode-yaml'
+import 'ace-builds/src-min-noconflict/theme-tomorrow'
+import 'ace-builds/src-min-noconflict/theme-tomorrow_night_eighties'
 import fileDownload from 'js-file-download'
-import i18n from 'components/T'
-import { memo } from 'react'
-import { setConfirm } from 'slices/globalStatus'
-import { useIntl } from 'react-intl'
-import { useState } from 'react'
 import yaml from 'js-yaml'
+import { memo } from 'react'
+import { useState } from 'react'
+import AceEditor, { IAceEditorProps } from 'react-ace'
+import { useIntl } from 'react-intl'
+
+import Space from '@ui/mui-extends/esm/Space'
+
+import { useStoreDispatch, useStoreSelector } from '@/store'
 
 interface YAMLEditorProps {
   name?: string

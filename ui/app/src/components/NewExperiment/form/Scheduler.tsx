@@ -14,18 +14,15 @@
  * limitations under the License.
  *
  */
+import { TextField } from '@/components/FormField'
+import { ExperimentKind } from '@/components/NewExperiment/types'
+import i18n from '@/components/T'
+import { validateDuration, validateSchedule } from '@/lib/formikhelpers'
+import { useStoreSelector } from '@/store'
 import { Box, Link, Switch, Typography } from '@mui/joy'
 import { FormikErrors, FormikTouched, getIn, useFormikContext } from 'formik'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
-
-import { useStoreSelector } from 'store'
-
-import { TextField } from 'components/FormField'
-import { ExperimentKind } from 'components/NewExperiment/types'
-import i18n from 'components/T'
-
-import { validateDuration, validateSchedule } from 'lib/formikhelpers'
 
 function isInstant(kind: ExperimentKind | '', action: string) {
   if (kind === 'PodChaos' && (action === 'pod-kill' || action === 'container-kill')) {

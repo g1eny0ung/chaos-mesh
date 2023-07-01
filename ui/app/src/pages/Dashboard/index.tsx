@@ -14,6 +14,11 @@
  * limitations under the License.
  *
  */
+import EventsTimeline from '@/components/EventsTimeline'
+import StatusLabel from '@/components/StatusLabel'
+import i18n from '@/components/T'
+import timelinePlot, { genTimelineData } from '@/lib/d3/timeline'
+import { useGetEvents, useGetExperiments, useGetSchedules, useGetWorkflows } from '@/openapi'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined'
@@ -22,14 +27,7 @@ import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
 import { Box, Card, CardContent, Grid, IconButton, Typography } from '@mui/joy'
 import { TourProvider } from '@reactour/tour'
 import _ from 'lodash'
-import { useGetEvents, useGetExperiments, useGetSchedules, useGetWorkflows } from 'openapi'
 import { type ReactChild, useEffect, useRef } from 'react'
-
-import EventsTimeline from 'components/EventsTimeline'
-import StatusLabel from 'components/StatusLabel'
-import i18n from 'components/T'
-
-import timelinePlot, { genTimelineData } from 'lib/d3/timeline'
 
 import TotalStatus from './TotalStatus'
 import Welcome from './Welcome'

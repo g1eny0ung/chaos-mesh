@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
+import { Kind } from '@/components/NewExperiment/data/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-
-import { Kind } from 'components/NewExperimentNext/data/types'
 
 export type Env = 'k8s' | 'physic'
 

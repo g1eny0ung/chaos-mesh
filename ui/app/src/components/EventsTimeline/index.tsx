@@ -14,16 +14,14 @@
  * limitations under the License.
  *
  */
+import NotFound from '@/components/NotFound'
+import i18n from '@/components/T'
+import { iconByKind } from '@/lib/byKind'
+import DateTime, { format } from '@/lib/luxon'
+import { CoreEvent } from '@/openapi/index.schemas'
 import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Typography } from '@mui/joy'
-import { CoreEvent } from 'openapi/index.schemas'
 
-import { useStoreSelector } from 'store'
-
-import NotFound from 'components/NotFound'
-import i18n from 'components/T'
-
-import { iconByKind } from 'lib/byKind'
-import DateTime, { format } from 'lib/luxon'
+import { useStoreSelector } from '@/store'
 
 interface EventsTimelineProps {
   events?: CoreEvent[]

@@ -14,10 +14,9 @@
  * limitations under the License.
  *
  */
+import { T } from '@/components/T'
 import { PauseCircleOutlined, TaskAltOutlined } from '@mui/icons-material'
 import { Chip, CircularProgress, ColorPaletteProp } from '@mui/joy'
-
-import { T } from 'components/T'
 
 const statusColors: Record<string, ColorPaletteProp> = {
   injecting: 'info',

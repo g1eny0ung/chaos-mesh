@@ -14,27 +14,24 @@
  * limitations under the License.
  *
  */
+import { Stale } from '@/api/queryUtils'
+import { LabelField, SelectField, Submit, TextField } from '@/components/FormField'
+import MoreOptions from '@/components/MoreOptions'
+import { Fields as ScheduleSpecificFields, data as scheduleSpecificData } from '@/components/Schedule/types'
+import Scope from '@/components/Scope'
+import i18n from '@/components/T'
+import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
+import { setBasic, setStep2 } from '@/slices/experiments'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import CheckIcon from '@mui/icons-material/Check'
 import PublishIcon from '@mui/icons-material/Publish'
 import UndoIcon from '@mui/icons-material/Undo'
 import { Box, Card, Chip, Divider, Grid, IconButton, Option, Typography } from '@mui/joy'
-import { Stale } from 'api/queryUtils'
 import { Form, Formik } from 'formik'
 import _ from 'lodash'
-import { useGetCommonChaosAvailableNamespaces } from 'openapi'
 import { useEffect, useMemo, useState } from 'react'
 
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { setBasic, setStep2 } from 'slices/experiments'
-
-import { LabelField, SelectField, Submit, TextField } from 'components/FormField'
-import MoreOptions from 'components/MoreOptions'
-import { Fields as ScheduleSpecificFields, data as scheduleSpecificData } from 'components/Schedule/types'
-import Scope from 'components/Scope'
-import i18n from 'components/T'
 
 import basicData, { schema as basicSchema } from './data/basic'
 import Scheduler from './form/Scheduler'

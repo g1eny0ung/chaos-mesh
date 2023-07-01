@@ -14,6 +14,11 @@
  * limitations under the License.
  *
  */
+import AutoForm, { Belong } from '@/components/AutoForm'
+import i18n, { T } from '@/components/T'
+import { concatKindAction } from '@/lib/utils'
+import { setConfirm } from '@/slices/globalStatus'
+import { importNodes, removeWorkflowNode, updateWorkflowNode } from '@/slices/workflows'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Drawer, IconButton, ListItemIcon, ListItemText, MenuItem } from '@mui/material'
@@ -29,15 +34,7 @@ import { v4 as uuidv4 } from 'uuid'
 import Menu from '@ui/mui-extends/esm/Menu'
 import Paper from '@ui/mui-extends/esm/Paper'
 
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { setConfirm } from 'slices/globalStatus'
-import { importNodes, removeWorkflowNode, updateWorkflowNode } from 'slices/workflows'
-
-import AutoForm, { Belong } from 'components/AutoForm'
-import i18n, { T } from 'components/T'
-
-import { concatKindAction } from 'lib/utils'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 
 import AdjustableEdge from './AdjustableEdge'
 import { ElementDragData } from './Elements/types'

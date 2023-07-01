@@ -14,14 +14,20 @@
  * limitations under the License.
  *
  */
+import EventsTimeline from '@/components/EventsTimeline'
+import Helmet from '@/components/Helmet'
+import NodeConfiguration from '@/components/ObjectConfiguration/Node'
+import i18n from '@/components/T'
+import { constructWorkflowTopology } from '@/lib/cytoscape'
+import { useDeleteWorkflowsUid, useGetEventsWorkflowUid, useGetWorkflowsUid } from '@/openapi'
+import { CoreWorkflowDetail } from '@/openapi/index.schemas'
+import { Confirm, setAlert, setConfirm } from '@/slices/globalStatus'
 import loadable from '@loadable/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import { Box, Button, Grid, Grow, Modal, useTheme } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { EventHandler } from 'cytoscape'
 import yaml from 'js-yaml'
-import { useDeleteWorkflowsUid, useGetEventsWorkflowUid, useGetWorkflowsUid } from 'openapi'
-import { CoreWorkflowDetail } from 'openapi/index.schemas'
 import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -30,18 +36,9 @@ import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch } from 'store'
+import { useStoreDispatch } from '@/store'
 
-import { Confirm, setAlert, setConfirm } from 'slices/globalStatus'
-
-import EventsTimeline from 'components/EventsTimeline'
-import Helmet from 'components/Helmet'
-import NodeConfiguration from 'components/ObjectConfiguration/Node'
-import i18n from 'components/T'
-
-import { constructWorkflowTopology } from 'lib/cytoscape'
-
-const YAMLEditor = loadable(() => import('components/YAMLEditor'))
+const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 
 const useStyles = makeStyles((theme) => ({
   root: {},

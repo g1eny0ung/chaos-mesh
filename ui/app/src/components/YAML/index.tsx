@@ -14,15 +14,13 @@
  * limitations under the License.
  *
  */
+import { T } from '@/components/T'
+import { setAlert } from '@/slices/globalStatus'
 import FileOpenIcon from '@mui/icons-material/FileOpen'
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton'
 import { useState } from 'react'
 
-import { useStoreDispatch } from 'store'
-
-import { setAlert } from 'slices/globalStatus'
-
-import { T } from 'components/T'
+import { useStoreDispatch } from '@/store'
 
 interface YAMLProps {
   callback: (y: any) => void

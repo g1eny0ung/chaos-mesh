@@ -3,11 +3,8 @@
   "importOrder": [
     "<THIRD_PARTY_MODULES>",
     "^@ui/(.*)$",
-    "store",
-    "^slices/(.*)$",
     "^components/(.*)$",
     "^lib/(.*)$",
-    "^images/(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,

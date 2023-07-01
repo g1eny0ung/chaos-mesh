@@ -14,18 +14,16 @@
  * limitations under the License.
  *
  */
-import { templateTypeToFieldName } from 'api/zz_generated.frontend.chaos-mesh'
+import { templateTypeToFieldName } from '@/api/zz_generated.frontend.chaos-mesh'
+import { podPhases } from '@/components/AutoForm/data'
+import basicData from '@/components/NewExperiment/data/basic'
+import { Experiment, ExperimentKind, Frame, Scope } from '@/components/NewExperiment/types'
+import { WorkflowBasic } from '@/components/NewWorkflow'
+import { ScheduleSpecific } from '@/components/Schedule/types'
+import { Env } from '@/slices/experiments'
+import { Template } from '@/slices/workflows'
 import yaml from 'js-yaml'
 import _ from 'lodash'
-
-import { Env } from 'slices/experiments'
-import { Template } from 'slices/workflows'
-
-import { podPhases } from 'components/AutoForm/data'
-import { Experiment, ExperimentKind, Frame, Scope } from 'components/NewExperiment/types'
-import basicData from 'components/NewExperimentNext/data/basic'
-import { WorkflowBasic } from 'components/NewWorkflow'
-import { ScheduleSpecific } from 'components/Schedule/types'
 
 import { arrToObjBySep, sanitize } from './utils'
 

@@ -14,14 +14,13 @@
  * limitations under the License.
  *
  */
+import { T } from '@/components/T'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { Box, Button } from '@mui/joy'
 import { useState } from 'react'
 
 import Space from '@ui/mui-extends/esm/Space'
-
-import { T } from 'components/T'
 
 interface MoreOptionsProps {
   isOpen?: boolean

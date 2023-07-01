@@ -14,26 +14,28 @@
  * limitations under the License.
  *
  */
-import { Autocomplete, Box, IconButton, TextField as MUITextField, Typography } from '@mui/material'
-import { Branch, Template, TemplateType } from 'slices/workflows'
-import { Form, Formik } from 'formik'
-import { LabelField, Submit, TextField } from 'components/FormField'
-import { useRef, useState } from 'react'
-import { useStoreDispatch, useStoreSelector } from 'store'
-import { validateImage, validateName } from 'lib/formikhelpers'
-
-import Add from './Add'
+import { LabelField, Submit, TextField } from '@/components/FormField'
+import i18n from '@/components/T'
+import { validateImage, validateName } from '@/lib/formikhelpers'
+import { resetNewExperiment } from '@/slices/experiments'
+import { setAlert } from '@/slices/globalStatus'
+import { Branch, Template, TemplateType } from '@/slices/workflows'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
+import { Autocomplete, Box, IconButton, TextField as MUITextField, Typography } from '@mui/material'
+import { Form, Formik } from 'formik'
+import { useRef, useState } from 'react'
+import { useIntl } from 'react-intl'
+
 import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import Space from '@ui/mui-extends/esm/Space'
-import i18n from 'components/T'
-import { resetNewExperiment } from 'slices/experiments'
-import { setAlert } from 'slices/globalStatus'
-import { useIntl } from 'react-intl'
+
+import { useStoreDispatch, useStoreSelector } from '@/store'
+
+import Add from './Add'
 
 interface TaskProps extends FormProps {
   childrenCount: number

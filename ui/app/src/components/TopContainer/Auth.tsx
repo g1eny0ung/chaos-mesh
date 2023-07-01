@@ -14,19 +14,18 @@
  * limitations under the License.
  *
  */
+import { Stale } from '@/api/queryUtils'
+import RBACGenerator from '@/components/RBACGenerator'
+import i18n from '@/components/T'
+import Token from '@/components/Token'
+import { useGetCommonConfig } from '@/openapi'
 import GoogleIcon from '@mui/icons-material/Google'
 import { Box, Button, Divider, IconButton, Link, Typography } from '@mui/material'
-import { Stale } from 'api/queryUtils'
-import { useGetCommonConfig } from 'openapi'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
 import Space from '@ui/mui-extends/esm/Space'
-
-import RBACGenerator from 'components/RBACGenerator'
-import i18n from 'components/T'
-import Token from 'components/Token'
 
 interface AuthProps {
   open: boolean

@@ -14,25 +14,21 @@
  * limitations under the License.
  *
  */
+import { Submit } from '@/components/FormField'
+import { ExperimentKind } from '@/components/NewExperiment/types'
+import i18n from '@/components/T'
+import { parseSubmit } from '@/lib/formikhelpers'
+import { usePostExperiments } from '@/openapi'
+import { resetNewExperiment } from '@/slices/experiments'
+import { setAlert } from '@/slices/globalStatus'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import DoneAllIcon from '@mui/icons-material/DoneAll'
 import { Box, Typography } from '@mui/material'
-import { usePostExperiments } from 'openapi'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
-
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { resetNewExperiment } from 'slices/experiments'
-import { setAlert } from 'slices/globalStatus'
-
-import { Submit } from 'components/FormField'
-import { ExperimentKind } from 'components/NewExperiment/types'
-import i18n from 'components/T'
-
-import { parseSubmit } from 'lib/formikhelpers'
 
 interface Step3Props {
   onSubmit?: (parsedValues: any) => void

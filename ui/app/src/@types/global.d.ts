@@ -15,4 +15,6 @@
  *
  */
 
+/// <reference types="vite-plugin-svgr/client" />
+
 type uuid = string

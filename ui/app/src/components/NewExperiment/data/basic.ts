@@ -14,11 +14,9 @@
  * limitations under the License.
  *
  */
+import { schema as scheduleSchema } from '@/components/Schedule/types'
+import { Env } from '@/slices/experiments'
 import * as Yup from 'yup'
-
-import { Env } from 'slices/experiments'
-
-import { schema as scheduleSchema } from 'components/Schedule/types'
 
 const data = {
   metadata: {

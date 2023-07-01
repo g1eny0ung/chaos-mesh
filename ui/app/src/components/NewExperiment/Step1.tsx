@@ -14,7 +14,15 @@
  * limitations under the License.
  *
  */
+import { Stale } from '@/api/queryUtils'
+import { Submit } from '@/components/FormField'
+import i18n, { T } from '@/components/T'
+import { iconByKind, transByKind } from '@/lib/byKind'
+import { useGetCommonConfig } from '@/openapi'
+import { Env, setEnv, setKindAction, setSpec, setStep1 } from '@/slices/experiments'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import CheckIcon from '@mui/icons-material/Check'
+import PublishIcon from '@mui/icons-material/Publish'
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined'
 import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined'
 import UndoIcon from '@mui/icons-material/Undo'
@@ -31,17 +39,6 @@ import {
   SelectOption,
   Typography,
 } from '@mui/joy'
-import { Stale } from 'api/queryUtils'
-import { useGetCommonConfig } from 'openapi'
-
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { Env, setEnv, setKindAction, setSpec, setStep1 } from 'slices/experiments'
-
-import { Submit } from 'components/FormField'
-import i18n, { T } from 'components/T'
-
-import { iconByKind, transByKind } from 'lib/byKind'
 
 import _typesData, { Definition, Kind, dataPhysic, schema } from './data/types'
 import Kernel from './form/Kernel'
@@ -279,7 +276,7 @@ const Step1 = () => {
               <Typography level="body2">
                 <T id="newE.step1NoFill" />
               </Typography>
-              <Submit onClick={handleSubmitStep1} />
+              <Submit startDecorator={<PublishIcon />} onClick={handleSubmitStep1} />
             </>
           ) : (
             <TargetGenerated

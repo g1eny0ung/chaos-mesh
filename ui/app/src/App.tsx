@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+import TopContainer from '@/components/TopContainer'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import type { FC } from 'react'
@@ -22,8 +23,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Provider as StoreProvider } from 'react-redux'
 
 import store from './store'
-
-import TopContainer from 'components/TopContainer'
 
 import IntlProvider from './IntlProvider'
 import ThemeProvider from './ThemeProvider'

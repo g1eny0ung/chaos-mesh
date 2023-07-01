@@ -14,18 +14,15 @@
  * limitations under the License.
  *
  */
+import NewExperiment from '@/components/NewExperiment'
+import i18n from '@/components/T'
+import { usePostSchedules } from '@/openapi'
+import { resetNewExperiment } from '@/slices/experiments'
+import { setAlert } from '@/slices/globalStatus'
+import { useStoreDispatch } from '@/store'
 import { Grid } from '@mui/material'
-import { usePostSchedules } from 'openapi'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-
-import { useStoreDispatch } from 'store'
-
-import { resetNewExperiment } from 'slices/experiments'
-import { setAlert } from 'slices/globalStatus'
-
-import NewExperiment from 'components/NewExperimentNext'
-import i18n from 'components/T'
 
 const New = () => {
   const navigate = useNavigate()

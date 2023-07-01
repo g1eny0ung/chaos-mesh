@@ -14,19 +14,17 @@
  * limitations under the License.
  *
  */
+import { applyNSParam } from '@/api/interceptors'
+import { Stale } from '@/api/queryUtils'
+import i18n from '@/components/T'
+import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
+import { setNameSpace } from '@/slices/globalStatus'
 import { Autocomplete, TextField } from '@mui/material'
-import { applyNSParam } from 'api/interceptors'
-import { Stale } from 'api/queryUtils'
-import { useGetCommonChaosAvailableNamespaces } from 'openapi'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import Paper from '@ui/mui-extends/esm/Paper'
 
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { setNameSpace } from 'slices/globalStatus'
-
-import i18n from 'components/T'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 
 const Namespace = () => {
   const navigate = useNavigate()

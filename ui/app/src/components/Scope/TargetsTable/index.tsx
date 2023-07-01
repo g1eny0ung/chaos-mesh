@@ -14,13 +14,12 @@
  * limitations under the License.
  *
  */
+import { Env } from '@/slices/experiments'
+import { setAlert } from '@/slices/globalStatus'
 import { getIn, useFormikContext } from 'formik'
 import { useMemo } from 'react'
 
-import { useStoreDispatch } from 'store'
-
-import { Env } from 'slices/experiments'
-import { setAlert } from 'slices/globalStatus'
+import { useStoreDispatch } from '@/store'
 
 import PhysicalMachinesTable from './PhysicalMachinesTable'
 import PodsTable from './PodsTable'

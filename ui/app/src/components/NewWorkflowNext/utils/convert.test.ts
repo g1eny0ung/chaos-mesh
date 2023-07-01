@@ -143,7 +143,7 @@ spec:
             options: ['--cpu 1', '--timeout 600']
 `
 
-describe('components/NewWorkflowNext/utils/convert', () => {
+describe('@/components/NewWorkflowNext/utils/convert', () => {
   describe('templateTypeToFieldName', () => {
     it('should return the correct field names', () => {
       expect(templateTypeToFieldName(ExperimentKind.AWSChaos)).toBe('awsChaos')

@@ -14,6 +14,19 @@
  * limitations under the License.
  *
  */
+import NotFound from '@/components/NotFound'
+import ObjectListItem from '@/components/ObjectListItem'
+import i18n from '@/components/T'
+import { transByKind } from '@/lib/byKind'
+import {
+  useDeleteSchedules,
+  useDeleteSchedulesUid,
+  useGetSchedules,
+  usePutSchedulesPauseUid,
+  usePutSchedulesStartUid,
+} from '@/openapi'
+import { DeleteSchedulesParams } from '@/openapi/index.schemas'
+import { Confirm, setAlert, setConfirm } from '@/slices/globalStatus'
 import AddIcon from '@mui/icons-material/Add'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
@@ -22,14 +35,6 @@ import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
 import { Box, Button, Checkbox, styled } from '@mui/material'
 import { Typography } from '@mui/material'
 import _ from 'lodash'
-import {
-  useDeleteSchedules,
-  useDeleteSchedulesUid,
-  useGetSchedules,
-  usePutSchedulesPauseUid,
-  usePutSchedulesStartUid,
-} from 'openapi'
-import { DeleteSchedulesParams } from 'openapi/index.schemas'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
@@ -38,15 +43,7 @@ import { FixedSizeList as RWList, ListChildComponentProps as RWListChildComponen
 import Loading from '@ui/mui-extends/esm/Loading'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch } from 'store'
-
-import { Confirm, setAlert, setConfirm } from 'slices/globalStatus'
-
-import NotFound from 'components/NotFound'
-import ObjectListItem from 'components/ObjectListItem'
-import i18n from 'components/T'
-
-import { transByKind } from 'lib/byKind'
+import { useStoreDispatch } from '@/store'
 
 const StyledCheckBox = styled(Checkbox)({
   position: 'relative',

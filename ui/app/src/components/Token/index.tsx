@@ -14,21 +14,18 @@
  * limitations under the License.
  *
  */
-import { applyAPIAuthentication, resetAPIAuthentication } from 'api/interceptors'
+import { applyAPIAuthentication, resetAPIAuthentication } from '@/api/interceptors'
+import { Submit, TextField } from '@/components/FormField'
+import i18n from '@/components/T'
+import { validateName } from '@/lib/formikhelpers'
+import { getExperimentsState } from '@/openapi'
+import { setAlert, setTokenName, setTokens } from '@/slices/globalStatus'
 import { Form, Formik, FormikHelpers } from 'formik'
-import { getExperimentsState } from 'openapi'
 import { useIntl } from 'react-intl'
 
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { setAlert, setTokenName, setTokens } from 'slices/globalStatus'
-
-import { Submit, TextField } from 'components/FormField'
-import i18n from 'components/T'
-
-import { validateName } from 'lib/formikhelpers'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 
 function validateToken(value: string) {
   let error

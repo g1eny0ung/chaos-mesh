@@ -14,11 +14,16 @@
  * limitations under the License.
  *
  */
+import EventsTimeline from '@/components/EventsTimeline'
+import Helmet from '@/components/Helmet'
+import ObjectConfiguration from '@/components/ObjectConfiguration'
+import i18n from '@/components/T'
+import { useQuery } from '@/lib/hooks'
+import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsUid, useGetEvents } from '@/openapi'
+import { TypesArchiveDetail } from '@/openapi/index.schemas'
 import loadable from '@loadable/component'
 import { Box, Grid, Grow } from '@mui/material'
 import yaml from 'js-yaml'
-import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsUid, useGetEvents } from 'openapi'
-import { TypesArchiveDetail } from 'openapi/index.schemas'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -27,14 +32,7 @@ import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
 import Space from '@ui/mui-extends/esm/Space'
 
-import EventsTimeline from 'components/EventsTimeline'
-import Helmet from 'components/Helmet'
-import ObjectConfiguration from 'components/ObjectConfiguration'
-import i18n from 'components/T'
-
-import { useQuery } from 'lib/hooks'
-
-const YAMLEditor = loadable(() => import('components/YAMLEditor'))
+const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 
 const Single = () => {
   const { uuid } = useParams()

@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  */
+import { ExperimentKind } from '@/components/NewExperiment/types'
+import i18n from '@/components/T'
+import { objToArrBySep } from '@/lib/utils'
 import {
   ListItemProps,
   ListProps,
@@ -26,10 +29,6 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-
-import { ExperimentKind } from 'components/NewExperiment/types'
-import i18n from 'components/T'
-import { objToArrBySep } from 'lib/utils'
 
 export const TableCell = (props: TableCellProps) => (
   <MUITableCell sx={{ borderBottom: 'none', '&:first-child': { width: '50%' } }} {...props} />

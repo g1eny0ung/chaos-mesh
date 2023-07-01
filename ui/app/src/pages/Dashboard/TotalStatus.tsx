@@ -14,16 +14,15 @@
  * limitations under the License.
  *
  */
+import NotFound from '@/components/NotFound'
+import i18n from '@/components/T'
+import { useGetExperimentsState } from '@/openapi'
+import type { StatusAllChaosStatus } from '@/openapi/index.schemas'
 import Box, { BoxProps } from '@mui/joy/Box'
 import type { PropertyAccessor } from '@nivo/core'
 import { ComputedDatum, ResponsivePie } from '@nivo/pie'
-import { useGetExperimentsState } from 'openapi'
-import type { StatusAllChaosStatus } from 'openapi/index.schemas'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
-
-import NotFound from 'components/NotFound'
-import i18n from 'components/T'
 
 interface SingleData {
   id: keyof StatusAllChaosStatus

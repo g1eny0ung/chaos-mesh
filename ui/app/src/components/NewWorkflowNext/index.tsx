@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+import YAML from '@/components/YAML'
+import { loadRecentlyUsedExperiments } from '@/slices/workflows'
 import TabPanelUnstyled from '@mui/base/TabPanelUnstyled'
 import TabUnstyled from '@mui/base/TabUnstyled'
 import TabsListUnstyled from '@mui/base/TabsListUnstyled'
@@ -27,11 +29,7 @@ import type { ReactFlowInstance } from 'react-flow-renderer'
 import Paper from '@ui/mui-extends/esm/Paper'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { loadRecentlyUsedExperiments } from 'slices/workflows'
-
-import YAML from 'components/YAML'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 
 import FunctionalNodesElements from './Elements/FunctionalNodes'
 import KubernetesElements from './Elements/Kubernetes'

@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
+import { SelectField, TextField } from '@/components/FormField'
+import { T } from '@/components/T'
 import { Option } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
-
-import { SelectField, TextField } from 'components/FormField'
-import { T } from 'components/T'
 
 const modes = [
   { name: 'Random One', value: 'one' },

@@ -14,10 +14,9 @@
  * limitations under the License.
  *
  */
+import { LabelField } from '@/components/FormField'
+import i18n from '@/components/T'
 import { getIn, useFormikContext } from 'formik'
-
-import { LabelField } from 'components/FormField'
-import i18n from 'components/T'
 
 const DeprecatedAddress = () => {
   const { errors, touched } = useFormikContext()

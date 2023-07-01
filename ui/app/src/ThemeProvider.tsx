@@ -18,7 +18,7 @@ import { ThemeProvider as MuiThemeProvider, StyledEngineProvider } from '@mui/ma
 import { useMemo } from 'react'
 import theme, { darkTheme } from 'theme'
 
-import { useStoreSelector } from 'store'
+import { useStoreSelector } from '@/store'
 
 const ThemeProvider: React.FC = ({ children }) => {
   const { theme: t } = useStoreSelector((state) => state.settings)

@@ -14,6 +14,14 @@
  * limitations under the License.
  *
  */
+import { SelectField, TextField } from '@/components/FormField'
+import NewExperimentNext, { NewExperimentHandles } from '@/components/NewExperiment'
+import i18n from '@/components/T'
+import { parseYAML } from '@/lib/formikhelpers'
+import { resetNewExperiment, setExternalExperiment } from '@/slices/experiments'
+import { setAlert } from '@/slices/globalStatus'
+import { Template, TemplateType, setTemplate, updateTemplate } from '@/slices/workflows'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Button, MenuItem, StepLabel, Typography } from '@mui/material'
@@ -23,18 +31,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch, useStoreSelector } from 'store'
-
-import { resetNewExperiment, setExternalExperiment } from 'slices/experiments'
-import { setAlert } from 'slices/globalStatus'
-import { Template, TemplateType, setTemplate, updateTemplate } from 'slices/workflows'
-
-import { SelectField, TextField } from 'components/FormField'
-import NewExperimentNext, { NewExperimentHandles } from 'components/NewExperimentNext'
-import i18n from 'components/T'
-
-import { parseYAML } from 'lib/formikhelpers'
 
 import HTTPTask from './HTTPTask'
 import SerialOrParallel from './SerailOrParallel'

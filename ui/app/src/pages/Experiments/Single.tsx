@@ -14,6 +14,18 @@
  * limitations under the License.
  *
  */
+import EventsTimeline from '@/components/EventsTimeline'
+import Helmet from '@/components/Helmet'
+import ObjectConfiguration from '@/components/ObjectConfiguration'
+import i18n from '@/components/T'
+import {
+  useDeleteExperimentsUid,
+  useGetEvents,
+  useGetExperimentsUid,
+  usePutExperimentsPauseUid,
+  usePutExperimentsStartUid,
+} from '@/openapi'
+import { setAlert, setConfirm } from '@/slices/globalStatus'
 import loadable from '@loadable/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline'
@@ -21,13 +33,6 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import Alert from '@mui/lab/Alert'
 import { Box, Button, Grid, Grow } from '@mui/material'
 import yaml from 'js-yaml'
-import {
-  useDeleteExperimentsUid,
-  useGetEvents,
-  useGetExperimentsUid,
-  usePutExperimentsPauseUid,
-  usePutExperimentsStartUid,
-} from 'openapi'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -36,16 +41,9 @@ import Paper from '@ui/mui-extends/esm/Paper'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch } from 'store'
+import { useStoreDispatch } from '@/store'
 
-import { setAlert, setConfirm } from 'slices/globalStatus'
-
-import EventsTimeline from 'components/EventsTimeline'
-import Helmet from 'components/Helmet'
-import ObjectConfiguration from 'components/ObjectConfiguration'
-import i18n from 'components/T'
-
-const YAMLEditor = loadable(() => import('components/YAMLEditor'))
+const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 
 export default function Single() {
   const navigate = useNavigate()
