@@ -17,9 +17,9 @@
 import NewExperiment from '@/components/NewExperiment'
 import i18n from '@/components/T'
 import { usePostSchedules } from '@/openapi'
-import { resetNewExperiment } from '@/slices/experiments'
 import { setAlert } from '@/slices/globalStatus'
 import { useStoreDispatch } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import { Grid } from '@mui/material'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
@@ -29,6 +29,7 @@ const New = () => {
   const intl = useIntl()
 
   const dispatch = useStoreDispatch()
+  const [resetNewExperiment] = useNewExperimentStore((state) => [state.resetNewExperiment])
 
   const { mutateAsync } = usePostSchedules()
 
@@ -42,7 +43,7 @@ const New = () => {
           })
         )
 
-        dispatch(resetNewExperiment())
+        resetNewExperiment()
 
         navigate('/schedules')
       })

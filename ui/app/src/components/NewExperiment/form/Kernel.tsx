@@ -15,7 +15,7 @@
  *
  */
 import { LabelField, SelectField, Submit, TextField } from '@/components/FormField'
-import { useStoreSelector } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import { Box, IconButton, InputAdornment, MenuItem, Typography } from '@mui/material'
@@ -32,7 +32,7 @@ interface KernelProps {
 }
 
 const Kernel: React.FC<KernelProps> = ({ onSubmit }) => {
-  const { spec } = useStoreSelector((state) => state.experiments)
+  const [spec] = useNewExperimentStore((state) => [state.spec])
 
   const initialValues = typesData.KernelChaos.spec!
 

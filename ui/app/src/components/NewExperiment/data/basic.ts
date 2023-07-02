@@ -15,7 +15,7 @@
  *
  */
 import { schema as scheduleSchema } from '@/components/Schedule/types'
-import { Env } from '@/slices/experiments'
+import { Env } from '@/zustand/newExperiment'
 import * as Yup from 'yup'
 
 const data = {

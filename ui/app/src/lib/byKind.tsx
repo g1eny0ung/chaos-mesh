@@ -33,9 +33,9 @@ import { ReactComponent as K8SIcon } from '@/images/k8s.svg'
 import { ReactComponent as PhysicIcon } from '@/images/physic.svg'
 import LinearScaleIcon from '@mui/icons-material/LinearScale'
 import TimelapseIcon from '@mui/icons-material/Timelapse'
-import { SvgIcon } from '@mui/material'
+import { SvgIcon } from '@mui/joy'
 
-export function iconByKind(kind: string, size: 'small' | 'inherit' | 'medium' | 'large' = 'medium') {
+export function iconByKind(kind: string) {
   let icon
 
   switch (kind) {
@@ -91,14 +91,14 @@ export function iconByKind(kind: string, size: 'small' | 'inherit' | 'medium' | 
       icon = <ClockIcon />
       break
     case 'Serial':
-      return <LinearScaleIcon fontSize={size} />
+      return <LinearScaleIcon />
     case 'Parallel':
-      return <LinearScaleIcon fontSize={size} sx={{ transform: 'rotate(90deg)', transformOrigin: 'center' }} />
+      return <LinearScaleIcon sx={{ transform: 'rotate(90deg)', transformOrigin: 'center' }} />
     case 'Suspend':
-      return <TimelapseIcon fontSize={size} />
+      return <TimelapseIcon />
   }
 
-  return <SvgIcon fontSize={size}>{icon}</SvgIcon>
+  return <SvgIcon>{icon}</SvgIcon>
 }
 
 export function transByKind(kind: ExperimentKind | 'Workflow' | 'Schedule') {

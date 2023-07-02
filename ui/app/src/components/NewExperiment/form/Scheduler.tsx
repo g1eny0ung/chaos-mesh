@@ -18,7 +18,7 @@ import { TextField } from '@/components/FormField'
 import { ExperimentKind } from '@/components/NewExperiment/types'
 import i18n from '@/components/T'
 import { validateDuration, validateSchedule } from '@/lib/formikhelpers'
-import { useStoreSelector } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import { Box, Link, Switch, Typography } from '@mui/joy'
 import { FormikErrors, FormikTouched, getIn, useFormikContext } from 'formik'
 import { useEffect, useState } from 'react'
@@ -39,10 +39,15 @@ interface SchedulerProps {
 }
 
 const Scheduler: React.FC<SchedulerProps> = ({ errors, touched, inSchedule = false }) => {
-  const { fromExternal, kindAction, basic } = useStoreSelector((state) => state.experiments)
-  const { values, setFieldValue } = useFormikContext()
+  const [fromExternal, kindAction, basic] = useNewExperimentStore((state) => [
+    state.fromExternal,
+    state.kindAction,
+    state.basic,
+  ])
   const [kind, action] = kindAction
   const instant = isInstant(kind, action)
+
+  const { values, setFieldValue } = useFormikContext()
 
   const [continuous, setContinuous] = useState(false)
 

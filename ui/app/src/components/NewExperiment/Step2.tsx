@@ -21,8 +21,7 @@ import { Fields as ScheduleSpecificFields, data as scheduleSpecificData } from '
 import Scope from '@/components/Scope'
 import i18n from '@/components/T'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
-import { setBasic, setStep2 } from '@/slices/experiments'
-import { useStoreDispatch, useStoreSelector } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import CheckIcon from '@mui/icons-material/Check'
 import PublishIcon from '@mui/icons-material/Publish'
 import UndoIcon from '@mui/icons-material/Undo'
@@ -42,11 +41,17 @@ interface Step2Props {
 }
 
 const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false }) => {
-  const { step2, env, kindAction, basic } = useStoreSelector((state) => state.experiments)
+  const [step2, env, kindAction, basic, setStep2, setBasic] = useNewExperimentStore((state) => [
+    state.step2,
+    state.env,
+    state.kindAction,
+    state.basic,
+    state.setStep2,
+    state.setBasic,
+  ])
   const [kind] = kindAction
   const scopeDisabled = kind === 'AWSChaos' || kind === 'GCPChaos'
   const schema = basicSchema({ env, scopeDisabled, scheduled: inSchedule, needDeadline: inWorkflow })
-  const dispatch = useStoreDispatch()
   const originalInit = useMemo(
     () =>
       inSchedule
@@ -91,15 +96,15 @@ const Step2: React.FC<Step2Props> = ({ inWorkflow = false, inSchedule = false })
   const handleOnSubmitStep2 = (_values: Record<string, any>) => {
     const values = schema.cast(_values) as Record<string, any>
 
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.debug('Debug handleSubmitStep2:', values)
     }
 
-    dispatch(setBasic(values))
-    dispatch(setStep2(true))
+    setBasic(values)
+    setStep2(true)
   }
 
-  const handleUndo = () => dispatch(setStep2(false))
+  const handleUndo = () => setStep2(false)
 
   return (
     <Card

@@ -19,9 +19,9 @@ import { ExperimentKind } from '@/components/NewExperiment/types'
 import i18n from '@/components/T'
 import { parseSubmit } from '@/lib/formikhelpers'
 import { usePostExperiments } from '@/openapi'
-import { resetNewExperiment } from '@/slices/experiments'
 import { setAlert } from '@/slices/globalStatus'
 import { useStoreDispatch, useStoreSelector } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import DoneAllIcon from '@mui/icons-material/DoneAll'
 import { Box, Typography } from '@mui/material'
 import { useIntl } from 'react-intl'
@@ -39,8 +39,16 @@ const Step3: React.FC<Step3Props> = ({ onSubmit, inSchedule }) => {
   const navigate = useNavigate()
   const intl = useIntl()
 
+  const [step1, step2, env, kindAction, spec, basic, resetNewExperiment] = useNewExperimentStore((state) => [
+    state.step1,
+    state.step2,
+    state.env,
+    state.kindAction,
+    state.spec,
+    state.basic,
+    state.resetNewExperiment,
+  ])
   const state = useStoreSelector((state) => state)
-  const { step1, step2, kindAction, env, basic, spec } = state.experiments
   const { debugMode, useNewPhysicalMachine } = state.settings
   const dispatch = useStoreDispatch()
 
@@ -60,7 +68,7 @@ const Step3: React.FC<Step3Props> = ({ onSubmit, inSchedule }) => {
       { inSchedule, useNewPhysicalMachine }
     )
 
-    if (process.env.NODE_ENV === 'development' || debugMode) {
+    if (import.meta.env.DEV || debugMode) {
       console.debug('Debug parsedValues:', parsedValues)
     }
 
@@ -79,7 +87,7 @@ const Step3: React.FC<Step3Props> = ({ onSubmit, inSchedule }) => {
               })
             )
 
-            dispatch(resetNewExperiment())
+            resetNewExperiment()
 
             navigate('/experiments')
           })

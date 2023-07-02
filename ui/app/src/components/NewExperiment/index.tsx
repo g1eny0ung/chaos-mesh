@@ -16,8 +16,7 @@
  */
 import i18n from '@/components/T'
 import { parseYAML } from '@/lib/formikhelpers'
-import { setEnv, setExternalExperiment } from '@/slices/experiments'
-import { useStoreDispatch } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import Tab from '@mui/joy/Tab'
 import TabList from '@mui/joy/TabList'
 import TabPanel from '@mui/joy/TabPanel'
@@ -47,7 +46,7 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
   { onSubmit, loadFrom = true, inWorkflow, inSchedule },
   ref
 ) => {
-  const dispatch = useStoreDispatch()
+  const [setEnv, setExternalExperiment] = useNewExperimentStore((state) => [state.setEnv, state.setExternalExperiment])
 
   const [panel, setPanel] = useState(0)
 
@@ -60,14 +59,12 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
     const env = kind === 'PhysicalMachineChaos' ? 'physic' : 'k8s'
     const action = spec.action ?? ''
 
-    dispatch(setEnv(env))
-    dispatch(
-      setExternalExperiment({
-        kindAction: [kind, action],
-        spec,
-        basic,
-      })
-    )
+    setEnv(env)
+    setExternalExperiment({
+      kindAction: [kind, action],
+      spec,
+      basic,
+    })
 
     setPanel(0)
   }
@@ -85,7 +82,7 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
         <Space>
           <Step1 />
           <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
-          {/* <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} /> */}
+          <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} />
         </Space>
       </TabPanel>
       <TabPanel value={1}>

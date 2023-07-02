@@ -19,8 +19,7 @@ import { Submit } from '@/components/FormField'
 import i18n, { T } from '@/components/T'
 import { iconByKind, transByKind } from '@/lib/byKind'
 import { useGetCommonConfig } from '@/openapi'
-import { Env, setEnv, setKindAction, setSpec, setStep1 } from '@/slices/experiments'
-import { useStoreDispatch, useStoreSelector } from '@/store'
+import useNewExperimentStore, { Env } from '@/zustand/newExperiment'
 import CheckIcon from '@mui/icons-material/Check'
 import PublishIcon from '@mui/icons-material/Publish'
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined'
@@ -54,20 +53,23 @@ function renderEnv(option: SelectOption<Env> | null) {
 
   return (
     <>
-      <ListItemDecorator sx={{ mr: 1.5 }}>{iconByKind(option.value, 'inherit')}</ListItemDecorator>
+      <ListItemDecorator sx={{ mr: 1.5 }}>{iconByKind(option.value)}</ListItemDecorator>
       {option.label}
     </>
   )
 }
 
 const Step1 = () => {
-  const state = useStoreSelector((state) => state)
-  const {
-    env,
-    kindAction: [kind, action],
-    step1,
-  } = state.experiments
-  const dispatch = useStoreDispatch()
+  const [step1, env, kindAction, setStep1, setEnv, setKindAction, setSpec] = useNewExperimentStore((state) => [
+    state.step1,
+    state.env,
+    state.kindAction,
+    state.setStep1,
+    state.setEnv,
+    state.setKindAction,
+    state.setSpec,
+  ])
+  const [kind, action] = kindAction
 
   const { data: config } = useGetCommonConfig({
     query: {
@@ -88,11 +90,11 @@ const Step1 = () => {
   }
 
   const handleSelectTarget = (key: Kind) => () => {
-    dispatch(setKindAction([key, '']))
+    setKindAction([key, ''])
   }
 
   const handleSelectAction = (newAction: string) => () => {
-    dispatch(setKindAction([kind, newAction]))
+    setKindAction([kind, newAction])
   }
 
   const handleSubmitStep1 = (values: Record<string, any>) => {
@@ -103,19 +105,19 @@ const Step1 = () => {
         }
       : values
 
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.debug('Debug handleSubmitStep1:', result)
     }
 
-    dispatch(setSpec(result))
-    dispatch(setStep1(true))
+    setSpec(result)
+    setStep1(true)
   }
 
-  const handleUndo = () => dispatch(setStep1(false))
+  const handleUndo = () => setStep1(false)
 
   const handleSwitchEnv = (_: React.SyntheticEvent | null, env: Env | null) => () => {
-    dispatch(setKindAction(['', '']))
-    dispatch(setEnv(env!))
+    setKindAction(['', ''])
+    setEnv(env!)
   }
 
   return (
@@ -147,7 +149,7 @@ const Step1 = () => {
           <Select defaultValue="k8s" size="sm" renderValue={renderEnv} sx={{ width: 150 }} onChange={handleSwitchEnv}>
             {envOptions.map((option) => (
               <Option key={option.value} value={option.value} label={option.label}>
-                <ListItemDecorator>{iconByKind(option.value, 'inherit')}</ListItemDecorator>
+                <ListItemDecorator>{iconByKind(option.value)}</ListItemDecorator>
                 {option.label}
               </Option>
             ))}

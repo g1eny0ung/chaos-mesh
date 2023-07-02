@@ -20,8 +20,7 @@ import MoreOptions from '@/components/MoreOptions'
 import Scope from '@/components/Scope'
 import i18n from '@/components/T'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
-import { Env } from '@/slices/experiments'
-import { useStoreSelector } from '@/store'
+import useNewExperimentStore, { Env } from '@/zustand/newExperiment'
 import PublishIcon from '@mui/icons-material/Publish'
 import { MenuItem } from '@mui/material'
 import { Form, Formik, FormikErrors, FormikTouched, getIn, setIn } from 'formik'
@@ -42,7 +41,7 @@ interface TargetGeneratedProps {
 }
 
 const TargetGenerated: React.FC<TargetGeneratedProps> = ({ env, kind, data, validationSchema, onSubmit }) => {
-  const { spec } = useStoreSelector((state) => state.experiments)
+  const [spec] = useNewExperimentStore((state) => [state.spec])
 
   const { data: namespaces } = useGetCommonChaosAvailableNamespaces({
     query: {

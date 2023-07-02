@@ -25,14 +25,13 @@ import {
   usePostCommonPhysicalmachines,
   usePostCommonPods,
 } from '@/openapi'
-import { Env } from '@/slices/experiments'
+import { useStoreSelector } from '@/store'
+import { Env } from '@/zustand/newExperiment'
 import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import { useEffect, useMemo } from 'react'
 
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreSelector } from '@/store'
 
 import DeprecatedAddress from './DeprecatedAddress'
 import Mode from './Mode'

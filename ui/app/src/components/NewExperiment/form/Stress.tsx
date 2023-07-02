@@ -16,7 +16,7 @@
  */
 import { LabelField, Submit, TextField } from '@/components/FormField'
 import MoreOptions from '@/components/MoreOptions'
-import { useStoreSelector } from '@/store'
+import useNewExperimentStore from '@/zustand/newExperiment'
 import { Typography } from '@mui/material'
 import { Form, Formik, getIn } from 'formik'
 import { useEffect, useState } from 'react'
@@ -53,7 +53,7 @@ interface StressProps {
 }
 
 const Stress: React.FC<StressProps> = ({ onSubmit }) => {
-  const { spec } = useStoreSelector((state) => state.experiments)
+  const [spec] = useNewExperimentStore((state) => [state.spec])
 
   const initialValues = typesData.StressChaos.spec!
 
