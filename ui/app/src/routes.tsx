@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  */
-import NewWorkflow from '@/components/NewWorkflow'
-import NewWorkflowNext from '@/components/NewWorkflowNext'
+import NewWorkflow from '@/components/NewWorkflowNext'
 import Archives from '@/pages/Archives'
 import Archive from '@/pages/Archives/Single'
 import Dashboard from '@/pages/Dashboard'
@@ -42,11 +41,6 @@ const routes: CustomRouteProps[] = [
   {
     element: <NewWorkflow />,
     path: '/workflows/new',
-    title: 'New Workflow',
-  },
-  {
-    element: <NewWorkflowNext />,
-    path: '/workflows/new/next',
     title: 'New Workflow',
   },
   {
