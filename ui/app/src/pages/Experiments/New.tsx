@@ -15,14 +15,12 @@
  *
  */
 import NewExperiment from '@/components/NewExperiment'
-import { Grid } from '@mui/joy'
+import Container from '@mui/system/Container'
 
 const New = () => (
-  <Grid container>
-    <Grid xs={12} lg={8}>
-      <NewExperiment />
-    </Grid>
-  </Grid>
+  <Container>
+    <NewExperiment />
+  </Container>
 )
 
 export default New

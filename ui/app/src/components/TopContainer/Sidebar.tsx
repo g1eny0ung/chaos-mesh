@@ -14,104 +14,26 @@
  * limitations under the License.
  *
  */
-import i18n from '@/components/T'
-import logoMiniWhite from '@/images/logo-mini-white.svg'
-import logoMini from '@/images/logo-mini.svg'
-import logoWhite from '@/images/logo-white.svg'
-import logo from '@/images/logo.svg'
-import { useStoreSelector } from '@/store'
+import i18n, { T } from '@/components/T'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined'
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import ViewTimelineOutlinedIcon from '@mui/icons-material/ViewTimelineOutlined'
-import {
-  Box,
-  CSSObject,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemTextProps,
-  Drawer as MuiDrawer,
-  ListItemText as MuiListItemText,
-} from '@mui/material'
-import { Theme, styled } from '@mui/material/styles'
+import { ListItem, ListItemButton, ListItemContent, ListItemDecorator, ListSubheader } from '@mui/joy'
 import { NavLink } from 'react-router-dom'
 
-export const openedWidth = 256
-export const closedWidth = 64
-
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: openedWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: 'hidden',
-})
-
-const closedMixin = (theme: Theme): CSSObject => ({
-  width: closedWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: 'hidden',
-})
-
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
-  width: openedWidth,
-  '& .MuiDrawer-paper': {
-    ...(open ? openedMixin(theme) : closedMixin(theme)),
-  },
-  '& .MuiListItemButton-root': {
-    paddingLeft: !open ? theme.spacing(3) : 16, // original paddingLeft is 16
-  },
-}))
-
-const SidebarNavHoverProperties = (theme: Theme) => ({
-  background: theme.palette.secondaryContainer.main,
-  color: theme.palette.onSecondaryContainer.main,
-  borderRadius: 4,
-  '& .MuiListItemIcon-root': {
-    color: theme.palette.onSecondaryContainer.main,
-  },
-})
-
-const SidebarNav = styled(List)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  color: theme.palette.onSurfaceVariant.main,
-  '& .MuiListItemButton-root': {
-    width: '80%',
-    marginBottom: theme.spacing(4),
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    '&:hover, &.active': SidebarNavHoverProperties(theme),
-  },
-  '& .MuiListItemIcon-root': {
-    minWidth: 0,
-    marginRight: theme.spacing(8),
-    color: theme.palette.onSurfaceVariant.main,
-  },
-}))
-
-const ListItemText = (props: ListItemTextProps) => (
-  <MuiListItemText
-    {...props}
-    primaryTypographyProps={{
-      ...props.primaryTypographyProps,
-      fontWeight: 'medium',
-    }}
-  />
-)
-
-export const topNavItems = [
+export const insightsItems = [
   { icon: <DashboardCustomizeOutlinedIcon />, text: 'dashboard' },
+  {
+    icon: <ViewTimelineOutlinedIcon />,
+    text: 'events',
+  },
+]
+
+export const resourcesItems = [
   {
     icon: <AccountTreeOutlinedIcon />,
     text: 'workflows',
@@ -124,60 +46,38 @@ export const topNavItems = [
     icon: <ScienceOutlinedIcon />,
     text: 'experiments',
   },
-  {
-    icon: <ViewTimelineOutlinedIcon />,
-    text: 'events',
-  },
+
   {
     icon: <ArchiveOutlinedIcon />,
     text: 'archives',
   },
+]
+
+export const otherItems = [
   {
     icon: <SettingsOutlinedIcon />,
     text: 'settings',
   },
 ]
 
-export const bottomNavItems = []
-
-interface SidebarProps {
-  open: boolean
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ open }) => {
-  const { theme } = useStoreSelector((state) => state.settings)
-
+export function NavList({ header, items }: { header: string; items: typeof insightsItems }) {
   return (
-    <Drawer variant="permanent" open={open}>
-      <Box sx={{ width: open ? 160 : 32, m: '0 auto', my: 8 }}>
-        <NavLink to="/">
-          <img
-            src={open ? (theme === 'light' ? logo : logoWhite) : theme === 'light' ? logoMini : logoMiniWhite}
-            alt="Chaos Mesh"
-          />
-        </NavLink>
-      </Box>
-      <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
-        <SidebarNav>
-          {topNavItems.map(({ icon, text }) => (
-            <ListItemButton key={text} className={`tutorial-${text}`} component={NavLink} to={text}>
-              <ListItemIcon>{icon}</ListItemIcon>
-              <ListItemText primary={i18n(`${text}.title`)} />
-            </ListItemButton>
-          ))}
-        </SidebarNav>
-
-        <SidebarNav>
-          <ListItemButton component="a" href="https://chaos-mesh.org/docs" target="_blank">
-            <ListItemIcon>
-              <MenuBookOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText primary={i18n('common.doc')} />
-          </ListItemButton>
-        </SidebarNav>
-      </Box>
-    </Drawer>
+    <ListItem nested>
+      <ListSubheader>
+        <T id={header} />
+      </ListSubheader>
+      {items.map(({ icon, text }) => (
+        <ListItem key={text} className={`tutorial-${text}`}>
+          <NavLink to={'/' + text} style={{ width: '100%', textDecoration: 'none' }}>
+            {({ isActive }) => (
+              <ListItemButton variant={isActive ? 'soft' : 'plain'} color={isActive ? 'primary' : 'neutral'}>
+                <ListItemDecorator sx={{ color: 'inherit' }}>{icon}</ListItemDecorator>
+                <ListItemContent>{i18n(`${text}.title`)}</ListItemContent>
+              </ListItemButton>
+            )}
+          </NavLink>
+        </ListItem>
+      ))}
+    </ListItem>
   )
 }
-
-export default Sidebar

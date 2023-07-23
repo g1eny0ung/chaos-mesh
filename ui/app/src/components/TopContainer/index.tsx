@@ -50,32 +50,16 @@ import { Outlet } from 'react-router-dom'
 import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
 import Loading from '@ui/mui-extends/esm/Loading'
 
-import { topNavItems } from './Sidebar'
+import { NavList, insightsItems, otherItems, resourcesItems } from './Sidebar'
 
 const Auth = loadable(() => import('./Auth'))
 
 function SideNav() {
   return (
     <List sx={{ '--ListItem-radius': '8px' }}>
-      <ListItem nested>
-        <List>
-          <ListSubheader>
-            <T id="dashboard.title" />
-          </ListSubheader>
-          {topNavItems.map(({ icon, text }) => (
-            <ListItem key={text} className={`tutorial-${text}`}>
-              <NavLink to={'/' + text} style={{ width: '100%', textDecoration: 'none' }}>
-                {({ isActive }) => (
-                  <ListItemButton variant={isActive ? 'soft' : 'plain'} color={isActive ? 'primary' : 'neutral'}>
-                    <ListItemDecorator sx={{ color: 'inherit' }}>{icon}</ListItemDecorator>
-                    <ListItemContent>{i18n(`${text}.title`)}</ListItemContent>
-                  </ListItemButton>
-                )}
-              </NavLink>
-            </ListItem>
-          ))}
-        </List>
-      </ListItem>
+      <NavList header="insights" items={insightsItems} />
+      <NavList header="resources" items={resourcesItems} />
+      <NavList header="common.other" items={otherItems} />
     </List>
   )
 }

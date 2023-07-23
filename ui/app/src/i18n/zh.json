@@ -1,4 +1,6 @@
 {
+  "insights": "洞察",
+  "resources": "资源",
   "dashboard": {
     "title": "仪表盘",
     "tutorial": {
@@ -349,6 +351,7 @@
     "noOptions": "无选项",
     "operation": "操作",
     "options": "选项",
+    "other": "其他",
     "pause": "暂停",
     "preview": "预览",
     "process": "流程",

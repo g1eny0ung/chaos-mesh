@@ -1,4 +1,6 @@
 {
+  "insights": "Insights",
+  "resources": "Resources",
   "dashboard": {
     "title": "Dashboard",
     "tutorial": {
@@ -342,6 +344,7 @@
     "noOptions": "No options",
     "operation": "Operation",
     "options": "Options",
+    "other": "Other",
     "pause": "Pause",
     "preview": "Preview",
     "process": "Process",
