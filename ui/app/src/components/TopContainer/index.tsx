@@ -24,7 +24,6 @@ import logoWhite from '@/images/logo-mini-white.svg'
 import logo from '@/images/logo-mini.svg'
 import LS from '@/lib/localStorage'
 import { useGetCommonConfig } from '@/openapi'
-import routes from '@/routes'
 import { setAlertOpen, setConfirmOpen, setNameSpace, setTokenName, setTokens } from '@/slices/globalStatus'
 import { useStoreDispatch, useStoreSelector } from '@/store'
 import loadable from '@loadable/component'
@@ -44,9 +43,8 @@ import {
 } from '@mui/joy'
 import { Alert, Portal, Snackbar, useMediaQuery } from '@mui/material'
 import Cookies from 'js-cookie'
-import { useEffect, useState } from 'react'
-import { BrowserRouter, NavLink } from 'react-router-dom'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { useState } from 'react'
+import { Outlet } from 'react-router-dom'
 
 import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
 import Loading from '@ui/mui-extends/esm/Loading'
@@ -154,7 +152,7 @@ const TopContainer = () => {
   })
 
   return (
-    <BrowserRouter>
+    <>
       <CssVarsProvider>
         <CssBaseline />
 
@@ -195,28 +193,7 @@ const TopContainer = () => {
             <SideNav />
           </Layout.SideNav>
 
-          <Layout.Main>
-            {loading ? (
-              <Loading />
-            ) : (
-              <Routes>
-                <Route path="/" element={<Navigate replace to="/dashboard" />} />
-                {!authOpen &&
-                  routes.map(({ path, element, title }) => (
-                    <Route
-                      key={path}
-                      path={path}
-                      element={
-                        <>
-                          <Helmet title={title} />
-                          {element}
-                        </>
-                      }
-                    />
-                  ))}
-              </Routes>
-            )}
-          </Layout.Main>
+          <Layout.Main>{loading ? <Loading /> : <Outlet />}</Layout.Main>
         </Layout.Root>
 
         {/* <Root open={openDrawer}>
@@ -277,7 +254,7 @@ const TopContainer = () => {
         />
       </Portal> */}
       </CssVarsProvider>
-    </BrowserRouter>
+    </>
   )
 }
 

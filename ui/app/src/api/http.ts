@@ -15,9 +15,8 @@
  *
  */
 import { setAlert } from '@/slices/globalStatus'
-import axios, { AxiosError, AxiosRequestConfig } from 'axios'
-
 import store from '@/store'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 
 interface ErrorData {
   code: number
@@ -26,7 +25,7 @@ interface ErrorData {
   full_text: string
 }
 
-const http = axios.create({ baseURL: '/api' })
+const http = axios.create({ baseURL: 'api' })
 
 http.interceptors.response.use(undefined, (error: AxiosError<ErrorData>) => {
   const data = error.response?.data

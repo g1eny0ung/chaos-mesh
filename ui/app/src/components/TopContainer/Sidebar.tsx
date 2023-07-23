@@ -19,6 +19,7 @@ import logoMiniWhite from '@/images/logo-mini-white.svg'
 import logoMini from '@/images/logo-mini.svg'
 import logoWhite from '@/images/logo-white.svg'
 import logo from '@/images/logo.svg'
+import { useStoreSelector } from '@/store'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined'
@@ -39,8 +40,6 @@ import {
 } from '@mui/material'
 import { Theme, styled } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
-
-import { useStoreSelector } from '@/store'
 
 export const openedWidth = 256
 export const closedWidth = 64
@@ -161,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
       <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
         <SidebarNav>
           {topNavItems.map(({ icon, text }) => (
-            <ListItemButton key={text} className={`tutorial-${text}`} component={NavLink} to={'/' + text}>
+            <ListItemButton key={text} className={`tutorial-${text}`} component={NavLink} to={text}>
               <ListItemIcon>{icon}</ListItemIcon>
               <ListItemText primary={i18n(`${text}.title`)} />
             </ListItemButton>
