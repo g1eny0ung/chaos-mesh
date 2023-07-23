@@ -20,8 +20,9 @@ import i18n from '@/components/T'
 import { parseSubmit } from '@/lib/formikhelpers'
 import { usePostExperiments } from '@/openapi'
 import { setAlert } from '@/slices/globalStatus'
-import { useStoreDispatch, useStoreSelector } from '@/store'
+import { useStoreDispatch } from '@/store'
 import useNewExperimentStore from '@/zustand/newExperiment'
+import useSettingsStore from '@/zustand/settings'
 import DoneAllIcon from '@mui/icons-material/DoneAll'
 import { Box, Typography } from '@mui/material'
 import { useIntl } from 'react-intl'
@@ -48,8 +49,7 @@ const Step3: React.FC<Step3Props> = ({ onSubmit, inSchedule }) => {
     state.basic,
     state.resetNewExperiment,
   ])
-  const state = useStoreSelector((state) => state)
-  const { debugMode, useNewPhysicalMachine } = state.settings
+  const [debugMode, useNewPhysicalMachine] = useSettingsStore((state) => [state.debugMode, state.useNewPhysicalMachine])
   const dispatch = useStoreDispatch()
 
   const { mutateAsync } = usePostExperiments()

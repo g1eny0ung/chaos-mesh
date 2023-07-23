@@ -20,6 +20,7 @@ import FormikEffect from '@/components/FormikEffect'
 import { T } from '@/components/T'
 import { useGetCommonChaosAvailableNamespaces, usePostWorkflows } from '@/openapi'
 import { resetWorkflow } from '@/slices/workflows'
+import { useStoreDispatch } from '@/store'
 import loadable from '@loadable/component'
 import { Box, Divider, MenuItem, Typography } from '@mui/material'
 import { Form, Formik } from 'formik'
@@ -31,8 +32,6 @@ import * as Yup from 'yup'
 import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
 import Paper from '@ui/mui-extends/esm/Paper'
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch, useStoreSelector } from '@/store'
 
 const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 
@@ -64,8 +63,6 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
     deadline: '',
   })
 
-  const { debugMode } = useStoreSelector((state) => state.settings)
-
   useEffect(() => {
     setData(workflow)
   }, [workflow])
@@ -96,12 +93,6 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
 
   const submitWorkflow = () => {
     const payload: any = yaml.load(data)
-
-    if (debugMode) {
-      console.debug('submitWorkflow => payload', payload)
-
-      return
-    }
 
     mutateAsync({
       data: payload,

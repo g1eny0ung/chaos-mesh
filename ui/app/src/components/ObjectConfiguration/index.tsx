@@ -19,11 +19,10 @@ import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 import { format } from '@/lib/luxon'
 import { TypesArchiveDetail, TypesExperimentDetail } from '@/openapi/index.schemas'
+import useSettingsStore from '@/zustand/settings'
 import { Grid, Table, TableBody, TableRow, Typography } from '@mui/material'
 
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreSelector } from '@/store'
 
 import { Experiment, Selector, TableCell } from './common'
 
@@ -44,7 +43,7 @@ const ObjectConfiguration: React.FC<ObjectConfigurationProps> = ({
   inArchive,
   vertical,
 }) => {
-  const { lang } = useStoreSelector((state) => state.settings)
+  const [lang] = useSettingsStore((state) => [state.lang])
 
   const spec: any = inNode ? config : config!.kube_object!.spec
   const experiment =

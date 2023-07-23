@@ -19,9 +19,8 @@ import i18n from '@/components/T'
 import { iconByKind } from '@/lib/byKind'
 import DateTime, { format } from '@/lib/luxon'
 import { CoreEvent } from '@/openapi/index.schemas'
+import useSettingsStore from '@/zustand/settings'
 import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Typography } from '@mui/joy'
-
-import { useStoreSelector } from '@/store'
 
 interface EventsTimelineProps {
   events?: CoreEvent[]
@@ -29,7 +28,7 @@ interface EventsTimelineProps {
 }
 
 const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
-  const { lang } = useStoreSelector((state) => state.settings)
+  const [lang] = useSettingsStore((state) => [state.lang])
 
   return (
     <Box sx={{ height, overflowY: 'auto' }}>

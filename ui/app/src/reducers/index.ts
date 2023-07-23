@@ -15,12 +15,10 @@
  *
  */
 import globalStatus from '@/slices/globalStatus'
-import settings from '@/slices/settings'
 import workflows from '@/slices/workflows'
 import { combineReducers } from 'redux'
 
 export default combineReducers({
-  settings,
   globalStatus,
   workflows,
 })

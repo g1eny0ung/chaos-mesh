@@ -18,6 +18,7 @@ import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 import DateTime, { format } from '@/lib/luxon'
 import { TypesArchive, TypesExperiment, TypesSchedule } from '@/openapi/index.schemas'
+import useSettingsStore from '@/zustand/settings'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline'
@@ -30,8 +31,6 @@ import { useNavigate } from 'react-router-dom'
 import Paper from '@ui/mui-extends/esm/Paper'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreSelector } from '@/store'
-
 interface ObjectListItemProps {
   type?: 'schedule' | 'experiment' | 'archive'
   archive?: 'workflow' | 'schedule' | 'experiment'
@@ -43,7 +42,7 @@ const ObjectListItem: React.FC<ObjectListItemProps> = ({ data, type = 'experimen
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const { lang } = useStoreSelector((state) => state.settings)
+  const [lang] = useSettingsStore((state) => [state.lang])
 
   const handleAction = (action: string) => (event: React.MouseEvent<HTMLSpanElement>) => {
     event.stopPropagation()

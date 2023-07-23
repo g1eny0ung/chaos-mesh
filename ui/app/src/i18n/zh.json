@@ -266,10 +266,7 @@
       "title": "使用新的 PhysicalMachine CRD",
       "choose": "创建 PhysicalMachineChaos 时，检索可用的 PhysicalMachines 而不是提供地址字段。"
     },
-    "useNextWorkflowInterface": {
-      "title": "使用全新的工作流界面",
-      "choose": "在过去的一段时间里，我们将工作流的相关界面进行了重构。现在你可以通过流程图的形式来更加方便地创建工作流。（注意：这项改进仍处于活跃地开发状态中，在它稳定前界面仍有可能会发生变动。）"
-    },
+    "general": "通用",
     "theme": {
       "title": "主题",
       "choose": "选择主题。",
@@ -278,9 +275,7 @@
     },
     "lang": {
       "title": "语言",
-      "choose": "选择界面语言。",
-      "en": "英语",
-      "zh": "简体中文"
+      "choose": "选择界面语言。"
     },
     "addToken": {
       "prompt": "输入令牌（RBAC 鉴权）以继续",
@@ -322,7 +317,9 @@
     }
   },
   "common": {
+    "about": "关于",
     "add": "添加",
+    "currentVersion": "当前版本：{version}",
     "moreOptions": "更多选项",
     "batchOperation": "批量操作",
     "cancel": "取消",
@@ -366,8 +363,7 @@
     "upload": "上传",
     "use": "使用",
     "using": "使用中",
-    "uuid": "UUID",
-    "version": "版本"
+    "uuid": "UUID"
   },
   "table": {
     "created": "创建于"

@@ -22,6 +22,7 @@ import { comparator, format, toRelative } from '@/lib/luxon'
 import { getWorkflowsUid, useDeleteWorkflowsUid, useGetWorkflows, usePostWorkflows } from '@/openapi'
 import { CoreWorkflowMeta } from '@/openapi/index.schemas'
 import { setAlert, setConfirm } from '@/slices/globalStatus'
+import { useStoreDispatch } from '@/store'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import ReplayIcon from '@mui/icons-material/Replay'
@@ -39,8 +40,6 @@ import Loading from '@ui/mui-extends/esm/Loading'
 import PaperTop from '@ui/mui-extends/esm/PaperTop'
 import Space from '@ui/mui-extends/esm/Space'
 
-import { useStoreDispatch, useStoreSelector } from '@/store'
-
 function transformWorkflows(data: CoreWorkflowMeta[]) {
   return data
     .map((d) => ({
@@ -56,7 +55,6 @@ const Workflows = () => {
 
   const [loading, setLoading] = useState(true)
 
-  const { useNextWorkflowInterface } = useStoreSelector((state) => state.settings)
   const dispatch = useStoreDispatch()
 
   const { data: workflows, refetch } = useGetWorkflows(undefined, {
@@ -75,7 +73,7 @@ const Workflows = () => {
       variant="contained"
       size="small"
       startIcon={<AddIcon />}
-      onClick={() => navigate(useNextWorkflowInterface ? '/workflows/new/next' : '/workflows/new')}
+      onClick={() => navigate('/workflows/new')}
       {...props}
     >
       <T id="newW.title" />

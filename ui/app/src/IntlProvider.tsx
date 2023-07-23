@@ -15,14 +15,13 @@
  *
  */
 import messages from '@/i18n/messages'
+import useSettingsStore from '@/zustand/settings'
 import flat from 'flat'
 import { useMemo } from 'react'
 import { IntlProvider as ReactIntlProvider } from 'react-intl'
 
-import { useStoreSelector } from '@/store'
-
-const IntlProvider: React.FC = ({ children }) => {
-  const { lang } = useStoreSelector((state) => state.settings)
+const IntlProvider: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+  const [lang] = useSettingsStore((state) => [state.lang])
   const intlMessages = useMemo<Record<string, string>>(() => flat(messages[lang]), [lang])
 
   return (

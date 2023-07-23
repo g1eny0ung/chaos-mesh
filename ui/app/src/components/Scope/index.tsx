@@ -25,8 +25,8 @@ import {
   usePostCommonPhysicalmachines,
   usePostCommonPods,
 } from '@/openapi'
-import { useStoreSelector } from '@/store'
 import { Env } from '@/zustand/newExperiment'
+import useSettingsStore from '@/zustand/settings'
 import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import { useEffect, useMemo } from 'react'
@@ -53,8 +53,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
     annotationSelectors: currentAnnotations,
   } = getIn(values, scope)
 
-  const { settings } = useStoreSelector((state) => state)
-  const { enableKubeSystemNS } = settings
+  const [enableKubeSystemNS] = useSettingsStore((state) => [state.enableKubeSystemNS])
 
   const { data: labels } = useGetCommonLabels(
     {
@@ -202,7 +201,7 @@ interface ConditionalScopeProps extends ScopeProps {
 const ConditionalScope = ({ kind, ...rest }: ConditionalScopeProps) => {
   const disabled = kind === 'AWSChaos' || kind === 'GCPChaos'
 
-  const { useNewPhysicalMachine } = useStoreSelector((state) => state.settings)
+  const [useNewPhysicalMachine] = useSettingsStore((state) => [state.useNewPhysicalMachine])
 
   if (disabled) {
     return <Typography level="body2">{`${kind} does not need to define the scope.`}</Typography>
