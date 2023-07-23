@@ -120,7 +120,8 @@
   "experiments": {
     "title": "Experiments",
     "single": "Experiment",
-    "notFound": "No experiments found",
+    "notFound": "No experiments",
+    "notFoundDesc": "Create an experiment to perform the injection.",
     "createdAt": "Created",
     "deleteMulti": "Archive selected experiments",
     "deleteDesc": "You can still find this experiment in the archives",
@@ -222,7 +223,7 @@
   },
   "events": {
     "title": "Events",
-    "notFound": "No events found",
+    "notFound": "No events",
     "eventsPerPage": "Events per page",
     "event": {
       "uuid": "UUID",

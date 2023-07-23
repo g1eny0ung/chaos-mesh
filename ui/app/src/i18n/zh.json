@@ -127,6 +127,7 @@
     "title": "实验",
     "single": "实验",
     "notFound": "未发现实验",
+    "notFoundDesc": "创建一个实验来进行注入。",
     "deleteMulti": "归档所选实验",
     "deleteDesc": "你仍然可以在归档中找到此实验",
     "pauseDesc": "你可以在同一位置重启这个实验",

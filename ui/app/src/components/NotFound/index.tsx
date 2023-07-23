@@ -14,25 +14,23 @@
  * limitations under the License.
  *
  */
-import EmptyStreetDark from '@/images/assets/undraw_empty_street-dark.svg'
-import undrawNotFound from '@/images/assets/undraw_not_found.svg'
-import { Box, BoxProps } from '@mui/joy'
+import { Avatar, Card } from '@mui/joy'
+import Container from '@mui/system/Container'
 
-interface NotFoundProps extends BoxProps {
-  illustrated?: boolean
-  img?: string
-  imgAlt?: string
+interface NotFoundProps {
+  children: React.ReactNode
+  img: React.ReactNode
 }
 
-const NotFound: React.FC<NotFoundProps> = ({ img, imgAlt, children, ...rest }) => (
-  <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%" {...rest}>
-    {img && (
-      <Box mb={3}>
-        <img src={img} alt={imgAlt} width={450} />
-      </Box>
-    )}
-    {children}
-  </Box>
+const NotFound: React.FC<NotFoundProps> = ({ children, img }) => (
+  <Container maxWidth="md">
+    <Card variant="outlined" sx={{ alignItems: 'center', width: '100%', py: 6 }}>
+      <Avatar variant="soft" color="primary" sx={{ mb: 1, '--Avatar-size': '4.5rem' }}>
+        {img}
+      </Avatar>
+      {children}
+    </Card>
+  </Container>
 )
 
 export default NotFound

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-import NotFound from '@/components/NotFound'
 import i18n from '@/components/T'
 import { iconByKind } from '@/lib/byKind'
 import DateTime, { format } from '@/lib/luxon'
@@ -36,7 +35,7 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
         <List>
           {events.map((event) => (
             <ListItem key={event.id}>
-              <ListItemDecorator>{iconByKind(event.kind!, 'small')}</ListItemDecorator>
+              <ListItemDecorator>{iconByKind(event.kind!)}</ListItemDecorator>
               <ListItemContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Typography>{event.name}</Typography>
@@ -59,7 +58,9 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
           ))}
         </List>
       ) : (
-        <NotFound>{i18n('events.notFound')}</NotFound>
+        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+          <Typography color="neutral">{i18n('events.notFound')}</Typography>
+        </Box>
       )}
     </Box>
   )

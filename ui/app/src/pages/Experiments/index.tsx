@@ -17,7 +17,6 @@
 import NotFound from '@/components/NotFound'
 import ObjectListItem from '@/components/ObjectListItem'
 import i18n from '@/components/T'
-import DecideSVG from '@/images/assets/undraw_decide_re_ixfw.svg'
 import { transByKind } from '@/lib/byKind'
 import {
   useDeleteExperiments,
@@ -28,11 +27,13 @@ import {
 } from '@/openapi'
 import { DeleteExperimentsParams } from '@/openapi/index.schemas'
 import { Confirm, setAlert, setConfirm } from '@/slices/globalStatus'
+import { useStoreDispatch } from '@/store'
 import AddIcon from '@mui/icons-material/Add'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import CloseIcon from '@mui/icons-material/Close'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
+import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
 import { Box, Button, Checkbox, Typography, styled } from '@mui/joy'
 import _ from 'lodash'
 import { useState } from 'react'
@@ -42,8 +43,6 @@ import { FixedSizeList as RWList, ListChildComponentProps as RWListChildComponen
 
 import Loading from '@ui/mui-extends/esm/Loading'
 import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch } from '@/store'
 
 const StyledCheckBox = styled(Checkbox)({
   position: 'relative',
@@ -218,15 +217,20 @@ export default function Experiments() {
         ))}
 
       {!loading && experiments?.length === 0 && (
-        <NotFound img={DecideSVG}>
-          <Space>
-            <Typography level="h2" fontSize="lg">
-              {i18n('experiments.notFound')}
-            </Typography>
-            <Button startDecorator={<AddIcon />} onClick={() => navigate('/experiments/new')}>
-              {i18n('newE.title')}
-            </Button>
-          </Space>
+        <NotFound img={<ScienceOutlinedIcon sx={{ fontSize: 32 }} />}>
+          <Typography level="h4" component="h2">
+            {i18n('experiments.notFound')}
+          </Typography>
+          <Typography level="body1" color="neutral">
+            {i18n('experiments.notFoundDesc')}
+          </Typography>
+          <Button
+            startDecorator={<AddIcon />}
+            onClick={() => navigate('/experiments/new')}
+            sx={{ width: 'fit-content', mt: 3 }}
+          >
+            {i18n('newE.title')}
+          </Button>
         </NotFound>
       )}
 

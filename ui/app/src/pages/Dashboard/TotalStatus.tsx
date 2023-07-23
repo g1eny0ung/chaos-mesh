@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
-import NotFound from '@/components/NotFound'
 import i18n from '@/components/T'
 import { useGetExperimentsState } from '@/openapi'
 import type { StatusAllChaosStatus } from '@/openapi/index.schemas'
-import Box, { BoxProps } from '@mui/joy/Box'
+import { Box, BoxProps, Typography } from '@mui/joy'
 import type { PropertyAccessor } from '@nivo/core'
 import { ComputedDatum, ResponsivePie } from '@nivo/pie'
 import { useState } from 'react'
@@ -81,7 +80,9 @@ const TotalStatus: React.FC<BoxProps> = (props) => {
           colors={(d) => statusColors[d.data.id]}
         />
       ) : (
-        <NotFound>{i18n('experiments.notFound')}</NotFound>
+        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+          <Typography color="neutral">{i18n('experiments.notFound')}</Typography>
+        </Box>
       )}
     </Box>
   )
