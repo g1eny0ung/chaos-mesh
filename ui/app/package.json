@@ -15,7 +15,7 @@
     "@loadable/component": "^5.14.1",
     "@mui/base": "5.0.0-alpha.120",
     "@mui/icons-material": "^5.10.16",
-    "@mui/joy": "5.0.0-alpha.84",
+    "@mui/joy": "5.0.0-beta.5",
     "@mui/lab": "5.0.0-alpha.122",
     "@mui/material": "^5.10.16",
     "@mui/styles": "^5.10.16",
