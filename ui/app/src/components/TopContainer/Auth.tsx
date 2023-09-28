@@ -21,7 +21,7 @@ import Token from '@/components/Token'
 import { useGetCommonConfig } from '@/openapi'
 import GoogleIcon from '@mui/icons-material/Google'
 import { Box, Button, Divider, IconButton, Link, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
@@ -29,10 +29,9 @@ import Space from '@ui/mui-extends/esm/Space'
 
 interface AuthProps {
   open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const Auth: React.FC<AuthProps> = ({ open, setOpen }) => {
+const Auth: React.FC<AuthProps> = ({ open }) => {
   const navigate = useNavigate()
 
   const { data: config } = useGetCommonConfig({
@@ -43,10 +42,6 @@ const Auth: React.FC<AuthProps> = ({ open, setOpen }) => {
   })
 
   const [tokenGenOpen, setTokenGenOpen] = useState(false)
-
-  useEffect(() => {
-    setOpen(open)
-  }, [open, setOpen])
 
   const handleSubmitCallback = () => navigate(0)
   const handleAuthGCP = () => (window.location.href = '/api/auth/gcp/redirect')

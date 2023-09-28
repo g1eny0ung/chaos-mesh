@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  */
-import TopContainer from '@/components/TopContainer'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import type { FC } from 'react'
 import { DndProvider } from 'react-dnd'
@@ -24,11 +23,9 @@ import { Provider as StoreProvider } from 'react-redux'
 import { RouterProvider } from 'react-router-dom'
 
 import IntlProvider from './IntlProvider'
-import ThemeProvider from './ThemeProvider'
+import queryClient from './reactQueryClient'
 import router from './router'
 import store from './store'
-
-const queryClient = new QueryClient()
 
 interface AppProps {
   forTesting?: boolean

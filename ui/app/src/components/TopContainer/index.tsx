@@ -80,7 +80,6 @@ const TopContainer = () => {
   }
 
   const [loading, setLoading] = useState(true)
-  const [authOpen, setAuthOpen] = useState(false)
 
   /**
    * Set authorization (RBAC token / GCP) for API use.
@@ -114,7 +113,7 @@ const TopContainer = () => {
       dispatch(setTokens(tokens))
       dispatch(setTokenName(tokenName))
     } else {
-      setAuthOpen(true)
+      dispatch(setAuthOpen(true))
     }
 
     if (globalNamespace) {
@@ -211,7 +210,7 @@ const TopContainer = () => {
         </Box>
       </Root>
 
-      <Auth open={authOpen} setOpen={setAuthOpen} />
+      <Auth open={authOpen} />
 
       <Portal>
         <Snackbar

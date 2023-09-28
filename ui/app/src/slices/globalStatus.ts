@@ -36,6 +36,7 @@ const initialState: {
   alertOpen: boolean
   confirm: Confirm
   confirmOpen: boolean // control global confirm dialog
+  authOpen: boolean
   namespace: string
   tokens: TokenFormValues[]
   tokenName: string
@@ -49,6 +50,7 @@ const initialState: {
     title: '',
     description: '',
   },
+  authOpen: false,
   confirmOpen: false,
   namespace: 'All',
   tokens: [],
@@ -73,6 +75,9 @@ const globalStatusSlice = createSlice({
     setConfirmOpen(state, action: PayloadAction<boolean>) {
       state.confirmOpen = action.payload
     },
+    setAuthOpen(state, action: PayloadAction<boolean>) {
+      state.authOpen = action.payload
+    },
     setNameSpace(state, action: PayloadAction<string>) {
       const ns = action.payload
 
@@ -94,10 +99,26 @@ const globalStatusSlice = createSlice({
 
       LS.set('token-name', name)
     },
+    removeToken(state) {
+      state.tokenName = ''
+      state.tokens = []
+
+      LS.remove('token')
+      LS.remove('token-name')
+    },
   },
 })
 
-export const { setAlert, setAlertOpen, setConfirm, setConfirmOpen, setNameSpace, setTokens, setTokenName } =
-  globalStatusSlice.actions
+export const {
+  setAlert,
+  setAlertOpen,
+  setConfirm,
+  setConfirmOpen,
+  setAuthOpen,
+  setNameSpace,
+  setTokens,
+  setTokenName,
+  removeToken,
+} = globalStatusSlice.actions
 
 export default globalStatusSlice.reducer
