@@ -10,10 +10,23 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 
 ### Added
 
+- Allow if condition for creating chaos-controller-manager ServiceAccount and allow setting securityContext for chaos-daemon pods [#4390](https://github.com/chaos-mesh/chaos-mesh/pull/4390)
 - Allow annotations on chaos-controller-manager and chaos-daemon ServiceAccount [#4106](https://github.com/chaos-mesh/chaos-mesh/pull/4106)
 - Support for deploying chaos-dashboard under the subpath [#4093](https://github.com/chaos-mesh/chaos-mesh/pull/4093)
 - Support more rate units for networkchaos [#4129](https://github.com/chaos-mesh/chaos-mesh/pull/4129)
 - Support for deploying chaos-dashboard with sidecar containers in helm chart [#4164](https://github.com/chaos-mesh/chaos-mesh/pull/4164)
+- Add `values.schema.json` [#4205](https://github.com/chaos-mesh/chaos-mesh/pull/4205)
+- Add [`GreptimeDB`](https://greptime.com) to ADOPTERS.md [#4245](https://github.com/chaos-mesh/chaos-mesh/pull/4245)
+- Support configurable chaos-dns-server pod affinities [#4260](https://github.com/chaos-mesh/chaos-mesh/pull/4260)
+- Add experiment `name`, `namespace` and `kind` to "apply chaos" and "recover chaos" log messages [4278](https://github.com/chaos-mesh/chaos-mesh/pull/4278)
+- Support for watching remote status of chaos experiments to local [#4188](https://github.com/chaos-mesh/chaos-mesh/pull/4188)
+- Add netem/rate support for NetworkChaos [#4017](https://github.com/chaos-mesh/chaos-mesh/pull/4017)
+- Support for setting `loadBalancerSourceRanges` in chaos-dashboard service in helm chart [#4172](https://github.com/chaos-mesh/chaos-mesh/pull/4172)
+- Helm: allow templating of dashboard rootUrl [#4370](https://github.com/chaos-mesh/chaos-mesh/pull/4370)
+- Support for reading database connection string from secret [#4363](https://github.com/chaos-mesh/chaos-mesh/pull/4363)
+- Allow if condition for creating chaos-controller-manager ServiceAccount and allow setting securityContext for chaos-daemon pods [#4390](https://github.com/chaos-mesh/chaos-mesh/pull/4390)
+- Integrate helm-values-schema-json to generate schema for values.yaml [#4435](https://github.com/chaos-mesh/chaos-mesh/pull/4435)
+- Add an option to toggle metric scraping of Chaos Daemon [#4488](https://github.com/chaos-mesh/chaos-mesh/pull/4488)
 
 ### Changed
 
@@ -29,6 +42,10 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 - Update ginkgo to 2.12.0 [#4190](https://github.com/chaos-mesh/chaos-mesh/pull/4190)
 - Update k8s controller-runtime dependency [#4198](https://github.com/chaos-mesh/chaos-mesh/pull/4198)
 - Automatically remove the token from the dashboard when it expires [#4193](https://github.com/chaos-mesh/chaos-mesh/pull/4193)
+- Optimize `allInjected` and `allRecovered` states when targets are not selected [#4199](https://github.com/chaos-mesh/chaos-mesh/pull/4199)
+- Upgrade byteman-helper to v4.0.22 [#4299](https://github.com/chaos-mesh/chaos-mesh/pull/4299)
+- GCP auth is changed to object with additional key `existingSecret` in helm chart values [#4303](https://github.com/chaos-mesh/chaos-mesh/pull/4303)
+- Add context to the http request to download the chart [#4304](https://github.com/chaos-mesh/chaos-mesh/pull/4304)
 
 ### Deprecated
 
@@ -44,10 +61,21 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 - Remove redundant where statements [#4084](https://github.com/chaos-mesh/chaos-mesh/pull/4084)
 - Fix dashboard panic when exec delete action by finish_time [#4100](https://github.com/chaos-mesh/chaos-mesh/pull/4100)
 - Fix remote cluster cannot upgrade helm release [#4075](https://github.com/chaos-mesh/chaos-mesh/pull/4075)
+- Fix goroutine leak [#4229](https://github.com/chaos-mesh/chaos-mesh/pull/4229)
+- Remove the duplicate `make test` [#4234](https://github.com/chaos-mesh/chaos-mesh/pull/4234)
+- Fix daemon-server `SetDNSServer` endpoint to validate provided server address [#4246](https://github.com/chaos-mesh/chaos-mesh/pull/4246)
+- Enable prometheus directive within CoreDNS [#4321](https://github.com/chaos-mesh/chaos-mesh/pull/4321)
+- Fix TTL configuration from environment variables [#4338](https://github.com/chaos-mesh/chaos-mesh/pull/4338)
+- Fix dashboard panic while replacing query namespace with targetNamespace in namespace scoped mode [#4409](https://github.com/chaos-mesh/chaos-mesh/issues/4409)
+- Fix incorrect mmap args for IOChaos [#3680](https://github.com/chaos-mesh/chaos-mesh/issues/3680)
+- Fix excessive records by adding the `MaxEvents` field [#4402](https://github.com/chaos-mesh/chaos-mesh/pull/4402)
+- Fix chaos controller can't find daemonIP over 1000 nodes using endpoints [#4421](https://github.com/chaos-mesh/chaos-mesh/pull/4421)
+- Minor fixes in certificates to make them ArgoCD friendly [#4482](https://github.com/chaos-mesh/chaos-mesh/pull/4482)
 
 ### Security
 
-- Nothing
+- Remove `-k` from `curl` command lines in chaos-daemon Dockerfile [#4241](https://github.com/chaos-mesh/chaos-mesh/pull/4241)
+- Upgrade the base image of dev/build-env [#4388](https://github.com/chaos-mesh/chaos-mesh/pull/4388)
 
 ## [2.6.0] - 2023-05-30
 

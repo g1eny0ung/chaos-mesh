@@ -984,6 +984,7 @@ data:
             ttl 30
             grpcport 9288
         }
+        prometheus :9153
         forward . /etc/resolv.conf {
             max_concurrent 1000
         }
@@ -1312,8 +1313,11 @@ metadata:
     app.kubernetes.io/component: controller-manager
 rules:
   - apiGroups: [ "" ]
-    resources: [ "services", "endpoints", "secrets" ]
+    resources: [ "services", "secrets" ]
     verbs: [ "get", "list", "watch" ]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "list", "watch"]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews
@@ -1649,7 +1653,7 @@ spec:
               containerPort: 31766
       volumes:
         - name: socket-path
-          hostPath: 
+          hostPath:
             path: ${socketDir}
         - name: sys-path
           hostPath:
@@ -1963,14 +1967,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
+          - podAffinityTerm:
               labelSelector:
                 matchExpressions:
-                  - key: k8s-app
-                    operator: In
-                    values: ["chaos-dns"]
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                  - chaos-dns-server
               topologyKey: kubernetes.io/hostname
+            weight: 100
       priorityClassName: 
       containers:
       - name: chaos-dns-server

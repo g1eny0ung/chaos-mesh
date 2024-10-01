@@ -50,7 +50,7 @@ endif
 
 endif
 
-BASIC_IMAGE_ENV= IMAGE_DEV_ENV_TAG=$(IMAGE_DEV_ENV_TAG) \
+BASIC_IMAGE_ENV=IMAGE_DEV_ENV_TAG=$(IMAGE_DEV_ENV_TAG) \
 	IMAGE_BUILD_ENV_TAG=$(IMAGE_BUILD_ENV_TAG) \
 	IMAGE_TAG=$(IMAGE_TAG) TARGET_PLATFORM=$(TARGET_PLATFORM) \
 	GO_BUILD_CACHE=$(GO_BUILD_CACHE)
@@ -91,7 +91,7 @@ config: SHELL:=$(RUN_IN_DEV_SHELL)
 config: images/dev-env/.dockerbuilt ## Generate CRD manifests with controller-gen
 	cd ./api ;\
 		controller-gen crd:ignoreUnexportedFields=true,crdVersions=v1 rbac:roleName=manager-role paths="./..." output:crd:artifacts:config=../config/crd/bases ;\
-		controller-gen crd:ignoreUnexportedFields=true,crdVersions=v1 rbac:roleName=manager-role paths="./..." output:crd:artifacts:config=../helm/chaos-mesh/crds ;
+		rm ../helm/chaos-mesh/crds/* && cp ../config/crd/bases/* ../helm/chaos-mesh/crds
 
 chaos-build: SHELL:=$(RUN_IN_DEV_SHELL)
 chaos-build: bin/chaos-builder images/dev-env/.dockerbuilt ## Generate codes for CustomResource Kinds under api/v1alpha1
@@ -132,7 +132,7 @@ swagger_spec: images/dev-env/.dockerbuilt ## Generate OpenAPI/Swagger spec for f
 
 ##@ Linters, formatters and others
 
-check: generate manifests/crd.yaml vet boilerplate lint tidy install.sh fmt ## Run prerequisite checks for PR
+check: generate manifests/crd.yaml vet boilerplate lint fmt tidy install.sh helm-values-schema ## Run prerequisite checks for PR
 
 SKYWALKING_EYES_HEADER = /go/bin/license-eye header -c ./.github/.licenserc.yaml
 boilerplate: SHELL:=$(RUN_IN_DEV_SHELL)
@@ -171,6 +171,10 @@ tidy: images/dev-env/.dockerbuilt ## Run go mod tidy in all submodules
 vet: SHELL:=$(RUN_IN_DEV_SHELL)
 vet: images/dev-env/.dockerbuilt ## Lint go files with go vet
 	$(CGOENV) go vet ./...
+
+helm-values-schema: SHELL:=$(RUN_IN_DEV_SHELL)
+helm-values-schema: images/dev-env/.dockerbuilt
+	helm schema -input helm/chaos-mesh/values.yaml -output helm/chaos-mesh/values.schema.json
 
 ##@ Common used building targets
 
@@ -214,12 +218,24 @@ PAUSE_IMAGE ?= gcr.io/google-containers/pause:latest
 e2e: e2e-build ## Run e2e tests in current kubernetes cluster
 	./e2e-test/image/e2e/bin/ginkgo ${GINKGO_FLAGS} ./e2e-test/image/e2e/bin/e2e.test -- --e2e-image ghcr.io/chaos-mesh/e2e-helper:${IMAGE_TAG} --pause-image ${PAUSE_IMAGE}
 
+define failpoint-ctl
+	find $(ROOT)/* -type d | grep -vE "(\.git|bin|\.cache|ui)" | xargs failpoint-ctl $1
+endef
+
+failpoint-enable: SHELL:=$(RUN_IN_DEV_SHELL)
+failpoint-enable: images/dev-env/.dockerbuilt ## Enable failpoint stub for testing
+	$(call failpoint-ctl,enable)
+
+failpoint-disable: SHELL:=$(RUN_IN_DEV_SHELL)
+failpoint-disable: images/dev-env/.dockerbuilt ## Disable failpoint stub for testing
+	$(call failpoint-ctl,disable)
+
 test: SHELL:=$(RUN_IN_DEV_SHELL)
 test: generate manifests test-utils images/dev-env/.dockerbuilt ## Run unit tests
-	make failpoint-enable
+	$(call failpoint-ctl,enable)
 	CGO_ENABLED=1 $(GOTEST) -p 1 $$($(PACKAGE_LIST)) -coverprofile cover.out.tmp -covermode=atomic
 	cat cover.out.tmp | grep -v "_generated.deepcopy.go" > cover.out
-	make failpoint-disable
+	$(call failpoint-ctl,disable)
 
 ##@ Advanced building targets
 
@@ -275,7 +291,6 @@ pkg/time/fakeclock/fake_gettimeofday.o: pkg/time/fakeclock/fake_gettimeofday.c i
 	[[ "$$TARGET_PLATFORM" == "arm64" ]] && CFLAGS="-mcmodel=tiny" ;\
 	cc -c ./pkg/time/fakeclock/fake_gettimeofday.c -fPIE -O2 -o pkg/time/fakeclock/fake_gettimeofday.o $$CFLAGS
 
-
 CLEAN_TARGETS += e2e-test/image/e2e/manifests e2e-test/image/e2e/chaos-mesh
 
 e2e-test/image/e2e/manifests: manifests ## Copy CRD manifests to e2e image build directory
@@ -302,14 +317,6 @@ e2e-build: e2e-test/image/e2e/bin/ginkgo e2e-test/image/e2e/bin/e2e.test ## Buil
 bin/chaos-builder: SHELL:=$(RUN_IN_DEV_SHELL)
 bin/chaos-builder: images/dev-env/.dockerbuilt
 	$(CGOENV) go build -ldflags '$(LDFLAGS)' -buildvcs=false -o bin/chaos-builder ./cmd/chaos-builder/...
-
-failpoint-enable: SHELL:=$(RUN_IN_DEV_SHELL)
-failpoint-enable: images/dev-env/.dockerbuilt ## Enable failpoint stub for testing
-	find $(ROOT)/* -type d | grep -vE "(\.git|bin|\.cache|ui)" | xargs failpoint-ctl enable
-
-failpoint-disable: SHELL:=$(RUN_IN_DEV_SHELL)
-failpoint-disable: images/dev-env/.dockerbuilt ## Disable failpoint stub for testing
-	find $(ROOT)/* -type d | grep -vE "(\.git|bin|\.cache|ui)" | xargs failpoint-ctl disable
 
 .PHONY: all image clean test manifests manifests/crd.yaml \
 	boilerplate tidy groupimports fmt vet lint install.sh schedule-migration \

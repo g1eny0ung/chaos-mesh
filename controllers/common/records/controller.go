@@ -29,6 +29,7 @@ import (
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
+	"github.com/chaos-mesh/chaos-mesh/controllers/config"
 	"github.com/chaos-mesh/chaos-mesh/controllers/utils/recorder"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector"
 )
@@ -62,7 +63,6 @@ const (
 // Reconcile the chaos records
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	obj := r.Object.DeepCopyObject().(v1alpha1.InnerObjectWithSelector)
-
 	if err := r.Client.Get(context.TODO(), req.NamespacedName, obj); err != nil {
 		if apierrors.IsNotFound(err) {
 			r.Log.Info("chaos not found")
@@ -79,11 +79,13 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	records := obj.GetStatus().Experiment.Records
 	selectors := obj.GetSelectorSpecs()
 
+	logger := r.Log.WithValues("name", obj.GetName(), "namespace", obj.GetNamespace(), "kind", obj.GetObjectKind().GroupVersionKind().Kind)
+
 	if records == nil {
 		for name, sel := range selectors {
 			targets, err := r.Selector.Select(context.TODO(), sel)
 			if err != nil {
-				r.Log.Error(err, "fail to select")
+				logger.Error(err, "fail to select")
 				r.Recorder.Event(obj, recorder.Failed{
 					Activity: "select targets",
 					Err:      err.Error(),
@@ -92,7 +94,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			}
 
 			if len(targets) == 0 {
-				r.Log.Info("no target has been selected")
+				logger.Info("no target has been selected")
 				r.Recorder.Event(obj, recorder.Failed{
 					Activity: "select targets",
 					Err:      "no target has been selected",
@@ -115,7 +117,8 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	needRetry := false
 	for index, record := range records {
 		var err error
-		r.Log.Info("iterating record", "record", record, "desiredPhase", desiredPhase)
+		idLogger := logger.WithValues("id", records[index].Id)
+		idLogger.Info("iterating record", "record", record, "desiredPhase", desiredPhase)
 
 		// The whole running logic is a cycle:
 		// Not Injected -> Not Injected/* -> Injected -> Injected/* -> Not Injected
@@ -146,7 +149,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		}
 
 		if operation == Apply {
-			r.Log.Info("apply chaos", "id", records[index].Id)
+			idLogger.Info("apply chaos")
 			record.Phase, err = r.Impl.Apply(context.TODO(), index, records, obj)
 			if record.Phase != originalPhase {
 				shouldUpdate = true
@@ -154,8 +157,11 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			if err != nil {
 				// TODO: add backoff and retry mechanism
 				// but the retry shouldn't block other resource process
-				r.Log.Error(err, "fail to apply chaos")
+				idLogger.Error(err, "fail to apply chaos")
 				applyFailedEvent := newRecordEvent(v1alpha1.TypeFailed, v1alpha1.Apply, err.Error())
+				if len(records[index].Events) >= config.ControllerCfg.MaxEvents {
+					records[index].Events = records[index].Events[1:]
+				}
 				records[index].Events = append(records[index].Events, *applyFailedEvent)
 				r.Recorder.Event(obj, recorder.Failed{
 					Activity: "apply chaos",
@@ -170,13 +176,16 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			if record.Phase == v1alpha1.Injected {
 				records[index].InjectedCount++
 				applySucceedEvent := newRecordEvent(v1alpha1.TypeSucceeded, v1alpha1.Apply, "")
+				if len(records[index].Events) >= config.ControllerCfg.MaxEvents {
+					records[index].Events = records[index].Events[1:]
+				}
 				records[index].Events = append(records[index].Events, *applySucceedEvent)
 				r.Recorder.Event(obj, recorder.Applied{
 					Id: records[index].Id,
 				})
 			}
 		} else if operation == Recover {
-			r.Log.Info("recover chaos", "id", records[index].Id)
+			idLogger.Info("recover chaos")
 			record.Phase, err = r.Impl.Recover(context.TODO(), index, records, obj)
 			if record.Phase != originalPhase {
 				shouldUpdate = true
@@ -184,8 +193,11 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			if err != nil {
 				// TODO: add backoff and retry mechanism
 				// but the retry shouldn't block other resource process
-				r.Log.Error(err, "fail to recover chaos")
+				idLogger.Error(err, "fail to recover chaos")
 				recoverFailedEvent := newRecordEvent(v1alpha1.TypeFailed, v1alpha1.Recover, err.Error())
+				if len(records[index].Events) >= config.ControllerCfg.MaxEvents {
+					records[index].Events = records[index].Events[1:]
+				}
 				records[index].Events = append(records[index].Events, *recoverFailedEvent)
 				r.Recorder.Event(obj, recorder.Failed{
 					Activity: "recover chaos",
@@ -200,6 +212,9 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			if record.Phase == v1alpha1.NotInjected {
 				records[index].RecoveredCount++
 				recoverSucceedEvent := newRecordEvent(v1alpha1.TypeSucceeded, v1alpha1.Recover, "")
+				if len(records[index].Events) >= config.ControllerCfg.MaxEvents {
+					records[index].Events = records[index].Events[1:]
+				}
 				records[index].Events = append(records[index].Events, *recoverSucceedEvent)
 				r.Recorder.Event(obj, recorder.Recovered{
 					Id: records[index].Id,
@@ -215,11 +230,11 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	}
 	if shouldUpdate {
 		updateError := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
-			r.Log.Info("updating records", "records", records)
+			logger.Info("updating records", "records", records)
 			obj := r.Object.DeepCopyObject().(v1alpha1.InnerObjectWithSelector)
 
 			if err := r.Client.Get(context.TODO(), req.NamespacedName, obj); err != nil {
-				r.Log.Error(err, "unable to get chaos")
+				logger.Error(err, "unable to get chaos")
 				return err
 			}
 
@@ -232,7 +247,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			return r.Client.Update(context.TODO(), obj)
 		})
 		if updateError != nil {
-			r.Log.Error(updateError, "fail to update")
+			logger.Error(updateError, "fail to update")
 			r.Recorder.Event(obj, recorder.Failed{
 				Activity: "update records",
 				Err:      updateError.Error(),
