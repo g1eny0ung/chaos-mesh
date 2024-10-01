@@ -16,6 +16,7 @@
  */
 import i18n from '@/components/T'
 import { comparator, format } from '@/lib/luxon'
+import Paper from '@/mui-extends/Paper'
 import { CoreEvent as Event } from '@/openapi/index.schemas'
 import FirstPageIcon from '@mui/icons-material/FirstPage'
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
@@ -37,8 +38,6 @@ import {
 import _ from 'lodash'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
-
-import Paper from '@ui/mui-extends/esm/Paper'
 
 function descendingComparator<T extends Record<string, any>>(a: T, b: T, orderBy: string) {
   if (['StartTime', 'EndTime'].includes(orderBy)) {

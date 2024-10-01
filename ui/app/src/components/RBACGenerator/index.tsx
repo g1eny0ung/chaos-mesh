@@ -17,8 +17,10 @@
 import { Stale } from '@/api/queryUtils'
 import { SelectField } from '@/components/FormField'
 import i18n from '@/components/T'
+import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces, useGetCommonRbacConfig } from '@/openapi'
 import { setAlert } from '@/slices/globalStatus'
+import { useStoreDispatch } from '@/store'
 import { Box, Button, Checkbox, FormControl, FormControlLabel, MenuItem, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import copy from 'copy-text-to-clipboard'
@@ -26,10 +28,6 @@ import { Field, Form, Formik } from 'formik'
 import _ from 'lodash'
 import { useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
-
-import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch } from '@/store'
 
 const useStyles = makeStyles((theme) => ({
   pre: {

@@ -16,6 +16,7 @@
  */
 import { resetAPIAuthentication } from '@/api/interceptors'
 import i18n from '@/components/T'
+import PaperTop from '@/mui-extends/PaperTop'
 import { removeToken, setAuthOpen, setConfirm } from '@/slices/globalStatus'
 import { useStoreDispatch, useStoreSelector } from '@/store'
 import GoogleIcon from '@mui/icons-material/Google'
@@ -24,8 +25,6 @@ import Cookies from 'js-cookie'
 import _ from 'lodash'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-
-import PaperTop from '@ui/mui-extends/esm/PaperTop'
 
 const Token = () => {
   const navigate = useNavigate()

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
+import MuiExtendsSelectField, { SelectFieldProps } from '@/mui-extends/SelectField'
 import { Field } from 'formik'
-
-import MuiExtendsSelectField, { SelectFieldProps } from '@ui/mui-extends/esm/SelectField'
 
 function SelectField<T>(props: SelectFieldProps<T>) {
   return <Field {...props} as={MuiExtendsSelectField} />

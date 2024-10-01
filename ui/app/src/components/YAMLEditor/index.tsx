@@ -15,7 +15,9 @@
  *
  */
 import i18n from '@/components/T'
+import Space from '@/mui-extends/Space'
 import { setConfirm } from '@/slices/globalStatus'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import PublishIcon from '@mui/icons-material/Publish'
 import { Box, Button } from '@mui/material'
@@ -30,10 +32,6 @@ import { memo } from 'react'
 import { useState } from 'react'
 import AceEditor, { IAceEditorProps } from 'react-ace'
 import { useIntl } from 'react-intl'
-
-import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch, useStoreSelector } from '@/store'
 
 interface YAMLEditorProps {
   name?: string

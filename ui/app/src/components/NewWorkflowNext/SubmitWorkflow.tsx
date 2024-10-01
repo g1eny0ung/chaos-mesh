@@ -18,6 +18,9 @@ import { Stale } from '@/api/queryUtils'
 import { SelectField, Submit, TextField } from '@/components/FormField'
 import FormikEffect from '@/components/FormikEffect'
 import { T } from '@/components/T'
+import ConfirmDialog from '@/mui-extends/ConfirmDialog'
+import Paper from '@/mui-extends/Paper'
+import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces, usePostWorkflows } from '@/openapi'
 import { resetWorkflow } from '@/slices/workflows'
 import { useStoreDispatch } from '@/store'
@@ -28,10 +31,6 @@ import yaml from 'js-yaml'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
-
-import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
-import Paper from '@ui/mui-extends/esm/Paper'
-import Space from '@ui/mui-extends/esm/Space'
 
 const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 

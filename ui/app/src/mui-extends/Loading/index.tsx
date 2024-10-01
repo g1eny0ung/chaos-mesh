@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 import { Box, CircularProgress, styled } from '@mui/material'
 
 const StyledBox = styled(Box)({

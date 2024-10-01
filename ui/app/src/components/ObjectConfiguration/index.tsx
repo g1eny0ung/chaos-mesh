@@ -18,11 +18,10 @@ import { templateTypeToFieldName } from '@/api/zz_generated.frontend.chaos-mesh'
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 import { format } from '@/lib/luxon'
+import Space from '@/mui-extends/Space'
 import { TypesArchiveDetail, TypesExperimentDetail } from '@/openapi/index.schemas'
 import useSettingsStore from '@/zustand/settings'
 import { Grid, Table, TableBody, TableRow, Typography } from '@mui/material'
-
-import Space from '@ui/mui-extends/esm/Space'
 
 import { Experiment, Selector, TableCell } from './common'
 

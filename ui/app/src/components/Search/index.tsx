@@ -17,6 +17,8 @@
 import i18n from '@/components/T'
 import { format } from '@/lib/luxon'
 import search from '@/lib/search'
+import Paper from '@/mui-extends/Paper'
+import Tooltip from '@/mui-extends/Tooltip'
 import {
   getArchives,
   getArchivesSchedules,
@@ -45,9 +47,6 @@ import _ from 'lodash'
 import { useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-import Tooltip from '@ui/mui-extends/esm/Tooltip'
 
 const Chip = (props: ChipProps) => <MUIChip {...props} variant="outlined" size="small" />
 

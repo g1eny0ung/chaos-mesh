@@ -19,6 +19,7 @@ import { AutocompleteField, SelectField } from '@/components/FormField'
 import MoreOptions from '@/components/MoreOptions'
 import { T } from '@/components/T'
 import { arrToObjBySep, objToArrBySep } from '@/lib/utils'
+import Space from '@/mui-extends/Space'
 import {
   useGetCommonAnnotations,
   useGetCommonLabels,
@@ -30,8 +31,6 @@ import useSettingsStore from '@/zustand/settings'
 import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import { useEffect, useMemo } from 'react'
-
-import Space from '@ui/mui-extends/esm/Space'
 
 import DeprecatedAddress from './DeprecatedAddress'
 import Mode from './Mode'

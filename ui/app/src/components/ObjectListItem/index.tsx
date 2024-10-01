@@ -17,6 +17,8 @@
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 import DateTime, { format } from '@/lib/luxon'
+import Paper from '@/mui-extends/Paper'
+import Space from '@/mui-extends/Space'
 import { TypesArchive, TypesExperiment, TypesSchedule } from '@/openapi/index.schemas'
 import useSettingsStore from '@/zustand/settings'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
@@ -27,9 +29,6 @@ import { Box, IconButton, Typography } from '@mui/material'
 import _ from 'lodash'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-import Space from '@ui/mui-extends/esm/Space'
 
 interface ObjectListItemProps {
   type?: 'schedule' | 'experiment' | 'archive'

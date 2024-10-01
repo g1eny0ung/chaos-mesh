@@ -16,14 +16,13 @@
  */
 import i18n from '@/components/T'
 import { parseYAML } from '@/lib/formikhelpers'
+import Space from '@/mui-extends/Space'
 import useNewExperimentStore from '@/zustand/newExperiment'
 import Tab from '@mui/joy/Tab'
 import TabList from '@mui/joy/TabList'
 import TabPanel from '@mui/joy/TabPanel'
 import Tabs from '@mui/joy/Tabs'
 import { forwardRef, useImperativeHandle, useState } from 'react'
-
-import Space from '@ui/mui-extends/esm/Space'
 
 import ByYAML from './ByYAML'
 import LoadFrom from './LoadFrom'

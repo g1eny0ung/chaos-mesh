@@ -15,7 +15,9 @@
  *
  */
 import i18n from '@/components/T'
-import { PreDefinedValue, getDB } from '@/lib/idb'
+import Paper from '@/mui-extends/Paper'
+import SkeletonN from '@/mui-extends/SkeletonN'
+import Space from '@/mui-extends/Space'
 import {
   useGetArchives,
   useGetArchivesSchedules,
@@ -32,10 +34,6 @@ import { useStoreDispatch } from '@/store'
 import { Box, Divider, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-import SkeletonN from '@ui/mui-extends/esm/SkeletonN'
-import Space from '@ui/mui-extends/esm/Space'
 
 import RadioLabel from './RadioLabel'
 
@@ -54,7 +52,6 @@ const LoadFrom: React.FC<LoadFromProps> = ({ callback, inSchedule, inWorkflow })
   const [experimentUUID, setExperimentUUID] = useState('')
   const [archiveUUID, setArchiveUUID] = useState('')
   const [scheduleArchiveUUID, setScheduleArchiveUUID] = useState('')
-  const [predefined, setPredefined] = useState<PreDefinedValue[]>([])
   const [radio, setRadio] = useState('')
 
   const { data: experiments, isLoading: loading1 } = useGetExperiments()
@@ -112,37 +109,8 @@ const LoadFrom: React.FC<LoadFromProps> = ({ callback, inSchedule, inWorkflow })
     },
   })
 
-  useEffect(() => {
-    const fetchPredefined = async () => {
-      let _predefined = await (await getDB()).getAll('predefined')
-
-      if (!inSchedule) {
-        _predefined = _predefined.filter((d) => d.kind !== 'Schedule')
-      }
-
-      setPredefined(_predefined)
-    }
-
-    fetchPredefined()
-  }, [inSchedule, inWorkflow])
-
   const onRadioChange = (e: any) => {
     const [type, uuid] = e.target.value.split('+')
-
-    if (type === 'p') {
-      const experiment = predefined?.filter((p) => p.name === uuid)[0].yaml
-
-      callback && callback(experiment)
-
-      dispatch(
-        setAlert({
-          type: 'success',
-          message: i18n('confirm.success.load', intl),
-        })
-      )
-
-      return
-    }
 
     switch (type) {
       case 's':
@@ -248,25 +216,6 @@ const LoadFrom: React.FC<LoadFromProps> = ({ callback, inSchedule, inWorkflow })
           <Divider />
 
           <Typography>{i18n('dashboard.predefined')}</Typography>
-
-          {loading ? (
-            <SkeletonN n={3} />
-          ) : predefined.length > 0 ? (
-            <Box display="flex" flexWrap="wrap">
-              {predefined.map((d) => (
-                <FormControlLabel
-                  key={d.name}
-                  value={`p+${d.name}`}
-                  control={<Radio color="primary" />}
-                  label={RadioLabel(d.name)}
-                />
-              ))}
-            </Box>
-          ) : (
-            <Typography variant="body2" color="textSecondary">
-              {i18n('dashboard.noPredefinedFound')}
-            </Typography>
-          )}
         </Space>
       </RadioGroup>
     </Paper>

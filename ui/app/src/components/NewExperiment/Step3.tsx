@@ -18,6 +18,8 @@ import { Submit } from '@/components/FormField'
 import { ExperimentKind } from '@/components/NewExperiment/types'
 import i18n from '@/components/T'
 import { parseSubmit } from '@/lib/formikhelpers'
+import Paper from '@/mui-extends/Paper'
+import PaperTop from '@/mui-extends/PaperTop'
 import { usePostExperiments } from '@/openapi'
 import { setAlert } from '@/slices/globalStatus'
 import { useStoreDispatch } from '@/store'
@@ -27,9 +29,6 @@ import DoneAllIcon from '@mui/icons-material/DoneAll'
 import { Box, Typography } from '@mui/material'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-import PaperTop from '@ui/mui-extends/esm/PaperTop'
 
 interface Step3Props {
   onSubmit?: (parsedValues: any) => void

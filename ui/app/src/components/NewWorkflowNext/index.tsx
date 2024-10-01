@@ -15,7 +15,10 @@
  *
  */
 import YAML from '@/components/YAML'
+import Paper from '@/mui-extends/Paper'
+import Space from '@/mui-extends/Space'
 import { loadRecentlyUsedExperiments } from '@/slices/workflows'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import TabPanelUnstyled from '@mui/base/TabPanelUnstyled'
 import TabUnstyled from '@mui/base/TabUnstyled'
 import TabsListUnstyled from '@mui/base/TabsListUnstyled'
@@ -25,11 +28,6 @@ import { styled } from '@mui/material/styles'
 import _ from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import type { ReactFlowInstance } from 'react-flow-renderer'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch, useStoreSelector } from '@/store'
 
 import FunctionalNodesElements from './Elements/FunctionalNodes'
 import KubernetesElements from './Elements/Kubernetes'

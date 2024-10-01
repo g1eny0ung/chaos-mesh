@@ -19,6 +19,7 @@ import { AutocompleteField, LabelField, SelectField, Submit, TextField } from '@
 import MoreOptions from '@/components/MoreOptions'
 import Scope from '@/components/Scope'
 import i18n from '@/components/T'
+import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import useNewExperimentStore, { Env } from '@/zustand/newExperiment'
 import PublishIcon from '@mui/icons-material/Publish'
@@ -26,8 +27,6 @@ import { MenuItem } from '@mui/material'
 import { Form, Formik, FormikErrors, FormikTouched, getIn, setIn } from 'formik'
 import { useEffect, useState } from 'react'
 import { ObjectSchema } from 'yup'
-
-import Space from '@ui/mui-extends/esm/Space'
 
 import basicData from '../data/basic'
 import { Kind, Spec } from '../data/types'

@@ -16,12 +16,11 @@
  */
 import { LabelField, Submit, TextField } from '@/components/FormField'
 import MoreOptions from '@/components/MoreOptions'
+import Space from '@/mui-extends/Space'
 import useNewExperimentStore from '@/zustand/newExperiment'
 import { Typography } from '@mui/material'
 import { Form, Formik, getIn } from 'formik'
 import { useEffect, useState } from 'react'
-
-import Space from '@ui/mui-extends/esm/Space'
 
 import typesData from '../data/types'
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Chaos Mesh Authors.
+ * Copyright 2021 Chaos Mesh Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,21 @@
  * limitations under the License.
  *
  */
-import { Theme } from '@mui/material/styles'
+import Paper from '../Paper'
 
-declare module '@mui/material/styles' {
-  interface Palette {
-    secondaryContainer: Palette['primary']
-    onSecondaryContainer: Palette['primary']
-    onSurfaceVariant: Palette['primary']
-  }
+/**
+ * PaperContainer usually be used to replace the default container.
+ *
+ * For example:
+ *
+ * <TableContainer component={PaperContainer}>
+ * ...
+ * </TableContainer>
+ *
+ * @param {React.ReactNode} { children }
+ */
+const PaperContainer: React.FC = ({ children }) => (
+  <Paper sx={{ maxHeight: 768, p: 0, overflow: 'scroll' }}>{children}</Paper>
+)
 
-  interface PaletteOptions {
-    secondaryContainer: PaletteOptions['primary']
-    onSecondaryContainer: PaletteOptions['primary']
-    onSurfaceVariant: PaletteOptions['primary']
-  }
-}
+export default PaperContainer

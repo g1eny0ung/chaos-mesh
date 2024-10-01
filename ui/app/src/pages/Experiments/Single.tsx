@@ -18,6 +18,10 @@ import EventsTimeline from '@/components/EventsTimeline'
 import Helmet from '@/components/Helmet'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
 import i18n from '@/components/T'
+import Loading from '@/mui-extends/Loading'
+import Paper from '@/mui-extends/Paper'
+import PaperTop from '@/mui-extends/PaperTop'
+import Space from '@/mui-extends/Space'
 import {
   useDeleteExperimentsUid,
   useGetEvents,
@@ -26,6 +30,7 @@ import {
   usePutExperimentsStartUid,
 } from '@/openapi'
 import { setAlert, setConfirm } from '@/slices/globalStatus'
+import { useStoreDispatch } from '@/store'
 import loadable from '@loadable/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline'
@@ -35,13 +40,6 @@ import { Box, Button, Grid, Grow } from '@mui/material'
 import yaml from 'js-yaml'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
-
-import Loading from '@ui/mui-extends/esm/Loading'
-import Paper from '@ui/mui-extends/esm/Paper'
-import PaperTop from '@ui/mui-extends/esm/PaperTop'
-import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch } from '@/store'
 
 const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 

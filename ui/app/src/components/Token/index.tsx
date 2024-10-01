@@ -18,14 +18,12 @@ import { applyAPIAuthentication, resetAPIAuthentication } from '@/api/intercepto
 import { Submit, TextField } from '@/components/FormField'
 import i18n from '@/components/T'
 import { validateName } from '@/lib/formikhelpers'
+import Space from '@/mui-extends/Space'
 import { getExperimentsState } from '@/openapi'
 import { setAlert, setTokenName, setTokens } from '@/slices/globalStatus'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import { Form, Formik, FormikHelpers } from 'formik'
 import { useIntl } from 'react-intl'
-
-import Space from '@ui/mui-extends/esm/Space'
-
-import { useStoreDispatch, useStoreSelector } from '@/store'
 
 function validateToken(value: string) {
   let error

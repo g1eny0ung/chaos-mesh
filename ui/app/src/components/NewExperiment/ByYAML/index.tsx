@@ -16,6 +16,8 @@
  */
 import i18n from '@/components/T'
 import YAML from '@/components/YAML'
+import Paper from '@/mui-extends/Paper'
+import Space from '@/mui-extends/Space'
 import { setAlert } from '@/slices/globalStatus'
 import { useStoreDispatch } from '@/store'
 import loadable from '@loadable/component'
@@ -25,9 +27,6 @@ import { Ace } from 'ace-builds'
 import yaml from 'js-yaml'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-import Space from '@ui/mui-extends/esm/Space'
 
 const YAMLEditor = loadable(() => import('@/components/YAMLEditor'))
 

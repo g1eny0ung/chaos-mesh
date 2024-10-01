@@ -17,14 +17,12 @@
 import { applyNSParam } from '@/api/interceptors'
 import { Stale } from '@/api/queryUtils'
 import i18n from '@/components/T'
+import Paper from '@/mui-extends/Paper'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { setNameSpace } from '@/slices/globalStatus'
+import { useStoreDispatch, useStoreSelector } from '@/store'
 import { Autocomplete, TextField } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
-
-import Paper from '@ui/mui-extends/esm/Paper'
-
-import { useStoreDispatch, useStoreSelector } from '@/store'
 
 const Namespace = () => {
   const navigate = useNavigate()

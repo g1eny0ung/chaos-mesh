@@ -23,6 +23,8 @@ import { TokenFormValues } from '@/components/Token'
 import logoWhite from '@/images/logo-mini-white.svg'
 import logo from '@/images/logo-mini.svg'
 import LS from '@/lib/localStorage'
+import ConfirmDialog from '@/mui-extends/ConfirmDialog'
+import Loading from '@/mui-extends/Loading'
 import { useGetCommonConfig } from '@/openapi'
 import { setAlertOpen, setConfirmOpen, setNameSpace, setTokenName, setTokens } from '@/slices/globalStatus'
 import { useStoreDispatch, useStoreSelector } from '@/store'
@@ -46,9 +48,6 @@ import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Outlet } from 'react-router-dom'
-
-import ConfirmDialog from '@ui/mui-extends/esm/ConfirmDialog'
-import Loading from '@ui/mui-extends/esm/Loading'
 
 import { NavList, insightsItems, otherItems, resourcesItems } from './Sidebar'
 

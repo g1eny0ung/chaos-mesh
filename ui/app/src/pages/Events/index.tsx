@@ -17,10 +17,9 @@
 import EventsTable from '@/components/EventsTable'
 import NotFound from '@/components/NotFound'
 import i18n from '@/components/T'
+import Loading from '@/mui-extends/Loading'
 import { useGetEvents } from '@/openapi'
 import { Grow, Typography } from '@mui/material'
-
-import Loading from '@ui/mui-extends/esm/Loading'
 
 export default function Events() {
   const { data: events, isLoading: loading } = useGetEvents()
