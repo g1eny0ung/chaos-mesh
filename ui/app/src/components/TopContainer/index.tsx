@@ -21,53 +21,25 @@ import Loading from '@/mui-extends/Loading'
 import { useGetCommonConfig } from '@/openapi'
 import { useAuthActions, useAuthStore } from '@/zustand/auth'
 import { useComponentActions, useComponentStore } from '@/zustand/component'
-import {
-  Alert,
-  Box,
-  BoxProps,
-  Container,
-  CssBaseline,
-  Divider,
-  Portal,
-  Snackbar,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import { styled } from '@mui/material/styles'
+import Box from '@mui/joy/Box'
+import CssBaseline from '@mui/joy/CssBaseline'
+import { CssVarsProvider } from '@mui/joy/styles'
+import { Alert, Portal, Snackbar } from '@mui/material'
 import Cookies from 'js-cookie'
 import { lazy, useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 
+import Sidebar from '@/components/Layout/Sidebar'
 import { TokenFormValues } from '@/components/Token'
 
 import insertCommonStyle from '@/lib/d3/insertCommonStyle'
 import LS from '@/lib/localStorage'
 
 import Navbar from './Navbar'
-import { closedWidth, openedWidth } from './Sidebar'
-import Sidebar from './Sidebar'
 
 const Auth = lazy(() => import('./Auth'))
 
-const Root = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})<BoxProps & { open: boolean }>(({ theme, open }) => ({
-  position: 'relative',
-  width: `calc(100% - ${open ? openedWidth : closedWidth}px)`,
-  height: '100vh',
-  marginLeft: open ? openedWidth : closedWidth,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration[open ? 'enteringScreen' : 'leavingScreen'],
-  }),
-  [theme.breakpoints.down('sm')]: {
-    minWidth: theme.breakpoints.values.md,
-  },
-}))
-
 const TopContainer = () => {
-  const theme = useTheme()
-
   const alert = useComponentStore((state) => state.alert)
   const alertOpen = useComponentStore((state) => state.alertOpen)
   const confirm = useComponentStore((state) => state.confirm)
@@ -75,14 +47,6 @@ const TopContainer = () => {
   const { setAlert, setAlertOpen, setConfirmOpen } = useComponentActions()
   const authOpen = useAuthStore((state) => state.authOpen)
   const { setAuthOpen, setNameSpace, setTokenName, setTokens, removeToken } = useAuthActions()
-
-  // Sidebar related
-  const miniSidebar = LS.get('mini-sidebar') === 'y'
-  const [openDrawer, setOpenDrawer] = useState(!miniSidebar)
-  const handleDrawerToggle = () => {
-    setOpenDrawer(!openDrawer)
-    LS.set('mini-sidebar', openDrawer ? 'y' : 'n')
-  }
 
   const [loading, setLoading] = useState(true)
 
@@ -147,27 +111,26 @@ const TopContainer = () => {
     insertCommonStyle()
   }, [])
 
-  const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'))
-  useEffect(() => {
-    if (isTabletScreen) {
-      setOpenDrawer(false)
-    }
-  }, [isTabletScreen])
-
   return (
     <>
-      <CssBaseline />
-      <Root open={openDrawer}>
-        <Sidebar open={openDrawer} />
-        <Box component="main" sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-          <Navbar openDrawer={openDrawer} handleDrawerToggle={handleDrawerToggle} />
-          <Divider />
-
-          <Container maxWidth="xl" disableGutters sx={{ flexGrow: 1, p: 6 }}>
+      <CssVarsProvider disableTransitionOnChange>
+        <CssBaseline />
+        <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
+          <Sidebar />
+          <Box
+            component="main"
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100dvh',
+              p: { xs: 2, md: 4 },
+            }}
+          >
             {loading ? <Loading /> : <Outlet />}
-          </Container>
+          </Box>
         </Box>
-      </Root>
+      </CssVarsProvider>
 
       <Auth open={authOpen} />
 

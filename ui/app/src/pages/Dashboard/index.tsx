@@ -14,113 +14,108 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import PaperTop from '@/mui-extends/PaperTop'
 import { useGetEvents, useGetExperiments, useGetSchedules, useGetWorkflows } from '@/openapi'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
-import { Box, Grid, Grow, IconButton, Typography } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { Box, Card, CardContent, Grid, IconButton, Typography } from '@mui/joy'
 import { TourProvider } from '@reactour/tour'
-import type { ReactNode } from 'react'
+import _ from 'lodash'
+import { type ReactNode, useEffect, useRef } from 'react'
 
-import EventsChart from '@/components/EventsChart'
 import EventsTimeline from '@/components/EventsTimeline'
+import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
+
+import timelinePlot, { genTimelineData } from '@/lib/d3/timeline'
 
 import TotalStatus from './TotalStatus'
 import Welcome from './Welcome'
+import { steps } from './tourSteps'
 
-const NumPanel: ReactFCWithChildren<{ title: ReactNode; num?: number; background: ReactNode }> = ({
+const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; status?: [string, number] }> = ({
+  icon,
   title,
   num,
-  background,
+  status,
 }) => (
-  <Paper sx={{ overflow: 'hidden' }}>
-    <PaperTop title={title} />
-    <Box mt={6}>
-      <Typography component="div" variant="h4">
-        {num}
+  <Card variant="outlined">
+    <Box display="flex" alignItems="center" gap={1.5}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 1,
+          bgcolor: 'primary.softBg',
+          color: 'primary.softColor',
+          fontSize: 'xl',
+          borderRadius: 6,
+        }}
+      >
+        {icon}
+      </Box>
+      <Typography level="h2" component="div" fontSize="lg">
+        {title}
       </Typography>
     </Box>
-    <Box position="absolute" bottom={-18} right={12}>
-      {background}
-    </Box>
-  </Paper>
+    <CardContent orientation="horizontal" sx={{ justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
+      <Typography level="h3" component="div" sx={{ ml: 0.5 }}>
+        {num && num > 0 ? num : '--'}
+      </Typography>
+      {status && (
+        <Box mt={1}>
+          <StatusLabel status={status} />
+        </Box>
+      )}
+    </CardContent>
+  </Card>
 )
 
 export default function Dashboard() {
-  const theme = useTheme()
-  const steps = [
-    {
-      selector: '.tutorial-dashboard',
-      content: i18n('dashboard.tutorial.steps.dashboard'),
-    },
-    {
-      selector: '.tutorial-workflows',
-      content: i18n('dashboard.tutorial.steps.workflows'),
-    },
-    {
-      selector: '.tutorial-schedules',
-      content: i18n('dashboard.tutorial.steps.schedules'),
-    },
-    {
-      selector: '.tutorial-experiments',
-      content: i18n('dashboard.tutorial.steps.experiments'),
-    },
-    {
-      selector: '.tutorial-events',
-      content: i18n('dashboard.tutorial.steps.events'),
-    },
-    {
-      selector: '.tutorial-archives',
-      content: i18n('dashboard.tutorial.steps.archives'),
-    },
-    {
-      selector: '.tutorial-newW',
-      content: i18n('dashboard.tutorial.steps.newW'),
-    },
-    {
-      selector: '.tutorial-newS',
-      content: i18n('dashboard.tutorial.steps.newS'),
-    },
-    {
-      selector: '.tutorial-newE',
-      content: i18n('dashboard.tutorial.steps.newE'),
-    },
-    {
-      selector: '.tutorial-search',
-      content: i18n('dashboard.tutorial.steps.search'),
-    },
-    {
-      selector: '.tutorial-namespace',
-      content: i18n('dashboard.tutorial.steps.namespace'),
-    },
-    {
-      selector: '.tutorial-end',
-      content: i18n('dashboard.tutorial.steps.end'),
-    },
-  ]
-
   const { data: experiments } = useGetExperiments()
   const { data: schedules } = useGetSchedules()
   const { data: workflows } = useGetWorkflows()
-  const { data: events } = useGetEvents()
+  const { data: events } = useGetEvents({ limit: 50 })
+
+  const calculateStatus = (data?: { status?: string }[]): [string, number] | undefined => {
+    if (!data) {
+      return undefined
+    }
+
+    const grouped = _.groupBy(data, 'status')
+
+    if (grouped['running']?.length > 0) {
+      return ['running', grouped['running'].length]
+    } else if (grouped['paused']?.length > 0) {
+      return ['paused', grouped['paused'].length]
+    } else {
+      return undefined
+    }
+  }
+
+  const timelineChartRef = useRef(null)
+
+  // useEffect(() => {
+  //   if (experiments) {
+  //     const timelineContainer = timelineChartRef.current!
+
+  //     const data = genTimelineData(experiments)
+  //     const plot = timelinePlot(data, {
+  //       width: timelineContainer.offsetWidth,
+  //     })
+
+  //     timelineContainer.append(plot)
+
+  //     return () => plot.remove()
+  //   }
+  // }, [experiments])
 
   return (
     <TourProvider
       steps={steps}
-      styles={{
-        popover: (base) => ({
-          ...base,
-          '--reactour-accent': theme.palette.primary.main,
-          background: theme.palette.background.default,
-          borderRadius: theme.shape.borderRadius,
-        }),
-      }}
       prevButton={({ setCurrentStep }) => (
         <IconButton onClick={() => setCurrentStep((s) => s + 1)}>
           <ArrowBackOutlinedIcon />
@@ -133,57 +128,57 @@ export default function Dashboard() {
       )}
       showCloseButton={false}
     >
-      <Grow in={true} style={{ transformOrigin: '0 0 0' }}>
-        <Grid container spacing={6}>
-          <Grid container spacing={6} alignContent="flex-start" item xs={12} lg={8}>
-            <Grid item xs={4}>
-              <NumPanel
-                title={i18n('experiments.title')}
-                num={experiments?.length}
-                background={<ScienceOutlinedIcon color="primary" style={{ fontSize: '3em' }} />}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <NumPanel
-                title={i18n('schedules.title')}
-                num={schedules?.length}
-                background={<ScheduleIcon color="primary" style={{ fontSize: '3em' }} />}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <NumPanel
-                title={i18n('workflows.title')}
-                num={workflows?.length}
-                background={<AccountTreeOutlinedIcon color="primary" style={{ fontSize: '3em' }} />}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Welcome />
-            </Grid>
-            <Grid item xs={12}>
-              <Paper>
-                <PaperTop title={i18n('common.timeline')} boxProps={{ mb: 3 }} />
-                {events && <EventsChart events={events} position="relative" height={300} />}
-              </Paper>
-            </Grid>
-          </Grid>
-
-          <Grid container spacing={6} item xs={12} lg={4}>
-            <Grid item xs={12}>
-              <Paper>
-                <PaperTop title={i18n('dashboard.totalStatus')} boxProps={{ sx: { mb: 3 } }} />
-                {experiments && <TotalStatus position="relative" height={experiments.length > 0 ? 300 : '100%'} />}
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper>
-                <PaperTop title={i18n('dashboard.recent')} boxProps={{ mb: 3 }} />
-                {events && <EventsTimeline events={events.slice(0, 6)} />}
-              </Paper>
-            </Grid>
-          </Grid>
+      <Grid container spacing={3}>
+        <Grid xs={12} lg={9}>
+          <Welcome />
         </Grid>
-      </Grow>
+      </Grid>
+      <Grid container spacing={3}>
+        <Grid xs={12} sm={6} lg={3}>
+          <NumCard title={i18n('workflows.title')} num={workflows?.length} icon={<AccountTreeOutlinedIcon />} />
+        </Grid>
+        <Grid xs={12} sm={6} lg={3}>
+          <NumCard
+            title={i18n('schedules.title')}
+            num={schedules?.length}
+            icon={<ScheduleIcon />}
+            status={calculateStatus(schedules)}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} lg={3}>
+          <NumCard title={i18n('experiments.title')} num={experiments?.length} icon={<ScienceOutlinedIcon />} />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3}>
+        <Grid xs={12} lg={4}>
+          <Card variant="outlined" sx={{ my: 1.5 }}>
+            <Typography level="h2" fontSize="lg">
+              {i18n('dashboard.totalStatus')}
+            </Typography>
+            <TotalStatus height={300} />
+          </Card>
+        </Grid>
+        <Grid xs={12} lg={5}>
+          <Card variant="outlined" sx={{ my: 1.5 }}>
+            <Typography level="h2" fontSize="lg">
+              {i18n('dashboard.recentEvents')}
+            </Typography>
+            <EventsTimeline events={events} height={300} />
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* <Grid container spacing={3}>
+        <Grid xs={12} lg={9}>
+          <Card variant="outlined" sx={{ my: 1.5 }}>
+            <Typography level="h2" fontSize="lg">
+              {i18n('dashboard.timeline')}
+            </Typography>
+            <Box ref={timelineChartRef} height={275} />
+          </Card>
+        </Grid>
+      </Grid> */}
     </TourProvider>
   )
 }

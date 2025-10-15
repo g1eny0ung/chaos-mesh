@@ -21,7 +21,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { RouterProvider } from 'react-router'
 
 import IntlProvider from './IntlProvider'
-import ThemeProvider from './ThemeProvider'
 import queryClient from './reactQueryClient'
 import router from './router'
 
@@ -37,11 +36,9 @@ const App: ReactFCWithChildren<AppProps> = ({ forTesting, children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <IntlProvider>
-          {!forTesting ? <RealWorldOnlyProviders>{rendered}</RealWorldOnlyProviders> : rendered}
-        </IntlProvider>
-      </ThemeProvider>
+      <IntlProvider>
+        {!forTesting ? <RealWorldOnlyProviders>{rendered}</RealWorldOnlyProviders> : rendered}
+      </IntlProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )

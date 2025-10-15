@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+import '@fontsource/inter'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-import { Paper as MUIPaper, PaperProps } from '@mui/material'
+import { Sheet, SheetProps } from '@mui/joy'
 
-const Paper: ReactFCWithChildren<PaperProps> = ({ children, sx, ...rest }) => (
-  <MUIPaper {...rest} variant="outlined" sx={{ position: 'relative', height: '100%', p: 4, ...sx }}>
+const Paper: ReactFCWithChildren<SheetProps> = ({ children, sx, ...rest }) => (
+  <Sheet {...rest} variant="outlined" sx={{ position: 'relative', height: '100%', p: 4, ...sx }}>
     {children}
-  </MUIPaper>
+  </Sheet>
 )
 
 export default Paper

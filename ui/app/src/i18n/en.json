@@ -1,11 +1,15 @@
 {
+  "sidebar": {
+    "insights": "Insights",
+    "resources": "Resources"
+  },
   "dashboard": {
     "title": "Dashboard",
     "tutorial": {
       "title": "Tutorial",
       "desc": "📖 Take a quick look at the functions of Chaos Mesh Dashboard",
       "steps": {
-        "dashboard": "Dashboard is an overview of Chaos Mesh, where you can observe the running status of all experiments.",
+        "overview": "Dashboard is an overview of Chaos Mesh, where you can observe the running status of all experiments.",
         "workflows": "Workflows manage all workflows. Here you can organize multiple experiments to simulate more realistic failures.",
         "schedules": "Schedules manage all schedules. Here you can run an experiment periodically.",
         "experiments": "Experiments manage all experiments, where you can perform various operations (pause, update, archive, etc.) on the experiment.",
@@ -19,14 +23,9 @@
         "end": "🎉 Congratulations on completing all the tutorial steps! Click the blank space to exit."
       }
     },
-    "newbie": "Newbie",
-    "newbieDesc": "⛑ Quickly inject a fault from a simple experiment",
-    "startAWorkflow": "Start with workflow",
-    "startAWorkflowDesc": "Workflow allows you to organize multiple experiments to simulate more realistic failures",
-    "startASchedule": "Start with schedule",
-    "startAScheduleDesc": "Schedule allows you to run an experiment periodically",
+    "timeline": "Timeline",
     "totalStatus": "Total Experiments Status",
-    "recent": "Recent Events"
+    "recentEvents": "Recent Events"
   },
   "newE": {
     "title": "New experiment",
