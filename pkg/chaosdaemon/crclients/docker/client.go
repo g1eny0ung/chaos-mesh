@@ -26,6 +26,7 @@ import (
 	dockerclient "github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
+	crerrors "github.com/chaos-mesh/chaos-mesh/pkg/chaosdaemon/crclients/errors"
 	"github.com/chaos-mesh/chaos-mesh/pkg/mock"
 )
 
@@ -123,6 +124,11 @@ func (c DockerClient) GetLabelsFromContainerID(ctx context.Context, containerID 
 	return container.Config.Labels, nil
 }
 
+// GetSandboxPidFromPodUID is not supported for Docker runtime.
+func (c DockerClient) GetSandboxPidFromPodUID(ctx context.Context, podUID string) (uint32, error) {
+	return 0, crerrors.ErrNotSupported
+}
+
 func New(host string, version string, client *http.Client, httpHeaders map[string]string) (*DockerClient, error) {
 	// Mock point to return error or mock client in unit test
 	if err := mock.On("NewDockerClientError"); err != nil {
@@ -134,12 +140,19 @@ func New(host string, version string, client *http.Client, httpHeaders map[strin
 		}, nil
 	}
 
-	c, err := dockerclient.NewClientWithOpts(
+	opts := []dockerclient.Opt{
 		dockerclient.FromEnv,
+		dockerclient.WithAPIVersionNegotiation(),
 		dockerclient.WithHost(host),
-		dockerclient.WithVersion(version),
 		dockerclient.WithHTTPClient(client),
-		dockerclient.WithHTTPHeaders(httpHeaders))
+		dockerclient.WithHTTPHeaders(httpHeaders),
+	}
+
+	if version != "" {
+		opts = append(opts, dockerclient.WithVersion(version))
+	}
+
+	c, err := dockerclient.NewClientWithOpts(opts...)
 	if err != nil {
 		return nil, err
 	}
