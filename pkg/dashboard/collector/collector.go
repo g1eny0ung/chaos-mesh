@@ -97,12 +97,26 @@ func (r *ChaosCollector) createOrUpdateExperimentInStore(obj v1alpha1.InnerObjec
 		return err
 	}
 
-	_, err = r.archive.FindByUID(context.Background(), exp.UID)
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+	found, err := r.archive.FindByUID(context.Background(), exp.UID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return r.archive.Set(context.Background(), exp)
 	}
+	if err != nil {
+		return err
+	}
 
-	return nil
+	// Chaos CR spec is immutable after creation. Only persist finish time updates.
+	if exp.FinishTime == nil {
+		return nil
+	}
+
+	if found.FinishTime != nil && found.FinishTime.Equal(*exp.FinishTime) {
+		return nil
+	}
+
+	found.FinishTime = exp.FinishTime
+	return r.archive.Set(context.Background(), found)
+
 }
 
 func (r *ChaosCollector) archiveExperiment(ns, name string) error {
