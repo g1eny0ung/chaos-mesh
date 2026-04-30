@@ -123,7 +123,7 @@ func (e *experimentStore) Set(_ context.Context, experiment *core.Experiment) er
 func (e *experimentStore) Archive(_ context.Context, namespace, name string) error {
 	if err := e.db.Model(&core.Experiment{}).
 		Where("namespace = ? AND name = ? AND archived = ?", namespace, name, false).
-		Updates(map[string]interface{}{"archived": true, "finish_time": time.Now()}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		Updates(map[string]any{"archived": true, "finish_time": gorm.Expr("COALESCE(finish_time, ?)", time.Now())}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 

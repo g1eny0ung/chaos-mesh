@@ -141,7 +141,7 @@ func (it *WorkflowStore) DeleteByFinishTime(ctx context.Context, ttl time.Durati
 func (it *WorkflowStore) MarkAsArchived(ctx context.Context, namespace, name string) error {
 	if err := it.db.Model(core.WorkflowEntity{}).
 		Where("namespace = ? AND name = ? AND archived = ?", namespace, name, false).
-		Updates(map[string]interface{}{"archived": true, "finish_time": time.Now().Format(time.RFC3339)}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		Updates(map[string]interface{}{"archived": true, "finish_time": gorm.Expr("COALESCE(finish_time, ?)", time.Now().Format(time.RFC3339))}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 	return nil

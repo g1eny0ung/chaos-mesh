@@ -95,7 +95,7 @@ func (e *ScheduleStore) Set(_ context.Context, schedule *core.Schedule) error {
 func (e *ScheduleStore) Archive(_ context.Context, ns, name string) error {
 	if err := e.db.Model(&core.Schedule{}).
 		Where("namespace = ? AND name = ? AND archived = ?", ns, name, false).
-		Updates(map[string]interface{}{"archived": true, "finish_time": time.Now()}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		Updates(map[string]interface{}{"archived": true, "finish_time": gorm.Expr("COALESCE(finish_time, ?)", time.Now())}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 

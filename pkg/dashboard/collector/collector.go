@@ -37,8 +37,17 @@ type ChaosCollector struct {
 	client.Client
 	Log     logr.Logger
 	apiType runtime.Object
-	archive core.ExperimentStore
+	store   core.ExperimentStore
 	event   core.EventStore
+}
+
+// Setup setups collectors by Manager.
+func (r *ChaosCollector) Setup(mgr ctrl.Manager, apiType client.Object) error {
+	r.apiType = apiType
+
+	return ctrl.NewControllerManagedBy(mgr).
+		For(apiType).
+		Complete(r)
 }
 
 // Reconcile reconciles a chaos collector.
@@ -74,7 +83,7 @@ func (r *ChaosCollector) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, nil
 	}
 
-	if err := r.createOrUpdateExperimentInStore(obj); err != nil {
+	if err := r.createOrUpdateExperiment(obj); err != nil {
 		r.Log.Error(err, "failed to create or update experiment in store")
 		// ignore error here
 	}
@@ -82,25 +91,17 @@ func (r *ChaosCollector) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	return ctrl.Result{}, nil
 }
 
-// Setup setups collectors by Manager.
-func (r *ChaosCollector) Setup(mgr ctrl.Manager, apiType client.Object) error {
-	r.apiType = apiType
-
-	return ctrl.NewControllerManagedBy(mgr).
-		For(apiType).
-		Complete(r)
-}
-
-func (r *ChaosCollector) createOrUpdateExperimentInStore(obj v1alpha1.InnerObject) error {
+func (r *ChaosCollector) createOrUpdateExperiment(obj v1alpha1.InnerObject) error {
 	exp, err := convertInnerObjectToExperiment(obj)
 	if err != nil {
 		return err
 	}
 
-	found, err := r.archive.FindByUID(context.Background(), exp.UID)
+	found, err := r.store.FindByUID(context.Background(), exp.UID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return r.archive.Set(context.Background(), exp)
+		return r.store.Set(context.Background(), exp)
 	}
+
 	if err != nil {
 		return err
 	}
@@ -115,12 +116,12 @@ func (r *ChaosCollector) createOrUpdateExperimentInStore(obj v1alpha1.InnerObjec
 	}
 
 	found.FinishTime = exp.FinishTime
-	return r.archive.Set(context.Background(), found)
+	return r.store.Set(context.Background(), found)
 
 }
 
 func (r *ChaosCollector) archiveExperiment(ns, name string) error {
-	if err := r.archive.Archive(context.Background(), ns, name); err != nil {
+	if err := r.store.Archive(context.Background(), ns, name); err != nil {
 		r.Log.Error(err, "failed to archive experiment", "namespace", ns, "name", name)
 		return err
 	}
@@ -129,7 +130,7 @@ func (r *ChaosCollector) archiveExperiment(ns, name string) error {
 }
 
 func (r *ChaosCollector) deleteManagedExperiments(ns, name string) error {
-	archives, err := r.archive.FindManagedByNamespaceName(context.Background(), ns, name)
+	archives, err := r.store.FindManagedByNamespaceName(context.Background(), ns, name)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil
 	}
@@ -138,12 +139,12 @@ func (r *ChaosCollector) deleteManagedExperiments(ns, name string) error {
 		return err
 	}
 
-	for _, expr := range archives {
-		if err = r.event.DeleteByUID(context.Background(), expr.UID); err != nil {
+	for _, exp := range archives {
+		if err = r.event.DeleteByUID(context.Background(), exp.UID); err != nil {
 			r.Log.Error(err, "failed to delete experiment related events")
 		}
 
-		if err = r.archive.Delete(context.Background(), expr); err != nil {
+		if err = r.store.Delete(context.Background(), exp); err != nil {
 			r.Log.Error(err, "failed to delete managed experiment")
 		}
 	}
