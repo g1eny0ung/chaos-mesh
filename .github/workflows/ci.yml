@@ -1,6 +1,6 @@
 # This workflow defines the go and ui related jobs.
 #
-# First, we use [dorny/paths-filter@v3](https://github.com/dorny/paths-filter) to
+# First, we use [dorny/paths-filter@v4](https://github.com/dorny/paths-filter) to
 # detect changes in go and ui related files, and then run the corresponding sub-jobs
 # based on the changes.
 #
@@ -17,6 +17,7 @@ on:
     branches:
       - master
       - release-*
+  merge_group:
 
 permissions: read-all
 
@@ -29,16 +30,19 @@ jobs:
       go: ${{ steps.filter.outputs.go }}
       ui: ${{ steps.filter.outputs.ui }}
     steps:
-      # For pull requests it's not necessary to checkout the code
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
+          predicate-quantifier: some-with-excludes
           filters: |
             go:
               - Makefile
               - go.*
               - '**.go'
               - 'helm/**'
+              - '!helm/**/*.md'
+              - '.github/actions/build-chaos-mesh-build-env/**'
             ui:
               - 'ui/pnpm-lock.yaml'
               - '**.js'
@@ -56,19 +60,10 @@ jobs:
           - test
     runs-on: ${{ fromJSON('{"amd64":"ubuntu-22.04", "arm64":"github-arm64-2c-8gb"}')[matrix.arch] }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Build Chaos Mesh Build Env
-        env:
-          IMAGE_BUILD_ENV_BUILD: ${{ contains(github.event.pull_request.labels.*.name, 'rebuild-build-env-image') }}
-        run: |
-          if [ "${IMAGE_BUILD_ENV_BUILD}" = "true" ] ; then
-            export IMAGE_BUILD_ENV_BUILD=1;
-          else
-            export IMAGE_BUILD_ENV_BUILD=0;
-          fi
-
-          make image-build-env
+        uses: ./.github/actions/build-chaos-mesh-build-env
 
       - name: Build Chaos Mesh Dev Env
         env:
@@ -99,13 +94,16 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         if: matrix.job == 'test'
         with:
           files: ./cover.out
   ui:
     needs: changes
     if: ${{ needs.changes.outputs.ui == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
     defaults:
       run:
         working-directory: ./ui
@@ -114,15 +112,14 @@ jobs:
         job:
           - build
           - test
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
-          version: 10
-      - uses: actions/setup-node@v4
+          version: 11
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: "pnpm"
           cache-dependency-path: "ui/pnpm-lock.yaml"
 
@@ -130,7 +127,7 @@ jobs:
 
       - name: Cache app/dist
         if: ${{ matrix.job == 'build' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ./ui/app/dist
           key: ${{ runner.os }}-pnpm-${{ hashFiles('ui/pnpm-lock.yaml') }}

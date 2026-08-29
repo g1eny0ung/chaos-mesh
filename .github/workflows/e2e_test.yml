@@ -7,6 +7,7 @@ on:
     branches:
       - master
       - release-*
+  merge_group:
 
 permissions: read-all
 
@@ -16,21 +17,23 @@ jobs:
     outputs:
       only_changed: ${{ steps.filter.outputs.only_changed }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Get changed files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         id: filter
         with:
           # Not available for frontend code for now.
           files: |
             .gitignore
             **.md
+            examples/**
             ui/**
+            test/integration_test/**
             .github/**
             !.github/workflows/e2e_test.yml
-            test/integration_test/**
+            !.github/actions/build-chaos-mesh-build-env/**
       - name: Show outputs
         run: echo "${{ toJSON(steps.filter.outputs) }}"
 
@@ -40,18 +43,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout codes
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Build Chaos Mesh Build Env
         if: ${{ github.event.pull_request }}
-        env:
-          IMAGE_BUILD_ENV_BUILD: ${{ contains(github.event.pull_request.labels.*.name, 'rebuild-build-env-image') }}
-        run: |
-          if [ "${IMAGE_BUILD_ENV_BUILD}" = "true" ] ; then
-            export IMAGE_BUILD_ENV_BUILD=1;
-          else
-            export IMAGE_BUILD_ENV_BUILD=0;
-          fi
-          make image-build-env
+        uses: ./.github/actions/build-chaos-mesh-build-env
       - name: Build Chaos Mesh Dev Env
         if: ${{ github.event.pull_request }}
         env:
@@ -94,7 +89,7 @@ jobs:
           docker image save ghcr.io/chaos-mesh/e2e-helper:latest > ./output/saved-images/e2e-helper.tgz
 
       - name: upload saved images
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: saved-images
           path: ./output/saved-images
@@ -106,18 +101,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout codes
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Build Chaos Mesh Build Env
         if: ${{ github.event.pull_request }}
-        env:
-          IMAGE_BUILD_ENV_BUILD: ${{ contains(github.event.pull_request.labels.*.name, 'rebuild-build-env-image') }}
-        run: |
-          if [ "${IMAGE_BUILD_ENV_BUILD}" = "true" ] ; then
-            export IMAGE_BUILD_ENV_BUILD=1;
-          else
-            export IMAGE_BUILD_ENV_BUILD=0;
-          fi
-          make image-build-env
+        uses: ./.github/actions/build-chaos-mesh-build-env
       - name: Build Chaos Mesh Dev Env
         if: ${{ github.event.pull_request }}
         env:
@@ -143,7 +130,7 @@ jobs:
         run: |
           make e2e-build
       - name: upload e2e binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-binary
           path: ./e2e-test/image/e2e/bin
@@ -158,9 +145,9 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes-version:
-          - v1.32.2
-          - v1.31.6
-          - v1.30.10
+          - v1.35.2
+          - v1.34.5
+          - v1.33.9
         focus:
           - "[Graceful-Shutdown] [IOChaos]"
           - "[Graceful-Shutdown] [HTTPChaos]"
@@ -172,16 +159,17 @@ jobs:
           - "[Basic] [NetworkChaos]"
           - "[Basic] [DNSChaos]"
           - "[Basic] [StressChaos]"
+          - "[Basic] [JVMChaos]"
     steps:
       - name: checkout codes
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: download saved images
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: saved-images
           path: ./output/saved-images
       - name: download e2e binary
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: e2e-binary
           path: ./output/e2e-binary
@@ -190,13 +178,15 @@ jobs:
           mkdir -p ./e2e-test/image/e2e/bin
           mv ./output/e2e-binary/ginkgo ./e2e-test/image/e2e/bin/ginkgo
           mv ./output/e2e-binary/e2e.test ./e2e-test/image/e2e/bin/e2e.test
+          mv ./output/e2e-binary/e2e-gherkin.test ./e2e-test/image/e2e/bin/e2e-gherkin.test
           chmod +x ./e2e-test/image/e2e/bin/ginkgo
           chmod +x ./e2e-test/image/e2e/bin/e2e.test
+          chmod +x ./e2e-test/image/e2e/bin/e2e-gherkin.test
 
       - name: Setup minikube
         uses: medyagh/setup-minikube@latest
         with:
-          minikube-version: 1.35.0
+          minikube-version: 1.38.1
           kubernetes-version: ${{ matrix.kubernetes-version }}
 
       - name: load image into minikube
@@ -210,19 +200,31 @@ jobs:
         run: chmod 600 ~/.kube/config
 
       - name: Setup Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
 
       - name: Install Chaos Mesh
         run: |
           helm install --wait --create-namespace chaos-mesh helm/chaos-mesh --namespace=chaos-mesh \
             --set images.tag=latest
       - name: e2e tests
+        # JVMChaos only has gherkin scenarios, no ginkgo specs
+        if: matrix.focus != '[Basic] [JVMChaos]'
         env:
           FOCUS: ${{ matrix.focus }}
+        # because ginkgo -focus accepts the regex expression, we should use escape to represent the squared brackets and dash
         run: |
-          # because ginkgo -focus accepts the regex expression, we should use escape to represent the squared brackets and dash
           export ESCAPED_FOCUS=$(echo $FOCUS | sed -e 's/\[/\\\[/g' | sed -e 's/\]/\\\]/g' | sed -e 's/\-/\\\-/g')
           KUBECONFIG=~/.kube/config ./e2e-test/image/e2e/bin/ginkgo -focus="${ESCAPED_FOCUS}" ./e2e-test/image/e2e/bin/e2e.test -- --e2e-image ghcr.io/chaos-mesh/e2e-helper:latest
+
+      - name: e2e gherkin tests (podchaos)
+        if: matrix.focus == '[Basic] [PodChaos]'
+        run: |
+          cd e2e-test/e2e-gherkin && KUBECONFIG=~/.kube/config GHERKIN_TAGS=@podchaos ../image/e2e/bin/e2e-gherkin.test -test.v --e2e-image=ghcr.io/chaos-mesh/e2e-helper:latest
+
+      - name: e2e gherkin tests (jvmchaos)
+        if: matrix.focus == '[Basic] [JVMChaos]'
+        run: |
+          cd e2e-test/e2e-gherkin && KUBECONFIG=~/.kube/config GHERKIN_TAGS=@jvmchaos ../image/e2e/bin/e2e-gherkin.test -test.v --e2e-image=ghcr.io/chaos-mesh/e2e-helper:latest
       - name: post run - extract profile info from kubernetes
         if: always()
         env:
@@ -234,17 +236,10 @@ jobs:
           kubectl get configmaps -A -o yaml > $PROFILE_DIRECTORY/manifests/configmaps.yaml
       - name: post run - upload Chaos Mesh profile info
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: profiling-${{ matrix.focus }}-k8s-${{ matrix.kubernetes-version }}
           path: ./output/chaos-mesh-profile
-          retention-days: 7
-      - name: post run - upload junit test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-junit-reports-${{ matrix.focus }}-k8s-${{ matrix.kubernetes-version }}
-          path: "**/*.xml"
           retention-days: 7
 
   pass:

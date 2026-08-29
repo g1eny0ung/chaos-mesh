@@ -11,16 +11,17 @@ permissions: read-all
 
 jobs:
   unitTestAndCodeCoverage:
+    if: github.repository_owner == 'chaos-mesh'
     runs-on: ubuntu-latest
     name: Unit Test And Code Coverage
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Unit Test
         run: make test
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./cover.out

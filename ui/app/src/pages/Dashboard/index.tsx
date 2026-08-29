@@ -23,13 +23,11 @@ import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
 import { Box, Card, CardContent, Grid, IconButton, Typography } from '@mui/joy'
 import { TourProvider } from '@reactour/tour'
 import _ from 'lodash'
-import { type ReactNode, useEffect, useRef } from 'react'
+import { type ReactNode } from 'react'
 
 import EventsTimeline from '@/components/EventsTimeline'
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
-
-import timelinePlot, { genTimelineData } from '@/lib/d3/timeline'
 
 import TotalStatus from './TotalStatus'
 import Welcome from './Welcome'
@@ -96,23 +94,6 @@ export default function Dashboard() {
     }
   }
 
-  const timelineChartRef = useRef(null)
-
-  // useEffect(() => {
-  //   if (experiments) {
-  //     const timelineContainer = timelineChartRef.current!
-
-  //     const data = genTimelineData(experiments)
-  //     const plot = timelinePlot(data, {
-  //       width: timelineContainer.offsetWidth,
-  //     })
-
-  //     timelineContainer.append(plot)
-
-  //     return () => plot.remove()
-  //   }
-  // }, [experiments])
-
   return (
     <TourProvider
       steps={steps}
@@ -168,17 +149,6 @@ export default function Dashboard() {
           </Card>
         </Grid>
       </Grid>
-
-      {/* <Grid container spacing={3}>
-        <Grid xs={12} lg={9}>
-          <Card variant="outlined" sx={{ my: 1.5 }}>
-            <Typography level="h2" fontSize="lg">
-              {i18n('dashboard.timeline')}
-            </Typography>
-            <Box ref={timelineChartRef} height={275} />
-          </Card>
-        </Grid>
-      </Grid> */}
     </TourProvider>
   )
 }

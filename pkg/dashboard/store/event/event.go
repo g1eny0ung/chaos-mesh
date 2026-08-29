@@ -17,18 +17,21 @@ package event
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"github.com/chaos-mesh/chaos-mesh/pkg/dashboard/core"
 )
 
-func NewStore(db *gorm.DB) core.EventStore {
-	db.AutoMigrate(&core.Event{})
+func NewStore(db *gorm.DB) (core.EventStore, error) {
+	if err := db.AutoMigrate(&core.Event{}); err != nil {
+		return nil, fmt.Errorf("migrate event table: %w", err)
+	}
 
-	return &eventStore{db}
+	return &eventStore{db}, nil
 }
 
 type eventStore struct {
@@ -45,7 +48,7 @@ func (e *eventStore) List(_ context.Context) ([]*core.Event, error) {
 	return events, nil
 }
 
-func (e *eventStore) ListBy(_ context.Context, by string, args ...interface{}) ([]*core.Event, error) {
+func (e *eventStore) ListBy(_ context.Context, by string, args ...any) ([]*core.Event, error) {
 	var events []*core.Event
 
 	if err := e.db.Where(by, args...).Find(&events).Error; err != nil {
@@ -59,7 +62,7 @@ func (e *eventStore) ListByUID(c context.Context, uid string) ([]*core.Event, er
 	return e.ListBy(c, "object_id = ?", uid)
 }
 
-func (e *eventStore) ListByUIDs(c context.Context, uids []string) ([]*core.Event, error) {
+func (e *eventStore) ListByUIDList(c context.Context, uids []string) ([]*core.Event, error) {
 	return e.ListBy(c, "object_id IN (?)", uids)
 }
 
@@ -67,7 +70,15 @@ func (e *eventStore) ListByExperiment(c context.Context, namespace string, name 
 	return e.ListBy(c, "namespace = ? AND name = ? AND kind = ?", namespace, name, kind)
 }
 
+func (e *eventStore) ListByUIDListWithFilter(_ context.Context, uids []string, filter core.Filter) ([]*core.Event, error) {
+	return listByFilter(e.db.Where("object_id IN (?)", uids), filter)
+}
+
 func (e *eventStore) ListByFilter(_ context.Context, filter core.Filter) ([]*core.Event, error) {
+	return listByFilter(e.db, filter)
+}
+
+func listByFilter(statement *gorm.DB, filter core.Filter) ([]*core.Event, error) {
 	var (
 		events []*core.Event
 		limit  int
@@ -75,7 +86,11 @@ func (e *eventStore) ListByFilter(_ context.Context, filter core.Filter) ([]*cor
 	)
 
 	query, args := filter.ConstructQueryArgs()
-	statement := e.db.Where(query, args...).Order("id desc")
+	if query != "" {
+		statement = statement.Where(query, args...)
+	}
+
+	statement = statement.Order("id desc")
 
 	if filter.Limit != "" {
 		limit, err = strconv.Atoi(filter.Limit)
@@ -111,12 +126,8 @@ func (e *eventStore) DeleteByUID(_ context.Context, uid string) error {
 	return e.db.Where("object_id = ?", uid).Delete(&core.Event{}).Error
 }
 
-func (e *eventStore) DeleteByUIDs(_ context.Context, uids []string) error {
+func (e *eventStore) DeleteByUIDList(_ context.Context, uids []string) error {
 	return e.db.Where("object_id IN (?)", uids).Delete(&core.Event{}).Error
-}
-
-func (e *eventStore) DeleteByTime(_ context.Context, start string, end string) error {
-	return e.db.Where("created_at BETWEEN ? AND ?", start, end).Delete(&core.Event{}).Error
 }
 
 func (e *eventStore) DeleteByDuration(_ context.Context, duration time.Duration) error {

@@ -17,6 +17,7 @@ package event
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"sort"
 	"strconv"
@@ -24,7 +25,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-logr/logr"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -34,6 +35,8 @@ import (
 	u "github.com/chaos-mesh/chaos-mesh/pkg/dashboard/apiserver/utils"
 	"github.com/chaos-mesh/chaos-mesh/pkg/dashboard/core"
 )
+
+var extractTokenAndGetClient = clientpool.ExtractTokenAndGetClient
 
 // Service defines a handler service for events.
 type Service struct {
@@ -152,7 +155,7 @@ func (s *Service) cascadeFetchEventsForWorkflow(c *gin.Context) {
 	// we should fetch the events for Workflow and related WorkflowNode, so we need namespaced name at first
 	workflowEntity, err := s.workflowStore.FindByUID(ctx, uid)
 	if err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			u.SetAPIError(c, u.ErrNotFound.Wrap(err, "this requested workflow is not found, uid: %s", uid))
 		} else {
 			u.SetAPIError(c, u.ErrInternalServer.WrapWithNoMessage(err))
@@ -167,7 +170,7 @@ func (s *Service) cascadeFetchEventsForWorkflow(c *gin.Context) {
 		return
 	}
 
-	kubeClient, err := clientpool.ExtractTokenAndGetClient(c.Request.Header)
+	kubeClient, err := extractTokenAndGetClient(c.Request.Header)
 	if err != nil {
 		u.SetAPIError(c, u.ErrBadRequest.WrapWithNoMessage(err))
 		return
@@ -192,9 +195,13 @@ func (s *Service) cascadeFetchEventsForWorkflow(c *gin.Context) {
 	}
 
 	result := make([]*core.Event, 0)
-	// fetch events of Workflow
-	eventsForWorkflow, err := s.event.ListByFilter(ctx, core.Filter{
-		ObjectID:  uid,
+	objectIDs := make([]string, 0, len(workflowNodeList.Items)+1)
+	objectIDs = append(objectIDs, uid)
+	for _, workflowNode := range workflowNodeList.Items {
+		objectIDs = append(objectIDs, string(workflowNode.GetUID()))
+	}
+
+	result, err = s.event.ListByUIDListWithFilter(ctx, objectIDs, core.Filter{
 		Namespace: ns,
 		Start:     start.UTC().Format(layout),
 		End:       end.UTC().Format(layout),
@@ -202,22 +209,6 @@ func (s *Service) cascadeFetchEventsForWorkflow(c *gin.Context) {
 	if err != nil {
 		u.SetAPIError(c, u.ErrInternalServer.WrapWithNoMessage(err))
 		return
-	}
-	result = append(result, eventsForWorkflow...)
-
-	// fetch all events of WorkflowNodes
-	for _, workflowNode := range workflowNodeList.Items {
-		eventsForWorkflowNode, err := s.event.ListByFilter(ctx, core.Filter{
-			Namespace: ns,
-			Name:      workflowNode.GetName(),
-			Start:     start.UTC().Format(layout),
-			End:       end.UTC().Format(layout),
-		})
-		if err != nil {
-			u.SetAPIError(c, u.ErrInternalServer.WrapWithNoMessage(err))
-			return
-		}
-		result = append(result, eventsForWorkflowNode...)
 	}
 
 	// sort by CreatedAt
@@ -266,7 +257,7 @@ func (s *Service) get(c *gin.Context) {
 
 	event, err := s.event.Find(context.Background(), uint(intID))
 	if err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			u.SetAPIError(c, u.ErrNotFound.New("Event %s not found", id))
 		} else {
 			u.SetAPIError(c, u.ErrInternalServer.WrapWithNoMessage(err))

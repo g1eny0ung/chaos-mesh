@@ -14,25 +14,44 @@
  * limitations under the License.
  *
  */
-import { CoreEvent } from '@/openapi/index.schemas'
+import Paper from '@/mui-extends/Paper'
+import PaperTop from '@/mui-extends/PaperTop'
+import { type CoreEvent } from '@/openapi/index.schemas'
+import { useSettingActions, useSettingStore } from '@/zustand/setting'
 import { useSystemStore } from '@/zustand/system'
-import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Typography } from '@mui/joy'
+import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Switch, Typography } from '@mui/joy'
 
 import i18n from '@/components/T'
 
 import { iconByKind } from '@/lib/byKind'
-import DateTime, { format } from '@/lib/luxon'
+import { format, toRelative } from '@/lib/luxon'
 
 interface EventsTimelineProps {
   events?: CoreEvent[]
   height?: number
+  paperProps?: React.ComponentProps<typeof Paper>
 }
 
-const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
+const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperProps }) => {
   const lang = useSystemStore((state) => state.lang)
+  const eventTimeFormat = useSettingStore((state) => state.eventTimeFormat)
+  const { setEventTimeFormat } = useSettingActions()
 
-  return (
-    <Box sx={{ height, overflowY: 'auto' }}>
+  const handleEventTimeFormatChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEventTimeFormat(event.target.checked ? 'absolute' : 'relative')
+  }
+
+  const toggle = (
+    <Switch
+      size="sm"
+      checked={eventTimeFormat === 'absolute'}
+      onChange={handleEventTimeFormatChange}
+      startDecorator={i18n('events.absoluteTime')}
+    />
+  )
+
+  const eventList = (
+    <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
       {events && events.length > 0 ? (
         <List>
           {events.map((event) => (
@@ -50,9 +69,9 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
                     {event.message}
                   </Typography>
                   <Typography level="body3" title={format(event.created_at!)}>
-                    {DateTime.fromISO(event.created_at!, {
-                      locale: lang,
-                    }).toRelative()}
+                    {eventTimeFormat === 'absolute'
+                      ? format(event.created_at!, lang)
+                      : toRelative(event.created_at!, lang)}
                   </Typography>
                 </Box>
               </ListItemContent>
@@ -64,6 +83,24 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height }) => {
           <Typography color="neutral">{i18n('events.notFound')}</Typography>
         </Box>
       )}
+    </Box>
+  )
+
+  if (paperProps) {
+    return (
+      <Paper {...paperProps} sx={{ display: 'flex', flexDirection: 'column', ...paperProps.sx }}>
+        <PaperTop title={paperProps.title || i18n('events.title')} boxProps={{ mb: 3 }}>
+          {toggle}
+        </PaperTop>
+        {eventList}
+      </Paper>
+    )
+  }
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>{toggle}</Box>
+      {eventList}
     </Box>
   )
 }

@@ -102,6 +102,9 @@
                 "privileged": {
                     "type": "boolean"
                 },
+                "resourceProfile": {
+                    "type": "string"
+                },
                 "resources": {
                     "type": "object"
                 },
@@ -476,6 +479,29 @@
                 "nodeSelector": {
                     "type": "object"
                 },
+                "oidcSecurityMode": {
+                    "type": "object",
+                    "properties": {
+                        "caBundlePEM": {
+                            "type": "string"
+                        },
+                        "clientId": {
+                            "type": "string"
+                        },
+                        "clientSecret": {
+                            "type": "string"
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "existingSecret": {
+                            "type": "string"
+                        },
+                        "issuerUrl": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "persistentVolume": {
                     "type": "object",
                     "properties": {
@@ -690,6 +716,9 @@
         },
         "enableProfiling": {
             "type": "boolean"
+        },
+        "extraObjects": {
+            "type": "array"
         },
         "fullnameOverride": {
             "type": "string"
