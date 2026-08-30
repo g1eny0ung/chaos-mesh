@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { arrToObjBySep, isDeepEmpty, sanitize } from './utils'
+import { arrToObjBySep, isDeepEmpty, replaceYamlValues, sanitize } from './utils'
 
 describe('lib/utils', () => {
   describe('arrToObjBySep', () => {
@@ -94,6 +94,24 @@ describe('lib/utils', () => {
           f: {},
         }),
       ).toEqual({})
+    })
+  })
+
+  describe('replaceYamlValues', () => {
+    it('recursively replaces mapping values and preserves array positions as null', () => {
+      const result = replaceYamlValues(
+        {
+          emptyString: '',
+          nested: { keep: 'value', remove: '' },
+          items: ['value', ''],
+        },
+        (_, value) => (value === '' ? undefined : value),
+      )
+
+      expect(result).toEqual({
+        nested: { keep: 'value' },
+        items: ['value', null],
+      })
     })
   })
 })

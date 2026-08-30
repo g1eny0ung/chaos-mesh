@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
 import Tooltip from '@/mui-extends/Tooltip'
 import {
   getArchives,
@@ -26,7 +25,7 @@ import {
 } from '@/openapi'
 import type { CoreWorkflowMeta, TypesArchive, TypesExperiment, TypesSchedule } from '@/openapi/index.schemas'
 import FingerprintIcon from '@mui/icons-material/Fingerprint'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import SearchIcon from '@mui/icons-material/Search'
 import {
@@ -36,6 +35,7 @@ import {
   CircularProgress,
   InputAdornment,
   Chip as MUIChip,
+  Paper,
   TextField,
   Typography,
 } from '@mui/material'
@@ -211,38 +211,44 @@ const Search: ReactFCWithChildren = () => {
         <TextField
           {...params}
           label={i18n('search.placeholder')}
-          InputProps={{
-            ...params.InputProps,
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <>
-                {loading && !noResult ? <CircularProgress color="inherit" size={15} /> : null}
-                <InputAdornment position="end">
-                  <Tooltip
-                    title={
-                      <Typography variant="body2" component="div">
-                        {i18n('search.tip.title')}
-                        <ul className={classes.tooltip}>
-                          <li>{i18n('search.tip.namespace')}</li>
-                          <li>{i18n('search.tip.kind')}</li>
-                        </ul>
-                      </Typography>
-                    }
-                  >
-                    <HelpOutlineIcon />
-                  </Tooltip>
+          slotProps={{
+            ...params.slotProps,
+
+            input: {
+              ...params.slotProps.input,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
                 </InputAdornment>
-              </>
-            ),
+              ),
+              endAdornment: (
+                <>
+                  {loading && !noResult ? <CircularProgress color="inherit" size={15} /> : null}
+                  <InputAdornment position="end">
+                    <Tooltip
+                      title={
+                        <Typography variant="body2" component="div">
+                          {i18n('search.tip.title')}
+                          <ul className={classes.tooltip}>
+                            <li>{i18n('search.tip.namespace')}</li>
+                            <li>{i18n('search.tip.kind')}</li>
+                          </ul>
+                        </Typography>
+                      }
+                    >
+                      <HelpOutlineIcon />
+                    </Tooltip>
+                  </InputAdornment>
+                </>
+              ),
+            },
           }}
         />
       )}
-      PaperComponent={(props) => <StyledPaper {...props} sx={{ p: 0 }} />}
       disableClearable
+      slots={{
+        paper: (props) => <StyledPaper {...props} sx={{ p: 0 }} />,
+      }}
     />
   )
 }

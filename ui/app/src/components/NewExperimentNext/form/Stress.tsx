@@ -63,7 +63,7 @@ const Stress: ReactFCWithChildren<StressProps> = ({ onSubmit }) => {
     setInit({
       ...initialValues,
       ...spec,
-    })
+    } as typeof initialValues)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spec])
 

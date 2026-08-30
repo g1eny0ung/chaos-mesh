@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import type { Node } from 'react-flow-renderer'
+import type { Node } from '@xyflow/react'
 import { v4 as uuidv4 } from 'uuid'
 
 import {

@@ -28,9 +28,25 @@ const NotFound: ReactFCWithChildren<NotFoundProps> = ({ illustrated = false, chi
   const theme = useTheme()
 
   return (
-    <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%" {...rest}>
+    <Box
+      {...rest}
+      sx={[
+        {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+        },
+        ...(Array.isArray(rest.sx) ? rest.sx : [rest.sx]),
+      ]}
+    >
       {illustrated && (
-        <Box mb={3}>
+        <Box
+          sx={{
+            mb: 3,
+          }}
+        >
           <img
             style={{ width: 450 }}
             src={theme.palette.mode === 'light' ? undrawNotFound : EmptyStreetDark}

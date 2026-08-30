@@ -26,7 +26,7 @@ interface MoreOptionsProps {
   isOpen?: boolean
   beforeOpen?: () => void
   afterClose?: () => void
-  title?: string | JSX.Element
+  title?: string | React.JSX.Element
 }
 
 const MoreOptions: ReactFCWithChildren<MoreOptionsProps> = ({
@@ -50,7 +50,11 @@ const MoreOptions: ReactFCWithChildren<MoreOptionsProps> = ({
 
   return (
     <Space>
-      <Box textAlign="right">
+      <Box
+        sx={{
+          textAlign: 'right',
+        }}
+      >
         <Button color="primary" startIcon={open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} onClick={setOpen}>
           {title ? title : <T id="common.moreOptions" />}
         </Button>

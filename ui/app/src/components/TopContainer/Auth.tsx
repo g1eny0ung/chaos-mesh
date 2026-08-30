@@ -63,9 +63,10 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
       open={open}
       title={i18n('settings.addToken.prompt')}
       dialogProps={{
-        disableEscapeKeyDown: true,
-        PaperProps: {
-          style: { width: 512 },
+        slotProps: {
+          paper: {
+            style: { width: 512 },
+          },
         },
       }}
     >
@@ -83,7 +84,11 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
           <Divider sx={{ mt: 6, mb: 3, color: 'text.secondary', typography: 'body2' }}>
             {i18n('settings.addToken.or')}
           </Divider>
-          <Box textAlign="center">
+          <Box
+            sx={{
+              textAlign: 'center',
+            }}
+          >
             <IconButton color="primary" onClick={handleAuthGCP}>
               <GoogleIcon />
             </IconButton>
@@ -95,7 +100,11 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
           <Divider sx={{ mt: 6, mb: 3, color: 'text.secondary', typography: 'body2' }}>
             {i18n('settings.addToken.or')}
           </Divider>
-          <Box textAlign="center">
+          <Box
+            sx={{
+              textAlign: 'center',
+            }}
+          >
             <IconButton color="primary" onClick={handleAuthOIDC} title="OIDC">
               <OpenIdIcon />
             </IconButton>
@@ -107,13 +116,20 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
         open={tokenGenOpen}
         title={i18n('settings.addToken.generator')}
         dialogProps={{
-          PaperProps: {
-            style: { width: 750, maxWidth: 'unset' }, // max-width: 600
+          slotProps: {
+            paper: {
+              style: { width: 750, maxWidth: 'unset' }, // max-width: 600
+            },
           },
         }}
       >
         <RBACGenerator />
-        <Box mt={3} textAlign="right">
+        <Box
+          sx={{
+            mt: 3,
+            textAlign: 'right',
+          }}
+        >
           <Button onClick={() => setTokenGenOpen(false)}>{i18n('common.close')}</Button>
         </Box>
       </ConfirmDialog>

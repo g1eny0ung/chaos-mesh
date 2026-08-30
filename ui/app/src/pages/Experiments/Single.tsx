@@ -27,11 +27,10 @@ import {
 } from '@/openapi'
 import { useComponentActions } from '@/zustand/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
-import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
-import Alert from '@mui/lab/Alert'
-import { Box, Button, Grid, Grow } from '@mui/material'
-import yaml from 'js-yaml'
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutlineOutlined'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
+import { Alert, Box, Button, Grid, Grow } from '@mui/material'
+import * as yaml from 'js-yaml'
 import { lazy } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router'
@@ -171,15 +170,31 @@ export default function Single() {
             <Paper>{experiment && <ObjectConfiguration config={experiment} />}</Paper>
 
             <Grid container>
-              <Grid item xs={12} lg={6} sx={{ pr: 3 }}>
+              <Grid
+                sx={{ pr: 3 }}
+                size={{
+                  xs: 12,
+                  lg: 6,
+                }}
+              >
                 <EventsTimeline events={events} paperProps={{ sx: { height: 600 } }} />
               </Grid>
-              <Grid item xs={12} lg={6} sx={{ pl: 3 }}>
+              <Grid
+                sx={{ pl: 3 }}
+                size={{
+                  xs: 12,
+                  lg: 6,
+                }}
+              >
                 <Paper sx={{ height: 600, p: 0 }}>
                   {experiment && (
-                    <Space display="flex" flexDirection="column" height="100%">
-                      <PaperTop title={i18n('common.definition')} boxProps={{ p: 4.5, pb: 0 }} />
-                      <Box flex={1}>
+                    <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                      <PaperTop title={i18n('common.definition')} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+                      <Box
+                        sx={{
+                          flex: 1,
+                        }}
+                      >
                         <YAMLEditor name={experiment.name} data={yaml.dump(experiment.kube_object)} download />
                       </Box>
                     </Space>

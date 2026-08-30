@@ -20,10 +20,7 @@ import { type ExperimentKind } from '@/components/NewExperiment/types'
 
 export type Kind = Exclude<ExperimentKind, 'PhysicalMachineChaos' | 'AzureChaos'>
 export type KindPhysic =
-  | Extract<Kind, 'NetworkChaos' | 'StressChaos' | 'TimeChaos'>
-  | 'DiskChaos'
-  | 'JVMChaos'
-  | 'ProcessChaos'
+  Extract<Kind, 'NetworkChaos' | 'StressChaos' | 'TimeChaos'> | 'DiskChaos' | 'JVMChaos' | 'ProcessChaos'
 type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'label' | 'autocomplete'
 interface SpecField {
   field: FieldType
@@ -1376,7 +1373,7 @@ const httpPathCommonSchema = {
   path: Yup.string().required('The path is required'),
 }
 
-export const schema: Partial<Record<Kind, Record<string, Yup.ObjectSchema>>> = {
+export const schema: Partial<Record<Kind, Record<string, Yup.AnyObjectSchema>>> = {
   AWSChaos: {
     'ec2-stop': AWSChaosCommonSchema,
     'ec2-restart': AWSChaosCommonSchema,

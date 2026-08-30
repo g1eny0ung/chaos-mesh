@@ -50,7 +50,12 @@ const New = () => {
 
   return (
     <Grid container>
-      <Grid item xs={12} lg={8}>
+      <Grid
+        size={{
+          xs: 12,
+          lg: 8,
+        }}
+      >
         <NewExperiment inSchedule={true} onSubmit={onSubmit} />
       </Grid>
     </Grid>

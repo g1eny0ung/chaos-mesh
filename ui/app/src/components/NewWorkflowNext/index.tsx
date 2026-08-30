@@ -23,9 +23,9 @@ import { Tabs as BaseTabs } from '@mui/base/Tabs'
 import { TabsList as BaseTabsList } from '@mui/base/TabsList'
 import { Box, Button, Grow, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import type { ReactFlowInstance } from '@xyflow/react'
 import _ from 'lodash'
 import { useRef, useState } from 'react'
-import type { ReactFlowInstance } from 'react-flow-renderer'
 
 import YAML from '@/components/YAML'
 
@@ -89,7 +89,7 @@ export default function NewWorkflow() {
 
   const nodes = useWorkflowStore((state) => state.nodes)
 
-  const flowRef = useRef<ReactFlowInstance>(null)
+  const flowRef = useRef<ReactFlowInstance<any, any>>(null)
 
   const handleClickElement = (kind: string, act?: string) => {
     ;(flowRef.current as any).initNode({ kind, act }, undefined, { x: 100, y: 100 }) // TODO: calculate the appropriate coordinates automatically
@@ -113,9 +113,21 @@ export default function NewWorkflow() {
     <Grow in={true} style={{ transformOrigin: '0 0 0' }}>
       <div style={{ height: '100%' }}>
         <Space sx={{ height: '100%' }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <Box>
-              <Typography variant="h5" component="h1" fontWeight="bold">
+              <Typography
+                variant="h5"
+                component="h1"
+                sx={{
+                  fontWeight: 'bold',
+                }}
+              >
                 New Workflow
               </Typography>
               <Typography variant="body2">Use flowchart to create a new workflow.</Typography>
@@ -131,20 +143,50 @@ export default function NewWorkflow() {
           </Box>
           <Paper sx={{ display: 'flex', flex: 1 }}>
             <Space sx={{ width: 300, pr: 4, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}>
-              <Typography variant="h6" component="div" fontWeight="bold">
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                  fontWeight: 'bold',
+                }}
+              >
                 Elements
               </Typography>
               <Box>
-                <Typography fontWeight="medium">Functional Nodes</Typography>
-                <Typography variant="body2" color="secondary" fontSize={12}>
+                <Typography
+                  sx={{
+                    fontWeight: 'medium',
+                  }}
+                >
+                  Functional Nodes
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{
+                    fontSize: 12,
+                  }}
+                >
                   Drag or click items below into the board to create a functional node.
                 </Typography>
               </Box>
               <FunctionalNodesElements onElementClick={handleClickElement} />
 
               <Box>
-                <Typography fontWeight="medium">Chaos Nodes</Typography>
-                <Typography variant="body2" color="secondary" fontSize={12}>
+                <Typography
+                  sx={{
+                    fontWeight: 'medium',
+                  }}
+                >
+                  Chaos Nodes
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{
+                    fontSize: 12,
+                  }}
+                >
                   Drag or click items below into the board to create a Chaos node.
                 </Typography>
               </Box>
@@ -162,10 +204,20 @@ export default function NewWorkflow() {
               </Tabs>
             </Space>
             <Space sx={{ flex: 1, px: 4 }}>
-              <Typography variant="h6" component="div" fontWeight="bold">
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                  fontWeight: 'bold',
+                }}
+              >
                 Pipeline Board
               </Typography>
-              <Box flex={1}>
+              <Box
+                sx={{
+                  flex: 1,
+                }}
+              >
                 <Whiteboard flowRef={flowRef} />
               </Box>
             </Space>

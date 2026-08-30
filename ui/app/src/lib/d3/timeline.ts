@@ -26,14 +26,15 @@ interface Item {
 
 export function genTimelineData(items: TypesExperiment[]): Item[]
 export function genTimelineData(items: TypesSchedule[]): Item[]
-export function genTimelineData(items: CoreWorkflowMeta[]): Item[] {
+export function genTimelineData(items: CoreWorkflowMeta[]): Item[]
+export function genTimelineData(items: Array<TypesExperiment | TypesSchedule | CoreWorkflowMeta>): Item[] {
   return items.map((item) => ({
     name: item.name!,
     created_at: item.created_at!,
   }))
 }
 
-function plot(data: Item[], options?: Plot.PlotOptions) {
+function plot(_data: Item[], options?: Plot.PlotOptions) {
   const now = DateTime.now()
 
   return Plot.plot({

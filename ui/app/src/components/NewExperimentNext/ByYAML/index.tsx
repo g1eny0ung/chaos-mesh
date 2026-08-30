@@ -20,12 +20,13 @@ import { useComponentActions } from '@/zustand/component'
 import PublishIcon from '@mui/icons-material/Publish'
 import { Button, Typography } from '@mui/material'
 import { type Editor } from 'ace-builds'
-import yaml from 'js-yaml'
 import { lazy, useState } from 'react'
 import { useIntl } from 'react-intl'
 
 import i18n from '@/components/T'
 import YAML from '@/components/YAML'
+
+import { loadYaml } from '@/lib/yaml'
 
 const YAMLEditor = lazy(() => import('@/components/YAMLEditor'))
 
@@ -46,7 +47,7 @@ const ByYAML: ReactFCWithChildren<ByYAMLProps> = ({ callback }) => {
   const handleUploadYAMLCallback = (y: any) => yamlEditor?.setValue(y)
 
   const handleSubmit = () => {
-    const data = yaml.load(yamlEditor!.getValue())
+    const data = loadYaml(yamlEditor!.getValue())
 
     if (callback && typeof callback === 'function') {
       callback(data)
@@ -66,7 +67,7 @@ const ByYAML: ReactFCWithChildren<ByYAMLProps> = ({ callback }) => {
       <Paper sx={{ height: 600, p: 0 }}>
         <YAMLEditor mountEditor={setYAMLEditor} aceProps={{ onChange }} />
       </Paper>
-      <Space direction="row" justifyContent="flex-end">
+      <Space direction="row" sx={{ justifyContent: 'flex-end' }}>
         <YAML callback={handleUploadYAMLCallback} />
         <Button
           variant="contained"

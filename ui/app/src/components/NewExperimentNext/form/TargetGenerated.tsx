@@ -21,7 +21,7 @@ import { type Env, useExperimentStore } from '@/zustand/experiment'
 import { MenuItem } from '@mui/material'
 import { Form, Formik, FormikErrors, FormikTouched, getIn, setIn } from 'formik'
 import { useEffect, useState } from 'react'
-import { ObjectSchema } from 'yup'
+import { AnyObjectSchema } from 'yup'
 
 import { AutocompleteField, LabelField, SelectField, Submit, TextField } from '@/components/FormField'
 import MoreOptions from '@/components/MoreOptions'
@@ -35,7 +35,7 @@ interface TargetGeneratedProps {
   env: Env
   kind?: Kind | ''
   data: Spec
-  validationSchema?: ObjectSchema
+  validationSchema?: AnyObjectSchema
   onSubmit: (values: Record<string, any>) => void
 }
 

@@ -20,27 +20,22 @@ import type { AutocompleteProps, TextFieldProps } from '@mui/material'
 import FormControl from '../FormControl'
 import OutlinedInput from '../OutlinedInput'
 
-export interface AutocompleteFieldProps<
-  T = string,
-  Multiple extends boolean | undefined = boolean,
-  DisableClearable extends boolean | undefined = boolean,
-  FreeSolo extends boolean | undefined = boolean,
-> extends Omit<AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>, 'renderInput'> {
+export interface AutocompleteFieldProps extends Omit<AutocompleteProps<string, true, boolean, boolean>, 'renderInput'> {
   name?: string
   label?: TextFieldProps['label']
   helperText?: TextFieldProps['helperText']
   error?: boolean
-  onRenderValueDelete?: (value: T) => (event: any) => void
+  onRenderValueDelete?: (value: string) => (event: any) => void
 }
 
-export default function AutocompleteField<T>({
+export default function AutocompleteField({
   name,
   label,
   helperText,
   error,
   onRenderValueDelete,
   ...props
-}: AutocompleteFieldProps<T>) {
+}: AutocompleteFieldProps) {
   const { disabled, fullWidth } = props
 
   return (
@@ -58,16 +53,16 @@ export default function AutocompleteField<T>({
         renderInput={(params) => (
           <OutlinedInput
             name={name}
-            {...params.InputProps}
-            inputProps={params.inputProps}
+            {...params.slotProps.input}
+            inputProps={params.slotProps.htmlInput}
             error={error}
             sx={{ width: '100%' }}
           />
         )}
-        renderTags={
+        renderValue={
           props.multiple
-            ? (value: T[], getTagProps) =>
-                value.map((val: T, index: number) => {
+            ? (value, getTagProps) =>
+                value.map((val, index) => {
                   const tagProps = getTagProps({ index })
 
                   return (
@@ -82,7 +77,9 @@ export default function AutocompleteField<T>({
                 })
             : undefined
         }
-        PaperComponent={(props) => <Paper {...props} sx={{ mt: 1 }} />}
+        slots={{
+          paper: (props) => <Paper {...props} sx={{ mt: 1 }} />,
+        }}
       />
     </FormControl>
   )

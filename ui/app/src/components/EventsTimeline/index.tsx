@@ -58,17 +58,37 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperPr
             <ListItem key={event.id}>
               <ListItemDecorator>{iconByKind(event.kind!)}</ListItemDecorator>
               <ListItemContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
                   <Typography>{event.name}</Typography>
                   <Chip variant="soft" size="sm">
                     {event.reason}
                   </Chip>
                 </Box>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography level="body2" noWrap maxWidth="75%" textOverflow="ellipsis" title={event.message}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography
+                    level="body-sm"
+                    noWrap
+                    title={event.message}
+                    sx={{
+                      maxWidth: '75%',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
                     {event.message}
                   </Typography>
-                  <Typography level="body3" title={format(event.created_at!)}>
+                  <Typography level="body-xs" title={format(event.created_at!)}>
                     {eventTimeFormat === 'absolute'
                       ? format(event.created_at!, lang)
                       : toRelative(event.created_at!, lang)}
@@ -79,7 +99,14 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperPr
           ))}
         </List>
       ) : (
-        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
           <Typography color="neutral">{i18n('events.notFound')}</Typography>
         </Box>
       )}
@@ -89,7 +116,7 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperPr
   if (paperProps) {
     return (
       <Paper {...paperProps} sx={{ display: 'flex', flexDirection: 'column', ...paperProps.sx }}>
-        <PaperTop title={paperProps.title || i18n('events.title')} boxProps={{ mb: 3 }}>
+        <PaperTop title={paperProps.title || i18n('events.title')} boxProps={{ sx: { mb: 3 } }}>
           {toggle}
         </PaperTop>
         {eventList}

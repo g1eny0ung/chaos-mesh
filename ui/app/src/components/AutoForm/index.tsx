@@ -244,7 +244,12 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
 
           return (
             <Box key={_label}>
-              <Typography fontWeight={500} mb={3}>
+              <Typography
+                sx={{
+                  fontWeight: 500,
+                  mb: 3,
+                }}
+              >
                 {label}
               </Typography>
               {helperText && <FormHelperText>{helperText}</FormHelperText>}
@@ -315,7 +320,12 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
       {(props) => (
         <Form>
           <Space>
-            <Typography variant="h6" fontWeight="bold">
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 'bold',
+              }}
+            >
               {kindAction}
             </Typography>
             {action && (
@@ -331,7 +341,12 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
             {renderForm(form, props)}
             {kind === 'NetworkChaos' && (
               <>
-                <Typography fontWeight={500} mb={3}>
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    mb: 3,
+                  }}
+                >
                   target
                 </Typography>
                 <Space direction="row">

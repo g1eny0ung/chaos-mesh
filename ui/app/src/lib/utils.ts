@@ -80,6 +80,31 @@ export function sanitize(obj: any) {
   return JSON.parse(JSON.stringify(obj, (_, value: any) => (isDeepEmpty(value) ? undefined : value)) ?? '{}')
 }
 
+/**
+ * Apply the data transformation that js-yaml v4's `replacer` option used to
+ * perform. js-yaml v5 removed that option, so callers must prepare the value
+ * before passing it to `dump`.
+ */
+export function replaceYamlValues(value: any, replacer: (key: string, value: any) => any, key = ''): any {
+  const replaced = replacer(key, value)
+
+  if (Array.isArray(replaced)) {
+    return replaced.map((item, index) => replaceYamlValues(item, replacer, String(index)) ?? null)
+  }
+
+  if (_.isPlainObject(replaced)) {
+    return Object.fromEntries(
+      Object.entries(replaced).flatMap(([childKey, childValue]) => {
+        const nextValue = replaceYamlValues(childValue, replacer, childKey)
+
+        return nextValue === undefined ? [] : [[childKey, nextValue]]
+      }),
+    )
+  }
+
+  return replaced
+}
+
 export function concatKindAction(kind: string, action?: string) {
   return `${kind}${action ? ` / ${action}` : ''}`
 }

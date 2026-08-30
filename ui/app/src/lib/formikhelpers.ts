@@ -17,7 +17,7 @@
 import { templateTypeToFieldName } from '@/api/zz_generated.frontend.chaos-mesh'
 import type { Env } from '@/zustand/experiment'
 import { Template } from '@/zustand/workflow'
-import yaml from 'js-yaml'
+import * as yaml from 'js-yaml'
 import _ from 'lodash'
 
 import { podPhases } from '@/components/AutoForm/data'
@@ -26,7 +26,7 @@ import basicData from '@/components/NewExperimentNext/data/basic'
 import type { WorkflowBasic } from '@/components/NewWorkflowNext/SubmitWorkflow'
 import { ScheduleSpecific } from '@/components/Schedule/types'
 
-import { arrToObjBySep, sanitize } from './utils'
+import { arrToObjBySep, replaceYamlValues, sanitize } from './utils'
 
 export function parsePodsOrPhysicalMachines(data: string[]) {
   return data.reduce(
@@ -504,28 +504,28 @@ export function constructWorkflow(basic: WorkflowBasic, templates: Template[]) {
   recurInsertTemplates(templates)
 
   return yaml.dump(
-    {
-      apiVersion: 'chaos-mesh.org/v1alpha1',
-      kind: 'Workflow',
-      metadata: {
-        name,
-        namespace,
+    replaceYamlValues(
+      {
+        apiVersion: 'chaos-mesh.org/v1alpha1',
+        kind: 'Workflow',
+        metadata: {
+          name,
+          namespace,
+        },
+        spec: {
+          entry: 'entry',
+          templates: [
+            {
+              name: 'entry',
+              templateType: 'Serial',
+              deadline,
+              children,
+            },
+            ...realTemplates,
+          ],
+        },
       },
-      spec: {
-        entry: 'entry',
-        templates: [
-          {
-            name: 'entry',
-            templateType: 'Serial',
-            deadline,
-            children,
-          },
-          ...realTemplates,
-        ],
-      },
-    },
-    {
-      replacer: (_, value) => {
+      (_, value) => {
         if (Array.isArray(value)) {
           return value.length ? value : undefined
         }
@@ -537,6 +537,6 @@ export function constructWorkflow(basic: WorkflowBasic, templates: Template[]) {
             return value
         }
       },
-    },
+    ),
   )
 }

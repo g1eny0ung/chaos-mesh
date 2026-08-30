@@ -37,7 +37,13 @@ export default function SelectField<T>({ label, helperText, onRenderValueDelete,
         renderValue={
           props.multiple
             ? (selected: unknown) => (
-                <Box display="flex" flexWrap="wrap" gap={1}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 1,
+                  }}
+                >
                   {(selected as string[]).map((val) => (
                     <Chip
                       key={val}

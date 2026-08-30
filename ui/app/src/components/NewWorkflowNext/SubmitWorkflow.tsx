@@ -23,7 +23,7 @@ import { useSettingStore } from '@/zustand/setting'
 import { useWorkflowActions } from '@/zustand/workflow'
 import { Box, Divider, MenuItem, Typography } from '@mui/material'
 import { Form, Formik } from 'formik'
-import yaml from 'js-yaml'
+import * as yaml from 'js-yaml'
 import { lazy, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import * as Yup from 'yup'
@@ -31,6 +31,8 @@ import * as Yup from 'yup'
 import { SelectField, Submit, TextField } from '@/components/FormField'
 import FormikEffect from '@/components/FormikEffect'
 import { T } from '@/components/T'
+
+import { loadYaml } from '@/lib/yaml'
 
 const YAMLEditor = lazy(() => import('@/components/YAMLEditor'))
 
@@ -71,7 +73,7 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
 
   useEffect(() => {
     setData((oldData) => {
-      let { metadata, spec, ...rest }: any = yaml.load(oldData)
+      let { metadata, spec, ...rest }: any = loadYaml(oldData)
       const { name, namespace, deadline } = workflowBasic
       metadata = { ...metadata, name, namespace }
 
@@ -92,7 +94,7 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
   const { mutateAsync } = usePostWorkflows()
 
   const submitWorkflow = () => {
-    const payload: any = yaml.load(data)
+    const payload: any = loadYaml(data)
 
     if (debugMode) {
       console.info('submitWorkflow => payload', payload)
@@ -117,13 +119,21 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
       close={() => setOpen(false)}
       title="Fill in the basic information and submit"
       dialogProps={{
-        PaperProps: {
-          style: { width: 1024, height: 768, maxWidth: 'unset' },
+        slotProps: {
+          paper: {
+            style: { width: 1024, height: 768, maxWidth: 'unset' },
+          },
         },
       }}
     >
-      <Space spacing={6} direction="row" height="100%">
-        <Box flexGrow={0} flexShrink={0} flexBasis="45%">
+      <Space spacing={6} direction="row" sx={{ height: '100%' }}>
+        <Box
+          sx={{
+            flexGrow: 0,
+            flexShrink: 0,
+            flexBasis: '45%',
+          }}
+        >
           <Formik
             initialValues={{
               name: '',
@@ -174,8 +184,13 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
           </Formik>
         </Box>
         <Divider orientation="vertical" flexItem />
-        <Space spacing={1.5} flex={1}>
-          <Typography variant="body2" fontWeight={500}>
+        <Space spacing={1.5} sx={{ flex: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+            }}
+          >
             Preview
           </Typography>
           <Paper sx={{ width: '100%', p: 0 }}>

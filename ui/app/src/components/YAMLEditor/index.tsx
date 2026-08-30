@@ -26,12 +26,13 @@ import 'ace-builds/src-noconflict/mode-yaml'
 import 'ace-builds/src-noconflict/theme-tomorrow'
 import 'ace-builds/src-noconflict/theme-tomorrow_night'
 import fileDownload from 'js-file-download'
-import yaml from 'js-yaml'
 import { memo, useState } from 'react'
 import AceEditor, { IAceEditorProps } from 'react-ace'
 import { useIntl } from 'react-intl'
 
 import i18n from '@/components/T'
+
+import { loadYaml } from '@/lib/yaml'
 
 interface YAMLEditorProps {
   name?: string
@@ -71,13 +72,19 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
   }
 
   const handleOnUpdate = () => {
-    typeof onUpdate === 'function' && onUpdate(yaml.load(editor!.getValue()))
+    typeof onUpdate === 'function' && onUpdate(loadYaml(editor!.getValue()))
   }
 
   const handleDownloadExperiment = () => fileDownload(editor!.getValue(), `${name}.yaml`)
 
   return (
-    <Box position="relative" width="100%" height="100%">
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      }}
+    >
       <AceEditor
         onLoad={handleOnLoad}
         width="100%"

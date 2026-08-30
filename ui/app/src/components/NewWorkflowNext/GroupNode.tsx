@@ -17,10 +17,10 @@
 import Paper from '@/mui-extends/Paper'
 import Space from '@/mui-extends/Space'
 import { Box, Typography } from '@mui/material'
+import { Position } from '@xyflow/react'
+import type { Node, NodeProps } from '@xyflow/react'
 import { Resizable } from 're-resizable'
 import { DropTargetMonitor, XYCoord, useDrop } from 'react-dnd'
-import type { NodeProps } from 'react-flow-renderer'
-import { Position } from 'react-flow-renderer'
 
 import { iconByKind } from '@/lib/byKind'
 
@@ -41,7 +41,8 @@ const handleClasses = {
   topLeft: ResizableHandleClassName,
 }
 
-interface GroupNodeProps {
+interface GroupNodeData {
+  [key: string]: unknown
   id: uuid
   name: React.ReactNode
   type: SpecialTemplateType.Serial | SpecialTemplateType.Parallel
@@ -54,7 +55,9 @@ interface GroupNodeProps {
   nodeControl?: React.ReactNode
 }
 
-export default function GroupNode({ data, isConnectable }: NodeProps<GroupNodeProps>) {
+type GroupNodeType = Node<GroupNodeData, 'groupNode'>
+
+export default function GroupNode({ data, isConnectable }: NodeProps<GroupNodeType>) {
   const {
     id,
     name,
@@ -86,11 +89,29 @@ export default function GroupNode({ data, isConnectable }: NodeProps<GroupNodePr
   }))
 
   return (
-    <Box id={groupNodeID} ref={drop}>
-      <Box display="flex" justifyContent="space-between" sx={{ mb: 1, color: 'secondary.main', fontSize: 18 }}>
-        <Space direction="row" spacing={1} alignItems="center">
+    <Box
+      id={groupNodeID}
+      ref={(element) => {
+        drop(element as HTMLElement | null)
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          mb: 1,
+          color: 'secondary.main',
+          fontSize: 18,
+        }}
+      >
+        <Space direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           {iconByKind(type, 'inherit')}
-          <Typography component="div" fontWeight="medium">
+          <Typography
+            component="div"
+            sx={{
+              fontWeight: 'medium',
+            }}
+          >
             {name}
           </Typography>
         </Space>

@@ -34,7 +34,15 @@ export default forwardRef<HTMLSpanElement, BareNodeProps>(({ kind, sx, children,
     startIcon={iconByKind(kind)}
     disableFocusRipple
     sx={{ alignItems: 'center', width: 200, ...sx }}
-    children={<Box flex={1}>{children}</Box>}
+    children={
+      <Box
+        sx={{
+          flex: 1,
+        }}
+      >
+        {children}
+      </Box>
+    }
     title={name}
     {...rest}
   />

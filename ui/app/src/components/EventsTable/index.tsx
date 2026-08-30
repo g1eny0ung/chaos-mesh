@@ -156,7 +156,12 @@ const TablePaginationActions: ReactFCWithChildren<TablePaginationActionsProps> =
     onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1))
 
   return (
-    <Box display="flex" ml={3}>
+    <Box
+      sx={{
+        display: 'flex',
+        ml: 3,
+      }}
+    >
       <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
         <FirstPageIcon />
       </IconButton>
@@ -231,9 +236,11 @@ const EventsTable: ReactFCWithChildren<EventsTableProps> = ({ events: allEvents 
                 rowsPerPage={rowsPerPage}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
-                ActionsComponent={TablePaginationActions as any}
                 labelDisplayedRows={({ from, to, count }) => `${from} - ${to} of ${count}`}
                 labelRowsPerPage={i18n('events.eventsPerPage', intl)}
+                slots={{
+                  actions: TablePaginationActions as any,
+                }}
               />
             )}
           </TableRow>

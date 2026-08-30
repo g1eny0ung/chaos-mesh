@@ -29,7 +29,12 @@ export default function Kubernetes({ onElementClick }: ElementsProps) {
     <Space>
       {Object.entries(actions).map(([kind, list]) => (
         <Space key={kind}>
-          <Typography variant="body2" fontWeight="medium">
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 'medium',
+            }}
+          >
             {kind}
           </Typography>
           {list.length > 0 ? (

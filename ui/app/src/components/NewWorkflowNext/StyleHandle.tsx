@@ -15,7 +15,7 @@
  *
  */
 import { styled } from '@mui/material'
-import { Handle } from 'react-flow-renderer'
+import { Handle } from '@xyflow/react'
 
 const StyledHandle = styled(Handle)(({ theme }) => ({
   width: '8px !important',

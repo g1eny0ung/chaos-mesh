@@ -16,7 +16,7 @@
  */
 import { Node, WorkflowSingle } from '@/api/workflows.type'
 import { Theme } from '@mui/material'
-import cytoscape, { EdgeDefinition, EventHandler, NodeDefinition, Stylesheet } from 'cytoscape'
+import cytoscape, { EdgeDefinition, EventHandler, NodeDefinition, StylesheetStyle } from 'cytoscape'
 import dagre from 'cytoscape-dagre'
 import _ from 'lodash'
 
@@ -202,7 +202,7 @@ export const constructWorkflowTopology = (
     label: 'data(id)',
   }
 
-  const workflowStyle: Stylesheet[] = [
+  const workflowStyle: StylesheetStyle[] = [
     {
       selector: 'node',
       style: workflowNodeStyle,

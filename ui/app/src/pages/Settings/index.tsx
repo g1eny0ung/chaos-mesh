@@ -79,7 +79,7 @@ const Settings = () => {
           />
           <Checkbox
             label={
-              <Space spacing={1} direction="row" alignItems="center">
+              <Space spacing={1} direction="row" sx={{ alignItems: 'center' }}>
                 <Box>
                   <T id="settings.useNewPhysicalMachineCRD.title" />
                 </Box>

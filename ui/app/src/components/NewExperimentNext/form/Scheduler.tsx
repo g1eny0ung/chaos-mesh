@@ -42,14 +42,14 @@ interface SchedulerProps {
 
 const Scheduler: ReactFCWithChildren<SchedulerProps> = ({ errors, touched, inSchedule = false }) => {
   const { fromExternal, kindAction, basic } = useExperimentStore()
-  const { values, setFieldValue } = useFormikContext()
+  const { values, setFieldValue } = useFormikContext<Record<string, any>>()
   const [kind, action] = kindAction
   const instant = isInstant(kind, action)
 
   const [continuous, setContinuous] = useState(false)
 
   useEffect(() => {
-    if (!inSchedule && fromExternal && basic.spec.duration === '') {
+    if (!inSchedule && fromExternal && (basic.spec.duration as unknown as string) === '') {
       setContinuous(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,15 +60,28 @@ const Scheduler: ReactFCWithChildren<SchedulerProps> = ({ errors, touched, inSch
 
     setContinuous(checked)
 
-    if (checked && getIn(values, 'spec.duration') !== '') {
+    if (checked && (getIn(values, 'spec.duration') as string) !== '') {
       setFieldValue('spec.duration', '')
     }
   }
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography fontWeight={500}>{i18n('newE.steps.run')}</Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Typography
+          sx={{
+            fontWeight: 500,
+          }}
+        >
+          {i18n('newE.steps.run')}
+        </Typography>
         {!inSchedule && (
           <FormControlLabel
             style={{ marginRight: 0 }}

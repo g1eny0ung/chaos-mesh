@@ -24,7 +24,7 @@ import {
   usePutExperimentsStartUid,
 } from '@/openapi'
 import type { DeleteExperimentsParams } from '@/openapi/index.schemas'
-import { Confirm, useComponentActions } from '@/zustand/component'
+import { useComponentActions } from '@/zustand/component'
 import AddIcon from '@mui/icons-material/Add'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import CloseIcon from '@mui/icons-material/Close'
@@ -35,10 +35,11 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
-import { FixedSizeList as RWList, ListChildComponentProps as RWListChildComponentProps } from 'react-window'
+import { List as RWList, type RowComponentProps as RWListRowComponentProps } from 'react-window'
 
 import NotFound from '@/components/NotFound'
 import ObjectListItem from '@/components/ObjectListItem'
+import type { ObjectListItemAction } from '@/components/ObjectListItem'
 import i18n from '@/components/T'
 
 import { transByKind } from '@/lib/byKind'
@@ -68,7 +69,7 @@ export default function Experiments() {
   const { mutateAsync: pauseExperiments } = usePutExperimentsPauseUid()
   const { mutateAsync: startExperiments } = usePutExperimentsStartUid()
 
-  const onSelect = (selected: Confirm) =>
+  const onSelect = (selected: ObjectListItemAction) =>
     setConfirm({
       title: selected.title,
       description: selected.description,
@@ -145,8 +146,15 @@ export default function Experiments() {
     })
   }
 
-  const Row = ({ data, index, style }: RWListChildComponentProps) => (
-    <Box display="flex" alignItems="center" mb={3} style={style}>
+  const Row = ({ data, index, style }: RWListRowComponentProps<{ data: any[] }>) => (
+    <Box
+      style={style}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        mb: 3,
+      }}
+    >
       {!isBatchEmpty && (
         <StyledCheckBox
           color="primary"
@@ -155,7 +163,11 @@ export default function Experiments() {
           disableRipple
         />
       )}
-      <Box flex={1}>
+      <Box
+        sx={{
+          flex: 1,
+        }}
+      >
         <ObjectListItem data={data[index]} onSelect={onSelect} />
       </Box>
     </Box>
@@ -163,7 +175,7 @@ export default function Experiments() {
 
   return (
     <>
-      <Space direction="row" mb={6}>
+      <Space direction="row" sx={{ mb: 6 }}>
         <Button variant="outlined" startIcon={<AddIcon />} onClick={() => navigate('/experiments/new')}>
           {i18n('newE.title')}
         </Button>
@@ -195,22 +207,25 @@ export default function Experiments() {
       {experiments &&
         experiments.length > 0 &&
         Object.entries(_.groupBy(experiments, 'kind')).map(([kind, experimentsByKind]) => (
-          <Box key={kind} mb={6}>
+          <Box
+            key={kind}
+            sx={{
+              mb: 6,
+            }}
+          >
             <Typography variant="overline">{transByKind(kind as any)}</Typography>
             <RWList
-              width="100%"
-              height={experimentsByKind.length > 3 ? 300 : experimentsByKind.length * 70}
-              itemCount={experimentsByKind.length}
-              itemSize={70}
-              itemData={experimentsByKind}
-            >
-              {Row}
-            </RWList>
+              style={{ width: '100%', height: experimentsByKind.length > 3 ? 300 : experimentsByKind.length * 70 }}
+              rowCount={experimentsByKind.length}
+              rowHeight={70}
+              rowComponent={Row}
+              rowProps={{ data: experimentsByKind }}
+            />
           </Box>
         ))}
 
       {!loading && experiments?.length === 0 && (
-        <NotFound illustrated textAlign="center">
+        <NotFound illustrated sx={{ textAlign: 'center' }}>
           <Typography>{i18n('experiments.notFound')}</Typography>
         </NotFound>
       )}

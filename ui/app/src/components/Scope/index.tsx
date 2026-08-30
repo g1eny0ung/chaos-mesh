@@ -43,7 +43,7 @@ interface ScopeProps {
   namespaces: string[]
   scope?: string
   modeScope?: string
-  previewTitle?: string | JSX.Element
+  previewTitle?: string | React.JSX.Element
 }
 
 const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTitle }: ScopeProps) => {
@@ -177,7 +177,11 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
       <Mode modeScope={modeScope} scope={scope} />
 
       <div>
-        <Typography fontWeight="medium">
+        <Typography
+          sx={{
+            fontWeight: 'medium',
+          }}
+        >
           {previewTitle || <T id={`newE.scope.target${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}Preview`} />}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -188,7 +192,12 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
       {targets ? (
         <TargetsTable env={env} scope={scope} data={targets} />
       ) : (
-        <Typography variant="body2" fontWeight="medium">
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 'medium',
+          }}
+        >
           <T id={`newE.scope.no${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}Found`} />
         </Typography>
       )}

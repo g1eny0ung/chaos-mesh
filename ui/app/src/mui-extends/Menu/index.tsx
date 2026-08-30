@@ -30,9 +30,17 @@ const StyledMenu = styled((props: MenuProps) => <MuiMenu elevation={0} {...props
   },
 }))
 
-const Menu: ReactFCWithChildren<
-  Omit<MenuProps, 'anchorEl' | 'open' | 'onClose'> & { IconButtonProps?: IconButtonProps; IconProps?: SvgIconProps }
-> = ({ IconButtonProps, IconProps, children, ...rest }) => {
+interface MenuComponentProps extends Omit<MenuProps, 'anchorEl' | 'open' | 'onClose' | 'children'> {
+  IconButtonProps?: IconButtonProps
+  IconProps?: SvgIconProps
+  children?: React.ReactNode | ((props: { onClose: (event?: CloseEvent) => void }) => React.ReactNode)
+}
+
+interface CloseEvent {
+  stopPropagation?: () => void
+}
+
+const Menu = ({ IconButtonProps, IconProps, children, ...rest }: MenuComponentProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const onClick = (e: React.SyntheticEvent<HTMLButtonElement>) => {
@@ -41,8 +49,8 @@ const Menu: ReactFCWithChildren<
     setAnchorEl(e.currentTarget)
   }
 
-  const onClose = (e: React.SyntheticEvent) => {
-    e && e.stopPropagation() // Allow no event.
+  const onClose = (e?: CloseEvent) => {
+    e?.stopPropagation?.() // Allow no event.
 
     setAnchorEl(null)
   }

@@ -26,9 +26,29 @@ interface PaperTopProps {
 }
 
 const PaperTop: ReactFCWithChildren<PaperTopProps> = ({ title, subtitle, h1, boxProps, children }) => (
-  <Box {...boxProps} display="flex" justifyContent="space-between" alignItems="center">
-    <Box flex={1}>
-      <Typography variant={h1 ? 'h5' : 'h6'} component={h1 ? 'h1' : 'div'} fontWeight={h1 ? 'bold' : undefined}>
+  <Box
+    {...boxProps}
+    sx={[
+      {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      ...(boxProps ? (Array.isArray(boxProps.sx) ? boxProps.sx : [boxProps.sx]) : []),
+    ]}
+  >
+    <Box
+      sx={{
+        flex: 1,
+      }}
+    >
+      <Typography
+        variant={h1 ? 'h5' : 'h6'}
+        component={h1 ? 'h1' : 'div'}
+        sx={{
+          fontWeight: h1 ? 'bold' : undefined,
+        }}
+      >
         {title}
       </Typography>
       {subtitle && (

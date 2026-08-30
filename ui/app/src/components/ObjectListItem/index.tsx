@@ -20,8 +20,8 @@ import type { TypesArchive, TypesExperiment, TypesSchedule } from '@/openapi/ind
 import { useSystemStore } from '@/zustand/system'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
-import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutlineOutlined'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
 import { Box, IconButton, Typography } from '@mui/material'
 import _ from 'lodash'
 import { useIntl } from 'react-intl'
@@ -32,11 +32,18 @@ import i18n from '@/components/T'
 
 import DateTime, { format } from '@/lib/luxon'
 
+export interface ObjectListItemAction {
+  uuid: uuid
+  title: string
+  description: string
+  action: string
+}
+
 interface ObjectListItemProps {
   type?: 'schedule' | 'experiment' | 'archive'
   archive?: 'workflow' | 'schedule' | 'experiment'
   data: TypesSchedule | TypesExperiment | TypesArchive
-  onSelect: (info: { uuid: uuid; title: string; description: string; action: string }) => void
+  onSelect: (info: ObjectListItemAction) => void
 }
 
 const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type = 'experiment', archive, onSelect }) => {
@@ -106,7 +113,7 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
   }
 
   const Actions = () => (
-    <Space direction="row" justifyContent="end" alignItems="center">
+    <Space direction="row" sx={{ justifyContent: 'end', alignItems: 'center' }}>
       <Typography variant="body2" title={format(data.created_at!)}>
         {i18n('table.created')}{' '}
         {DateTime.fromISO(data.created_at!, {
@@ -152,8 +159,15 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
       }}
       onClick={handleJumpTo}
     >
-      <Box display="flex" justifyContent="space-between" alignItems="center" p={3}>
-        <Space direction="row" alignItems="center">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        <Space direction="row" sx={{ alignItems: 'center' }}>
           {type !== 'archive' && <StatusLabel status={(data as any).status} />}
           <Typography component="div" title={data.name}>
             {_.truncate(data.name!)}

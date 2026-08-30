@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Chaos Mesh Authors.
+ * Copyright 2026 Chaos Mesh Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,23 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-import { Grid } from '@mui/material'
+import type { SetupServer } from 'msw/node'
 
-import NewExperiment from '@/components/NewExperimentNext'
-
-const New = () => (
-  <Grid container>
-    <Grid
-      size={{
-        xs: 12,
-        lg: 8,
-      }}
-    >
-      <NewExperiment />
-    </Grid>
-  </Grid>
-)
-
-export default New
+export const server: SetupServer

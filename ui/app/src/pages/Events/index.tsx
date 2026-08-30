@@ -36,7 +36,7 @@ export default function Events() {
       )}
 
       {!loading && events?.length === 0 && (
-        <NotFound illustrated textAlign="center">
+        <NotFound illustrated sx={{ textAlign: 'center' }}>
           <Typography>{i18n('events.notFound')}</Typography>
         </NotFound>
       )}

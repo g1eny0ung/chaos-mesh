@@ -46,7 +46,7 @@ export default function DataTable({ columns, sx, ...rest }: DataGridProps) {
       }}
       autoHeight
       disableColumnMenu
-      checkboxSelection={rest.rows.length > 0}
+      checkboxSelection={(rest.rows?.length ?? 0) > 0}
       {...rest}
     />
   )

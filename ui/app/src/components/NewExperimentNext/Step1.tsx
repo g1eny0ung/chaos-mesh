@@ -87,11 +87,30 @@ const TypeCard: ReactFCWithChildren<TypeCardProp> = ({ name, handleSwitchEnv, en
       variant="outlined"
       onClick={handleSwitchEnv(name)}
     >
-      <Box display="flex" justifyContent="center" alignItems="center" width={225} height={75}>
-        <Box display="flex" justifyContent="center" flex={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 225,
+          height: 75,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            flex: 1,
+          }}
+        >
           {iconByKind(name)}
         </Box>
-        <Box flex={1.5} textAlign="center">
+        <Box
+          sx={{
+            flex: 1.5,
+            textAlign: 'center',
+          }}
+        >
           <Typography variant="button">{i18n(title)}</Typography>
         </Box>
       </Box>
@@ -157,10 +176,26 @@ const Step1 = () => {
 
   return (
     <StyledPaper className={step1 ? classes.submit : ''}>
-      <Box display="flex" justifyContent="space-between" mb={step1 ? 0 : 3}>
-        <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          mb: step1 ? 0 : 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           {step1 && (
-            <Box display="flex" mr={3}>
+            <Box
+              sx={{
+                display: 'flex',
+                mr: 3,
+              }}
+            >
               <CheckIcon className={classes.submitIcon} />
             </Box>
           )}
@@ -169,14 +204,23 @@ const Step1 = () => {
         {step1 && <UndoIcon className={classes.asButton} onClick={handleUndo} />}
       </Box>
       <Box hidden={step1}>
-        <Box display="flex">
+        <Box
+          sx={{
+            display: 'flex',
+          }}
+        >
           <TypeCard name="k8s" handleSwitchEnv={handleSwitchEnv} env={env} />
           <TypeCard name="physic" handleSwitchEnv={handleSwitchEnv} env={env} />
         </Box>
         <Divider sx={{ my: 6 }} />
       </Box>
       <Box hidden={step1}>
-        <Box display="flex" flexWrap="wrap">
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+          }}
+        >
           {typesDataEntries.map(([key]) => (
             <Card
               key={key}
@@ -184,11 +228,30 @@ const Step1 = () => {
               variant="outlined"
               onClick={handleSelectTarget(key)}
             >
-              <Box display="flex" justifyContent="center" alignItems="center" width={280} height={75}>
-                <Box display="flex" justifyContent="center" flex={1}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: 280,
+                  height: 75,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flex: 1,
+                  }}
+                >
                   {iconByKind(key)}
                 </Box>
-                <Box flex={1.5} textAlign="center">
+                <Box
+                  sx={{
+                    flex: 1.5,
+                    textAlign: 'center',
+                  }}
+                >
                   <Typography variant="button">{transByKind(key)}</Typography>
                 </Box>
               </Box>
@@ -196,12 +259,26 @@ const Step1 = () => {
           ))}
         </Box>
         {kind && (
-          <Box overflow="hidden">
-            <Box mt={6} mb={3}>
+          <Box
+            sx={{
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                mt: 6,
+                mb: 3,
+              }}
+            >
               <Divider />
             </Box>
             {(typesData as any)[kind].categories ? (
-              <Box display="flex" flexWrap="wrap">
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                }}
+              >
                 {(typesData as any)[kind].categories!.map((d: any) => (
                   <Card
                     key={d.key}
@@ -209,11 +286,31 @@ const Step1 = () => {
                     variant="outlined"
                     onClick={handleSelectAction(d.key)}
                   >
-                    <Box display="flex" justifyContent="center" alignItems="center" width={210} height={50}>
-                      <Box display="flex" justifyContent="center" alignItems="center" flex={0.5}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: 210,
+                        height: 50,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flex: 0.5,
+                        }}
+                      >
                         {action === d.key ? <RadioButtonCheckedOutlinedIcon /> : <RadioButtonUncheckedOutlinedIcon />}
                       </Box>
-                      <Box flex={1.5} textAlign="center">
+                      <Box
+                        sx={{
+                          flex: 1.5,
+                          textAlign: 'center',
+                        }}
+                      >
                         <Typography variant="button">{d.name}</Typography>
                       </Box>
                     </Box>
@@ -221,11 +318,19 @@ const Step1 = () => {
                 ))}
               </Box>
             ) : kind === 'KernelChaos' ? (
-              <Box mt={6}>
+              <Box
+                sx={{
+                  mt: 6,
+                }}
+              >
                 <Kernel onSubmit={handleSubmitStep1} />
               </Box>
             ) : kind === 'TimeChaos' ? (
-              <Box mt={6}>
+              <Box
+                sx={{
+                  mt: 6,
+                }}
+              >
                 <TargetGenerated
                   env={env}
                   kind={kind}
@@ -235,11 +340,19 @@ const Step1 = () => {
                 />
               </Box>
             ) : kind === 'StressChaos' ? (
-              <Box mt={6}>
+              <Box
+                sx={{
+                  mt: 6,
+                }}
+              >
                 <Stress onSubmit={handleSubmitStep1} />
               </Box>
             ) : (kind as any) === 'ProcessChaos' ? (
-              <Box mt={6}>
+              <Box
+                sx={{
+                  mt: 6,
+                }}
+              >
                 <TargetGenerated
                   env={env}
                   kind={kind}

@@ -20,12 +20,16 @@ declare module '@mui/material/styles' {
   interface Palette {
     secondaryContainer: Palette['primary']
     onSecondaryContainer: Palette['primary']
+    surfaceVariant: Palette['primary']
     onSurfaceVariant: Palette['primary']
+    outline: Palette['primary']
   }
 
   interface PaletteOptions {
     secondaryContainer: PaletteOptions['primary']
     onSecondaryContainer: PaletteOptions['primary']
+    surfaceVariant: PaletteOptions['primary']
     onSurfaceVariant: PaletteOptions['primary']
+    outline: PaletteOptions['primary']
   }
 }

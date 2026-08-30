@@ -56,7 +56,9 @@ const DraggableBareNode = ({ elementType, kind, act, onNodeClick, sx, ...rest }:
           onClick: () => onNodeClick(kind, act),
         })}
       {...rest}
-      ref={drag}
+      ref={(element) => {
+        drag(element)
+      }}
     />
   )
 }

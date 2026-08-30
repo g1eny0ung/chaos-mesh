@@ -63,7 +63,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
   return (
     <>
       {!inNode && (
-        <Space direction="row" mb={3}>
+        <Space direction="row" sx={{ mb: 3 }}>
           <Typography>{config.name}</Typography>
 
           {!inArchive && <StatusLabel status={(config as any).status} />}
@@ -72,7 +72,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
 
       <Grid container spacing={vertical ? 3 : 0}>
         {!inNode && (
-          <Grid item xs={vertical ? 12 : 3}>
+          <Grid size={vertical ? 12 : 3}>
             <Typography variant="subtitle2" gutterBottom>
               {i18n('newE.steps.basic')}
             </Typography>
@@ -111,7 +111,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
         )}
 
         {(hasAddress || experiment?.selector) && (
-          <Grid item xs={vertical ? 12 : 3}>
+          <Grid size={vertical ? 12 : 3}>
             <Typography variant="subtitle2" gutterBottom>
               {i18n('newE.steps.scope')}
             </Typography>
@@ -137,7 +137,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
           </Grid>
         )}
 
-        <Grid item xs={vertical ? 12 : 3}>
+        <Grid size={vertical ? 12 : 3}>
           <Typography variant="subtitle2" gutterBottom>
             {i18n('experiments.single')}
           </Typography>
@@ -148,7 +148,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
           />
         </Grid>
 
-        <Grid item xs={vertical ? 12 : 3}>
+        <Grid size={vertical ? 12 : 3}>
           <Typography variant="subtitle2" gutterBottom>
             {i18n('newE.steps.run')}
           </Typography>

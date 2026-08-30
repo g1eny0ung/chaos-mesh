@@ -218,7 +218,11 @@ export default function gen({
 
   function genTooltipContent(d: Event) {
     return renderToString(
-      <Box width={360}>
+      <Box
+        sx={{
+          width: 360,
+        }}
+      >
         <Typography>{d.name}</Typography>
         <Typography variant="overline">{format(d.created_at!)}</Typography>
         <Typography variant="body2" color="textSecondary">

@@ -148,7 +148,12 @@ const RBACGenerator = () => {
         <Typography variant="body2" color="textSecondary">
           {i18n('settings.addToken.generatorHelperGetTokenHeader')}
         </Typography>
-        <Box position="relative" pl={2}>
+        <Box
+          sx={{
+            position: 'relative',
+            pl: 2,
+          }}
+        >
           <Typography variant="body2" color="textSecondary">
             {i18n('settings.addToken.generatorHelperGetTokenCase1')}
           </Typography>

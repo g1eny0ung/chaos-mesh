@@ -31,7 +31,14 @@ interface HeaderProps {
 const Navbar: ReactFCWithChildren<HeaderProps> = ({ openDrawer, handleDrawerToggle }) => (
   <AppBar position="static" color="transparent" elevation={0} sx={{ pl: 5, pr: 8 }}>
     <Toolbar disableGutters>
-      <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
         <IconButton size="large" onClick={handleDrawerToggle} sx={{ color: 'onSurfaceVariant.main' }}>
           {openDrawer ? <MenuOpenIcon fontSize="medium" /> : <MenuIcon fontSize="medium" />}
         </IconButton>

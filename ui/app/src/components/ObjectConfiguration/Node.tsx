@@ -156,7 +156,11 @@ const NodeConfiguration: ReactFCWithChildren<NodeConfigurationProps> = ({ templa
         return <Custom template={t} />
       default:
         return (
-          <Box p={4.5}>
+          <Box
+            sx={{
+              p: 4.5,
+            }}
+          >
             <ObjectConfiguration config={t} inNode vertical />
           </Box>
         )

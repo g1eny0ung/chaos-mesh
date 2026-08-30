@@ -58,7 +58,7 @@ const Step3: ReactFCWithChildren<Step3Props> = ({ onSubmit, inSchedule }) => {
           ...basic.spec,
           ...spec,
         },
-      },
+      } as any,
       { inSchedule, useNewPhysicalMachine },
     )
 
@@ -101,8 +101,12 @@ const Step3: ReactFCWithChildren<Step3Props> = ({ onSubmit, inSchedule }) => {
     <>
       {step1 && step2 && (
         <Paper>
-          <PaperTop title={i18n('common.submit')} boxProps={{ mb: 6 }} />
-          <Box textAlign="center">
+          <PaperTop title={i18n('common.submit')} boxProps={{ sx: { mb: 6 } }} />
+          <Box
+            sx={{
+              textAlign: 'center',
+            }}
+          >
             <DoneAllIcon fontSize="large" />
             <Typography>{i18n('newE.complete')}</Typography>
           </Box>

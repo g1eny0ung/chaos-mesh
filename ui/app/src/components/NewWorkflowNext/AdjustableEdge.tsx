@@ -14,12 +14,20 @@
  * limitations under the License.
  *
  */
-import { getBezierPath, getEdgeCenter } from 'react-flow-renderer'
-import type { EdgeProps } from 'react-flow-renderer'
+import type { TooltipProps } from '@mui/material'
+import { getBezierPath } from '@xyflow/react'
+import type { Edge, EdgeProps } from '@xyflow/react'
 
 import FlowTooltip from './FlowTooltip'
 
 const foreignObjectSize = 24
+
+type AdjustableEdgeType = Edge<
+  {
+    tooltipProps: Omit<TooltipProps, 'children'>
+  },
+  'adjustableEdge'
+>
 
 export default function SuspendEdge({
   id,
@@ -31,8 +39,8 @@ export default function SuspendEdge({
   targetPosition,
   markerEnd,
   data,
-}: EdgeProps) {
-  const edgePath = getBezierPath({
+}: EdgeProps<AdjustableEdgeType>) {
+  const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -40,13 +48,6 @@ export default function SuspendEdge({
     targetY,
     targetPosition,
   })
-  const [edgeCenterX, edgeCenterY] = getEdgeCenter({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-  })
-
   return (
     <>
       <path id={id} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
@@ -56,9 +57,11 @@ export default function SuspendEdge({
         x={edgeCenterX - foreignObjectSize / 2}
         y={edgeCenterY - foreignObjectSize / 2}
       >
-        <FlowTooltip arrow placement="top" {...data.tooltipProps}>
-          <div style={{ width: '100%', height: '100%' }} />
-        </FlowTooltip>
+        {data && (
+          <FlowTooltip arrow placement="top" {...data.tooltipProps}>
+            <div style={{ width: '100%', height: '100%' }} />
+          </FlowTooltip>
+        )}
       </foreignObject>
     </>
   )

@@ -108,10 +108,26 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
 
   return (
     <Paper sx={{ borderColor: step2 ? 'success.main' : undefined }}>
-      <Box display="flex" justifyContent="space-between" mb={step2 ? 0 : 6}>
-        <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          mb: step2 ? 0 : 6,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           {step2 && (
-            <Box display="flex" mr={3}>
+            <Box
+              sx={{
+                display: 'flex',
+                mr: 3,
+              }}
+            >
               <CheckIcon sx={{ color: 'success.main' }} />
             </Box>
           )}
@@ -119,7 +135,12 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
         </Box>
         {step2 && <UndoIcon onClick={handleUndo} sx={{ cursor: 'pointer' }} />}
       </Box>
-      <Box position="relative" hidden={step2}>
+      <Box
+        hidden={step2}
+        sx={{
+          position: 'relative',
+        }}
+      >
         <Formik
           enableReinitialize
           initialValues={init}
@@ -130,9 +151,15 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
           {({ errors, touched }) => (
             <Form>
               <Grid container spacing={6}>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Space>
-                    <Typography fontWeight={500}>{i18n('newE.steps.scope')}</Typography>
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                      }}
+                    >
+                      {i18n('newE.steps.scope')}
+                    </Typography>
                     {namespaces ? (
                       <Scope env={env} kind={kind} namespaces={namespaces} scope="spec.selector" modeScope="spec" />
                     ) : (
@@ -140,9 +167,15 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                     )}
                   </Space>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Space>
-                    <Typography fontWeight={500}>{i18n('newE.steps.basic')}</Typography>
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                      }}
+                    >
+                      {i18n('newE.steps.basic')}
+                    </Typography>
                     <TextField
                       fast
                       name="metadata.name"
@@ -200,7 +233,12 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                       </>
                     )}
                   </Space>
-                  <Box mt={6} textAlign="right">
+                  <Box
+                    sx={{
+                      mt: 6,
+                      textAlign: 'right',
+                    }}
+                  >
                     <Button type="submit" variant="contained" color="primary" startIcon={<PublishIcon />}>
                       {i18n('common.submit')}
                     </Button>

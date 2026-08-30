@@ -14,15 +14,17 @@
  * limitations under the License.
  *
  */
+import { Position } from '@xyflow/react'
+import type { Node, NodeProps } from '@xyflow/react'
 import { memo } from 'react'
-import { Position } from 'react-flow-renderer'
-import type { NodeProps } from 'react-flow-renderer'
 
 import BareNode from './BareNode'
 import type { BareNodeProps } from './BareNode'
 import StyledHandle from './StyleHandle'
 
-export type FlowNodeProps = NodeProps<BareNodeProps & { finished: true; name: string }>
+type FlowNodeData = BareNodeProps & { finished: boolean; name: string } & Record<string, unknown>
+type FlowNodeType = Node<FlowNodeData, 'flowNode'>
+export type FlowNodeProps = NodeProps<FlowNodeType>
 
 function FlowNode({ data, isConnectable }: FlowNodeProps) {
   const { finished, ...rest } = data // Exclude `finished` from the data.

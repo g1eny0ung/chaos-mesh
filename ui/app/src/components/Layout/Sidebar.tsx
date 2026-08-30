@@ -71,7 +71,7 @@ const resources = [
   },
 ]
 
-function NavGroup({ title, items }: { title: string; items: { icon: React.ReactNode; text: string }[] }) {
+function NavGroup({ title, items }: { title: React.ReactNode; items: { icon: React.ReactNode; text: string }[] }) {
   return (
     <List
       size="sm"

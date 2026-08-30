@@ -75,17 +75,29 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
         return (
           <Form>
             <Paper sx={{ mb: 6 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Typography component="div">Callchain</Typography>
                 <IconButton color="primary" size="small" onClick={addFrame}>
                   <AddCircleIcon />
                 </IconButton>
               </Box>
               {callchain.length > 0 && (
-                <Space mt={6}>
+                <Space sx={{ mt: 6 }}>
                   {callchain.map((_: any, i: number) => (
                     <Space key={'frame' + i}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
                         <Typography variant="body2">Frame {i + 1}</Typography>
                         <IconButton color="secondary" size="small" onClick={removeFrame(i)}>
                           <RemoveCircleIcon />

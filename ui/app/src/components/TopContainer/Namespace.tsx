@@ -16,10 +16,9 @@
  */
 import { applyNSParam } from '@/api/interceptors'
 import { Stale } from '@/api/queryUtils'
-import Paper from '@/mui-extends/Paper'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { useAuthStore } from '@/zustand/auth'
-import { Autocomplete, TextField } from '@mui/material'
+import { Autocomplete, Paper, TextField } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router'
 
 import i18n from '@/components/T'
@@ -56,7 +55,9 @@ const Namespace = () => {
       onChange={handleSelectGlobalNamespace}
       disableClearable={true}
       renderInput={(params) => <TextField {...params} size="small" label={i18n('common.chooseNamespace')} />}
-      PaperComponent={(props) => <Paper {...props} sx={{ p: 0 }} />}
+      slots={{
+        paper: (props) => <Paper {...props} sx={{ p: 0 }} />,
+      }}
     />
   )
 }

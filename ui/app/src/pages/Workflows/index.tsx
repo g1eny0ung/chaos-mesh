@@ -21,7 +21,7 @@ import { getWorkflowsUid, useDeleteWorkflowsUid, useGetWorkflows, usePostWorkflo
 import type { CoreWorkflowMeta } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
 import AddIcon from '@mui/icons-material/Add'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
 import ReplayIcon from '@mui/icons-material/Replay'
 import { Button, Grow, Typography } from '@mui/material'
 import type { ButtonProps } from '@mui/material'
@@ -193,7 +193,11 @@ const Workflows = () => {
             </Space>
           ) : (
             <NotFound illustrated>
-              <Typography fontWeight="medium">
+              <Typography
+                sx={{
+                  fontWeight: 'medium',
+                }}
+              >
                 <T id="workflows.notFound" />
               </Typography>
               <NewWorkflow sx={{ mt: 3 }} />

@@ -27,7 +27,7 @@ import {
   useGetArchivesSchedules,
   useGetArchivesWorkflows,
 } from '@/openapi'
-import { Confirm, useComponentActions } from '@/zustand/component'
+import { useComponentActions } from '@/zustand/component'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import FilterListIcon from '@mui/icons-material/FilterList'
@@ -40,10 +40,11 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
-import { FixedSizeList as RWList, ListChildComponentProps as RWListChildComponentProps } from 'react-window'
+import { List as RWList, type RowComponentProps as RWListRowComponentProps } from 'react-window'
 
 import NotFound from '@/components/NotFound'
 import ObjectListItem from '@/components/ObjectListItem'
+import type { ObjectListItemAction } from '@/components/ObjectListItem'
 import i18n from '@/components/T'
 
 import { transByKind } from '@/lib/byKind'
@@ -110,7 +111,7 @@ export default function Archives() {
   const { mutateAsync: deleteArchives } = useDeleteArchivesWrap(kind)()
   const { mutateAsync: deleteArchive } = useDeleteArchiveWrap(kind)()
 
-  const onSelect = (selected: Confirm) =>
+  const onSelect = (selected: ObjectListItemAction) =>
     setConfirm({
       title: selected.title,
       description: selected.description,
@@ -185,8 +186,15 @@ export default function Archives() {
     })
   }
 
-  const Row = ({ data, index, style }: RWListChildComponentProps) => (
-    <Box display="flex" alignItems="center" mb={3} style={style}>
+  const Row = ({ data, index, style }: RWListRowComponentProps<{ data: any[] }>) => (
+    <Box
+      style={style}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        mb: 3,
+      }}
+    >
       {!isBatchEmpty && (
         <StyledCheckBox
           color="primary"
@@ -195,7 +203,11 @@ export default function Archives() {
           disableRipple
         />
       )}
-      <Box flex={1}>
+      <Box
+        sx={{
+          flex: 1,
+        }}
+      >
         <ObjectListItem type="archive" archive={kind as any} data={data[index]} onSelect={onSelect} />
       </Box>
     </Box>
@@ -216,7 +228,7 @@ export default function Archives() {
         </TabList>
       </Box>
 
-      <Space direction="row" my={6}>
+      <Space direction="row" sx={{ my: 6 }}>
         <Button
           variant="outlined"
           startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
@@ -239,22 +251,25 @@ export default function Archives() {
 
       {archives &&
         Object.entries(_.groupBy(archives, 'kind')).map(([kind, archivesByKind]) => (
-          <Box key={kind} mb={6}>
+          <Box
+            key={kind}
+            sx={{
+              mb: 6,
+            }}
+          >
             <Typography variant="overline">{transByKind(kind as any)}</Typography>
             <RWList
-              width="100%"
-              height={archivesByKind.length > 3 ? 300 : archivesByKind.length * 70}
-              itemCount={archivesByKind.length}
-              itemSize={70}
-              itemData={archivesByKind}
-            >
-              {Row}
-            </RWList>
+              style={{ width: '100%', height: archivesByKind.length > 3 ? 300 : archivesByKind.length * 70 }}
+              rowCount={archivesByKind.length}
+              rowHeight={70}
+              rowComponent={Row}
+              rowProps={{ data: archivesByKind }}
+            />
           </Box>
         ))}
 
       {!loading && archives && (
-        <NotFound illustrated textAlign="center">
+        <NotFound illustrated sx={{ textAlign: 'center' }}>
           <Typography>{i18n('archives.notFound')}</Typography>
         </NotFound>
       )}

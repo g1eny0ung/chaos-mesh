@@ -40,7 +40,13 @@ const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; statu
   status,
 }) => (
   <Card variant="outlined">
-    <Box display="flex" alignItems="center" gap={1.5}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
@@ -55,7 +61,13 @@ const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; statu
       >
         {icon}
       </Box>
-      <Typography level="h2" component="div" fontSize="lg">
+      <Typography
+        level="h2"
+        component="div"
+        sx={{
+          fontSize: 'lg',
+        }}
+      >
         {title}
       </Typography>
     </Box>
@@ -64,7 +76,11 @@ const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; statu
         {num && num > 0 ? num : '--'}
       </Typography>
       {status && (
-        <Box mt={1}>
+        <Box
+          sx={{
+            mt: 1,
+          }}
+        >
           <StatusLabel status={status} />
         </Box>
       )}
@@ -134,7 +150,12 @@ export default function Dashboard() {
       <Grid container spacing={3}>
         <Grid xs={12} lg={4}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
-            <Typography level="h2" fontSize="lg">
+            <Typography
+              level="h2"
+              sx={{
+                fontSize: 'lg',
+              }}
+            >
               {i18n('dashboard.totalStatus')}
             </Typography>
             <TotalStatus height={300} />
@@ -142,7 +163,12 @@ export default function Dashboard() {
         </Grid>
         <Grid xs={12} lg={5}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
-            <Typography level="h2" fontSize="lg">
+            <Typography
+              level="h2"
+              sx={{
+                fontSize: 'lg',
+              }}
+            >
               {i18n('dashboard.recentEvents')}
             </Typography>
             <EventsTimeline events={events} height={300} />

@@ -20,7 +20,7 @@ import PaperTop from '@/mui-extends/PaperTop'
 import Space from '@/mui-extends/Space'
 import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsUid, useGetEvents } from '@/openapi'
 import { Box, Grid, Grow } from '@mui/material'
-import yaml from 'js-yaml'
+import * as yaml from 'js-yaml'
 import { lazy } from 'react'
 import { useParams } from 'react-router'
 
@@ -56,9 +56,13 @@ const Single = () => {
   const YAML = () => (
     <Paper sx={{ height: kind === 'workflow' ? (theme) => `calc(100vh - 56px - ${theme.spacing(18)})` : 600, p: 0 }}>
       {archive && (
-        <Space display="flex" flexDirection="column" height="100%">
-          <PaperTop title={i18n('common.definition')} boxProps={{ p: 4.5, pb: 0 }} />
-          <Box flex={1}>
+        <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <PaperTop title={i18n('common.definition')} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+          <Box
+            sx={{
+              flex: 1,
+            }}
+          >
             <YAMLEditor
               name={archive.name}
               data={yaml.dump(archive.kube_object)}
@@ -85,10 +89,22 @@ const Single = () => {
               )}
 
               <Grid container>
-                <Grid item xs={12} lg={6} sx={{ pr: 3 }}>
+                <Grid
+                  sx={{ pr: 3 }}
+                  size={{
+                    xs: 12,
+                    lg: 6,
+                  }}
+                >
                   <EventsTimeline events={events} paperProps={{ sx: { height: 600 } }} />
                 </Grid>
-                <Grid item xs={12} lg={6} sx={{ pl: 3 }}>
+                <Grid
+                  sx={{ pl: 3 }}
+                  size={{
+                    xs: 12,
+                    lg: 6,
+                  }}
+                >
                   <YAML />
                 </Grid>
               </Grid>

@@ -43,7 +43,7 @@ interface LoadFromProps {
   inWorkflow?: boolean
 }
 
-const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule, inWorkflow }) => {
+const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) => {
   const intl = useIntl()
 
   const { setAlert } = useComponentActions()
@@ -165,7 +165,12 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule, in
               {loading ? (
                 <SkeletonN n={3} />
               ) : schedules && schedules.length > 0 ? (
-                <Box display="flex" flexWrap="wrap">
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {schedules.map((d) => (
                     <FormControlLabel
                       key={d.uid}
@@ -192,7 +197,12 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule, in
               {loading ? (
                 <SkeletonN n={3} />
               ) : experiments && experiments.length > 0 ? (
-                <Box display="flex" flexWrap="wrap">
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {experiments.map((d) => (
                     <FormControlLabel
                       key={d.uid}
@@ -217,7 +227,12 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule, in
           {loading ? (
             <SkeletonN n={3} />
           ) : archives && archives.length > 0 ? (
-            <Box display="flex" flexWrap="wrap">
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+              }}
+            >
               {archives.map((d) => (
                 <FormControlLabel
                   key={d.uid}

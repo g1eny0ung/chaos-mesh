@@ -19,7 +19,7 @@ import { styled } from '@mui/material/styles'
 
 interface CopyableCodeBlockProps {
   text: string
-  copyLabel: string
+  copyLabel: React.ReactNode
   onCopy: (text: string) => void
   height?: number
   singleLine?: boolean
@@ -45,7 +45,11 @@ const CopyButton = styled(Box, {
 }))
 
 const CopyableCodeBlock = ({ text, copyLabel, onCopy, height, singleLine = false }: CopyableCodeBlockProps) => (
-  <Box position="relative">
+  <Box
+    sx={{
+      position: 'relative',
+    }}
+  >
     <CodeBlock
       style={
         singleLine

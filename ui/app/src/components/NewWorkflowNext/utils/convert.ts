@@ -15,15 +15,17 @@
  *
  */
 import type { NodeExperiment } from '@/zustand/workflow'
-import yaml from 'js-yaml'
+import { getIncomers } from '@xyflow/react'
+import type { Edge, Node, XYPosition } from '@xyflow/react'
+import * as yaml from 'js-yaml'
 import _ from 'lodash'
-import { Edge, Node, XYPosition, getIncomers } from 'react-flow-renderer'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Schedule, scheduleInitialValues } from '@/components/AutoForm/data'
 
 import { parsePodsOrPhysicalMachines } from '@/lib/formikhelpers'
-import { arrToObjBySep, isDeepEmpty, objToArrBySep } from '@/lib/utils'
+import { arrToObjBySep, isDeepEmpty, objToArrBySep, replaceYamlValues } from '@/lib/utils'
+import { loadYaml } from '@/lib/yaml'
 
 export enum ExperimentKind {
   AWSChaos = 'AWSChaos',
@@ -110,15 +112,15 @@ export function nodeExperimentToTemplate(node: NodeExperiment): Template {
   }
 }
 
-export function flowToWorkflow(nodes: Node[], edges: Edge[], storeTemplates: Record<string, NodeExperiment>) {
+export function flowToWorkflow(nodes: Node<any>[], edges: Edge<any>[], storeTemplates: Record<string, NodeExperiment>) {
   const origin = nodes
-    .filter((n) => !n.parentNode)
+    .filter((n) => !n.parentId)
     .map((n) => ({ ...n, incomers: getIncomers(n, nodes, edges) }))
     .find((n) => n.incomers.length === 0)!
   const nodeMap = _.keyBy(nodes, 'id')
   const sourceMap = _.keyBy(edges, 'source')
 
-  function genTemplates(origin: Node, level: number): Template[] {
+  function genTemplates(origin: Node<any>, level: number): Template[] {
     const originalTemplate = storeTemplates[origin.data.name]
     let currentTemplate: Template
     let restTemplates: Template[] = []
@@ -128,7 +130,7 @@ export function flowToWorkflow(nodes: Node[], edges: Edge[], storeTemplates: Rec
       originalTemplate.templateType === SpecialTemplateType.Parallel
     ) {
       const children = nodes
-        .filter((n) => n.parentNode === origin.id)
+        .filter((n) => n.parentId === origin.id)
         .map((n) => ({ id: n.id, ...storeTemplates[n.data.name] }))
 
       currentTemplate = {
@@ -149,11 +151,7 @@ export function flowToWorkflow(nodes: Node[], edges: Edge[], storeTemplates: Rec
       nextNode = nodeMap[edge.target]
     }
 
-    return [
-      currentTemplate,
-      ...restTemplates,
-      ...(nextNode && !nextNode.parentNode ? genTemplates(nextNode, level) : []),
-    ]
+    return [currentTemplate, ...restTemplates, ...(nextNode && !nextNode.parentId ? genTemplates(nextNode, level) : [])]
   }
 
   let templates = _.uniqBy(genTemplates(origin, 0), 'name')
@@ -176,17 +174,17 @@ export function flowToWorkflow(nodes: Node[], edges: Edge[], storeTemplates: Rec
   ]
 
   return yaml.dump(
-    {
-      apiVersion: 'chaos-mesh.org/v1alpha1',
-      kind: 'Workflow',
-      metadata: {},
-      spec: {
-        entry: hasEntry ? templatesWithLevel0[0].name : 'entry',
-        templates,
+    replaceYamlValues(
+      {
+        apiVersion: 'chaos-mesh.org/v1alpha1',
+        kind: 'Workflow',
+        metadata: {},
+        spec: {
+          entry: hasEntry ? templatesWithLevel0[0].name : 'entry',
+          templates,
+        },
       },
-    },
-    {
-      replacer: (key, value) => {
+      (key, value) => {
         if (isDeepEmpty(value)) {
           return undefined
         }
@@ -215,7 +213,7 @@ export function flowToWorkflow(nodes: Node[], edges: Edge[], storeTemplates: Rec
 
         return value
       },
-    },
+    ),
   )
 }
 
@@ -303,7 +301,7 @@ export enum View {
 }
 
 export function workflowToFlow(workflow: string) {
-  const { entry, templates }: { entry: string; templates: Template[] } = (yaml.load(workflow) as any).spec
+  const { entry, templates }: { entry: string; templates: Template[] } = (loadYaml(workflow) as any).spec
   const templatesMap = _.keyBy(templates, 'name')
   // Convert templates to store.
   //
@@ -316,8 +314,8 @@ export function workflowToFlow(workflow: string) {
       acc[k] = templateToNodeExperiment(t)
     }
   })
-  const nodes: Record<uuid, Node> = {}
-  const edges: Edge[] = []
+  const nodes: Record<uuid, Node<any>> = {}
+  const edges: Edge<any>[] = []
 
   function recurInsertNodesAndEdges(
     entry: Template,
@@ -326,7 +324,7 @@ export function workflowToFlow(workflow: string) {
     index: number,
     parentNode?: ParentNode,
   ): { id: uuid; width: number; height: number } {
-    function addNode(id: uuid, parentNode?: ParentNode): Node {
+    function addNode(id: uuid, parentNode?: ParentNode): Node<any> {
       return {
         id,
         type: 'flowNode',
@@ -347,7 +345,7 @@ export function workflowToFlow(workflow: string) {
           children: _.truncate(entry.name, { length: 20 }),
         },
         ...(parentNode && {
-          parentNode: parentNode.id,
+          parentId: parentNode.id,
           extent: 'parent',
         }),
       }
@@ -384,7 +382,7 @@ export function workflowToFlow(workflow: string) {
           childrenNum,
         },
         ...(parentNode && {
-          parentNode: parentNode.id,
+          parentId: parentNode.id,
           extent: 'parent',
           connectable: parentNode.type === SpecialTemplateType.Serial,
         }),

@@ -24,7 +24,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import { Box, Button, Grid, Grow, Modal, useTheme } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { EventHandler } from 'cytoscape'
-import yaml from 'js-yaml'
+import * as yaml from 'js-yaml'
 import { lazy, useEffect, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router'
@@ -185,15 +185,31 @@ const Single = () => {
             </Paper>
 
             <Grid container>
-              <Grid item xs={12} lg={6} sx={{ pr: 3 }}>
+              <Grid
+                sx={{ pr: 3 }}
+                size={{
+                  xs: 12,
+                  lg: 6,
+                }}
+              >
                 <EventsTimeline events={events} paperProps={{ sx: { height: 600 } }} />
               </Grid>
-              <Grid item xs={12} lg={6} sx={{ pl: 3 }}>
+              <Grid
+                sx={{ pl: 3 }}
+                size={{
+                  xs: 12,
+                  lg: 6,
+                }}
+              >
                 <Paper sx={{ height: 600, p: 0 }}>
                   {workflow && (
-                    <Space display="flex" flexDirection="column" height="100%">
-                      <PaperTop title={i18n('common.definition')} boxProps={{ p: 4.5, pb: 0 }} />
-                      <Box flex={1}>
+                    <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                      <PaperTop title={i18n('common.definition')} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+                      <Box
+                        sx={{
+                          flex: 1,
+                        }}
+                      >
                         <YAMLEditor
                           name={workflow.name}
                           data={yaml.dump({
@@ -219,11 +235,20 @@ const Single = () => {
             sx={{ width: selected === 'workflow' ? '50vw' : selected === 'node' ? '70vw' : '50vw' }}
           >
             {workflow && configOpen && (
-              <Space display="flex" flexDirection="column" height="100%">
-                <PaperTop title={modalTitle} boxProps={{ p: 4.5, pb: 0 }} />
-                <Box display="flex" flex={1}>
+              <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <PaperTop title={modalTitle} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flex: 1,
+                  }}
+                >
                   {selected === 'node' && (
-                    <Box width="50%">
+                    <Box
+                      sx={{
+                        width: '50%',
+                      }}
+                    >
                       <NodeConfiguration template={data} />
                     </Box>
                   )}

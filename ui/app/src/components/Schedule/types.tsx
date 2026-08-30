@@ -95,5 +95,5 @@ export const Fields = ({ errors, touched }: Pick<FormikProps<FormikValues>, 'err
 export const schema = {
   historyLimit: number().min(1, 'The historyLimit is at least 1'),
   concurrencyPolicy: string().required('The concurrencyPolicy is required'),
-  startingDeadlineSeconds: number().min(0, 'The startingDeadlineSeconds is at least 0').nullable(true),
+  startingDeadlineSeconds: number().min(0, 'The startingDeadlineSeconds is at least 0').nullable(),
 }

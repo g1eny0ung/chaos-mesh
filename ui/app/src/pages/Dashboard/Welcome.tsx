@@ -35,16 +35,41 @@ const Welcome = () => {
         my: 1.5,
       }}
     >
-      <Box display="flex" justifyContent="space-between" alignItems="start" height="100%">
-        <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'start',
+          height: '100%',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%',
+          }}
+        >
           <div>
-            <Typography level="h4" component="h1" fontWeight="xl">
+            <Typography
+              level="h4"
+              component="h1"
+              sx={{
+                fontWeight: 'xl',
+              }}
+            >
               Welcome to Chaos Mesh!
             </Typography>
             <Typography color="neutral">If you are new, we recommend that you start with the tutorial.</Typography>
           </div>
 
-          <Box display="flex" gap={1.5}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+            }}
+          >
             <Button onClick={() => setIsOpen(true)}>Tutorial</Button>
           </Box>
         </Box>

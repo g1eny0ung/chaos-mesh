@@ -21,12 +21,21 @@ import { useWorkflowActions, useWorkflowStore } from '@/zustand/workflow'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Drawer, IconButton, ListItemIcon, ListItemText, MenuItem } from '@mui/material'
+import {
+  Background,
+  Controls,
+  MarkerType,
+  MiniMap,
+  ReactFlow,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react'
+import type { Connection, Edge, Node, ReactFlowInstance, XYPosition } from '@xyflow/react'
 import _ from 'lodash'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import type { DropTargetMonitor, XYCoord } from 'react-dnd'
 import { useDrop } from 'react-dnd'
-import { MarkerType, Node, ReactFlowInstance, XYPosition } from 'react-flow-renderer'
-import ReactFlow, { Background, Controls, MiniMap, addEdge, useEdgesState, useNodesState } from 'react-flow-renderer'
 import { useIntl } from 'react-intl'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -104,7 +113,11 @@ const NodeControl = ({ id, type, onDelete, onCopy }: NodeControlProps) => {
           <ListItemIcon sx={{ fontSize: 18 }}>
             <ContentCopyIcon fontSize="inherit" />
           </ListItemIcon>
-          <ListItemText primaryTypographyProps={{ variant: 'button', color: 'secondary' }}>
+          <ListItemText
+            slotProps={{
+              primary: { variant: 'button', color: 'secondary' },
+            }}
+          >
             <T id="common.copy" />
           </ListItemText>
         </MenuItem>,
@@ -112,7 +125,11 @@ const NodeControl = ({ id, type, onDelete, onCopy }: NodeControlProps) => {
           <ListItemIcon sx={{ fontSize: 18 }}>
             <DeleteIcon fontSize="inherit" />
           </ListItemIcon>
-          <ListItemText primaryTypographyProps={{ variant: 'button', color: 'secondary' }}>
+          <ListItemText
+            slotProps={{
+              primary: { variant: 'button', color: 'secondary' },
+            }}
+          >
             <T id="common.delete" />
           </ListItemText>
         </MenuItem>,
@@ -141,14 +158,17 @@ const EdgeControl = ({ id, onDelete }: ControlProps) => {
 }
 
 interface WhiteboardProps {
-  flowRef: React.Ref<ReactFlowInstance>
+  flowRef: React.RefObject<ReactFlowInstance<any, any> | null>
 }
 
+type WorkflowNode = Node<any>
+type WorkflowEdge = Edge<any>
+
 export default function Whiteboard({ flowRef }: WhiteboardProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<WorkflowNode>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<WorkflowEdge>([])
   const onConnect = useCallback(
-    (connection) =>
+    (connection: Connection) =>
       setEdges((eds) => {
         const id = uuidv4()
 
@@ -178,7 +198,7 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
 
   const [openDrawer, setOpenDrawer] = useState(false)
   const [identifier, setIdentifier] = useState<Identifier | null>(null)
-  const formInitialValues = useRef()
+  const formInitialValues = useRef<Record<string, any> | undefined>(undefined)
   const cleanup = () => {
     setOpenDrawer(false)
     setIdentifier(null)
@@ -209,14 +229,14 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
     }
 
     const id = uuidv4()
-    const node: Node = {
+    const node: WorkflowNode = {
       id,
       position,
       data: {
         finished: false,
       },
       ...(parent && {
-        parentNode: parent,
+        parentId: parent,
         extent: 'parent',
       }),
     }
@@ -245,7 +265,7 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
     return id
   }
 
-  const editNode = (e: React.MouseEvent, { id, data }: Node) => {
+  const editNode = (e: React.MouseEvent, { id, data }: WorkflowNode) => {
     // Prevent editing nodes when resizing.
     //
     // See `GroupNode.tsx` for more details.
@@ -308,21 +328,23 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
 
   const copyNode = (id: uuid) => {
     setNodes((oldNodes) => {
-      function genNewChildrenNodes(id: uuid, results: Node[], parent?: uuid) {
+      function genNewChildrenNodes(id: uuid, results: WorkflowNode[], parent?: uuid) {
         const node = oldNodes.find((n) => n.id === id)!
         const newID = uuidv4()
 
         results.push({
           ...node,
           id: newID,
-          ...(!parent && { position: { x: node.position.x, y: node.position.y + node.height! + 100 } }),
+          ...(!parent && {
+            position: { x: node.position.x, y: node.position.y + (node.measured?.height ?? node.height ?? 0) + 100 },
+          }),
           selected: false, // Reset selection.
           data: {
             ...node.data,
             ...addNodeControl(newID, node.type as NodeControlProps['type']),
           },
           ...(parent && {
-            parentNode: parent,
+            parentId: parent,
             extent: 'parent',
           }),
         })
@@ -330,12 +352,12 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
         // Copy all children nodes.
         if (node.type === 'groupNode') {
           oldNodes
-            .filter((node) => node.parentNode === id)
+            .filter((node) => node.parentId === id)
             .forEach((node) => genNewChildrenNodes(node.id, results, newID))
         }
       }
 
-      const newNodes: Node[] = []
+      const newNodes: WorkflowNode[] = []
       genNewChildrenNodes(id, newNodes)
 
       return [...oldNodes, ...newNodes]
@@ -344,17 +366,17 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
 
   const deleteNode = (id: uuid) => {
     setNodes((oldNodes) => {
-      function findDeletedNodes(id: uuid, results: Node[]) {
+      function findDeletedNodes(id: uuid, results: WorkflowNode[]) {
         const node = oldNodes.find((n) => n.id === id)!
 
         results.push(node)
 
         if (node.type === 'groupNode') {
-          oldNodes.filter((n) => n.parentNode === id).forEach((n) => findDeletedNodes(n.id, results))
+          oldNodes.filter((n) => n.parentId === id).forEach((n) => findDeletedNodes(n.id, results))
         }
       }
 
-      const deletedNodes: Node[] = []
+      const deletedNodes: WorkflowNode[] = []
       findDeletedNodes(id, deletedNodes)
       const restNodes = _.differenceBy(oldNodes, deletedNodes, 'id')
       const templates = deletedNodes.map((n) => n.data.name)
@@ -433,7 +455,7 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
     )
   }
 
-  const onNodeMouseMove = (e: React.MouseEvent, { id }: Node) => {
+  const onNodeMouseMove = (e: React.MouseEvent, { id }: WorkflowNode) => {
     // Resume dragging nodes after resizing.
     //
     // See `GroupNode.tsx` for more details.
@@ -447,7 +469,9 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
   return (
     <>
       <ReactFlow
-        ref={drop}
+        ref={(element) => {
+          drop(element)
+        }}
         id="workflows-whiteboard"
         onInit={(flow) => {
           if (flowRef) {

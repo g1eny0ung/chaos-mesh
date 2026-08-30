@@ -76,7 +76,14 @@ const TotalStatus: React.FC<BoxProps> = (props) => {
           colors={(d) => statusColors[d.data.id]}
         />
       ) : (
-        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
           <Typography color="neutral">{i18n('experiments.notFound')}</Typography>
         </Box>
       )}

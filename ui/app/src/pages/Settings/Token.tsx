@@ -37,7 +37,12 @@ const Token = () => {
 
   const tokenDesc =
     tokenName === 'gcp' ? (
-      <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
         {i18n('settings.addToken.gcp')}
         <GoogleIcon sx={{ ml: 1 }} />
       </Box>
