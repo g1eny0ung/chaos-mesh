@@ -16,15 +16,16 @@
  */
 import Space from '@/mui-extends/Space'
 import { useComponentActions } from '@/zustand/component'
-import { useSystemStore } from '@/zustand/system'
+import { useResolvedTheme } from '@/zustand/system'
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import PublishIcon from '@mui/icons-material/Publish'
 import { Box, Button } from '@mui/material'
 import { type Editor } from 'ace-builds'
-import 'ace-builds/src-noconflict/ace'
+import ace from 'ace-builds/src-noconflict/ace'
 import 'ace-builds/src-noconflict/mode-yaml'
 import 'ace-builds/src-noconflict/theme-tomorrow'
 import 'ace-builds/src-noconflict/theme-tomorrow_night'
+import yamlWorkerUrl from 'ace-builds/src-noconflict/worker-yaml?url'
 import fileDownload from 'js-file-download'
 import { memo, useState } from 'react'
 import AceEditor, { IAceEditorProps } from 'react-ace'
@@ -33,6 +34,8 @@ import { useIntl } from 'react-intl'
 import i18n from '@/components/T'
 
 import { loadYaml } from '@/lib/yaml'
+
+ace.config.setModuleUrl('ace/mode/yaml_worker', yamlWorkerUrl)
 
 interface YAMLEditorProps {
   name?: string
@@ -53,7 +56,7 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
 }) => {
   const intl = useIntl()
 
-  const theme = useSystemStore((state) => state.theme)
+  const theme = useResolvedTheme()
   const { setConfirm } = useComponentActions()
 
   const [editor, setEditor] = useState<Editor>()

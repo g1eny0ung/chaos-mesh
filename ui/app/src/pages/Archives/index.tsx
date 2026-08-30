@@ -61,55 +61,56 @@ const StyledCheckBox = styled(Checkbox)({
 
 type PanelType = 'workflow' | 'schedule' | 'experiment'
 
-const useGetArchivesWrap = (kind: string) => {
-  switch (kind) {
-    case 'workflow':
-      return useGetArchivesWorkflows
-    case 'schedule':
-      return useGetArchivesSchedules
-    default:
-      return useGetArchives
-  }
-}
-
-const useDeleteArchivesWrap = (kind: string) => {
-  switch (kind) {
-    case 'workflow':
-      return useDeleteArchivesWorkflows
-    case 'schedule':
-      return useDeleteArchivesSchedules
-    default:
-      return useDeleteArchives
-  }
-}
-
-const useDeleteArchiveWrap = (kind: string) => {
-  switch (kind) {
-    case 'workflow':
-      return useDeleteArchivesWorkflowsUid
-    case 'schedule':
-      return useDeleteArchivesSchedulesUid
-    default:
-      return useDeleteArchivesUid
-  }
-}
-
 export default function Archives() {
   const navigate = useNavigate()
   const intl = useIntl()
   const query = useQuery()
-  const kind = query.get('kind') || 'experiment'
+  const requestedKind = query.get('kind')
+  const kind: PanelType =
+    requestedKind === 'workflow' || requestedKind === 'schedule' || requestedKind === 'experiment'
+      ? requestedKind
+      : 'experiment'
 
   const { setAlert, setConfirm } = useComponentActions()
 
-  const [panel, setPanel] = useState<PanelType>(kind as PanelType)
   const [batch, setBatch] = useState<Record<uuid, boolean>>({})
   const batchLength = Object.keys(batch).length
   const isBatchEmpty = batchLength === 0
 
-  const { data: archives, isLoading: loading, refetch } = useGetArchivesWrap(kind)(undefined)
-  const { mutateAsync: deleteArchives } = useDeleteArchivesWrap(kind)()
-  const { mutateAsync: deleteArchive } = useDeleteArchiveWrap(kind)()
+  const experimentArchivesQuery = useGetArchives(undefined, {
+    query: { enabled: kind === 'experiment' },
+  })
+  const scheduleArchivesQuery = useGetArchivesSchedules(undefined, {
+    query: { enabled: kind === 'schedule' },
+  })
+  const workflowArchivesQuery = useGetArchivesWorkflows(undefined, {
+    query: { enabled: kind === 'workflow' },
+  })
+  const {
+    data: archives = [],
+    isLoading: loading,
+    refetch,
+  } = kind === 'workflow'
+    ? workflowArchivesQuery
+    : kind === 'schedule'
+      ? scheduleArchivesQuery
+      : experimentArchivesQuery
+
+  const { mutateAsync: deleteExperimentArchives } = useDeleteArchives()
+  const { mutateAsync: deleteScheduleArchives } = useDeleteArchivesSchedules()
+  const { mutateAsync: deleteWorkflowArchives } = useDeleteArchivesWorkflows()
+  const deleteArchives =
+    kind === 'workflow'
+      ? deleteWorkflowArchives
+      : kind === 'schedule'
+        ? deleteScheduleArchives
+        : deleteExperimentArchives
+
+  const { mutateAsync: deleteExperimentArchive } = useDeleteArchivesUid()
+  const { mutateAsync: deleteScheduleArchive } = useDeleteArchivesSchedulesUid()
+  const { mutateAsync: deleteWorkflowArchive } = useDeleteArchivesWorkflowsUid()
+  const deleteArchive =
+    kind === 'workflow' ? deleteWorkflowArchive : kind === 'schedule' ? deleteScheduleArchive : deleteExperimentArchive
 
   const onSelect = (selected: ObjectListItemAction) =>
     setConfirm({
@@ -129,7 +130,10 @@ export default function Archives() {
     switch (action) {
       case 'delete':
         deleteArchive({ uid: uuid! })
-          .then(() => handleActionSuccess(action))
+          .then(() => {
+            handleActionSuccess(action)
+            return refetch()
+          })
           .catch(console.error)
 
         break
@@ -141,36 +145,34 @@ export default function Archives() {
               .join(','),
           },
         })
-          .then(() => handleActionSuccess(action))
+          .then(() => {
+            handleActionSuccess(action)
+            return refetch()
+          })
           .catch(console.error)
 
         setBatch({})
 
         break
     }
-
-    refetch()
   }
 
   const handleBatchSelect = () => {
-    if (archives) {
+    if (archives.length > 0) {
       setBatch(isBatchEmpty ? { [archives[0].uid!]: true } : {})
     }
   }
 
-  const handleBatchSelectAll = () => {
-    if (archives) {
-      setBatch(
-        batchLength <= archives.length
-          ? archives.reduce<Record<uuid, boolean>>((acc, d) => {
-              acc[d.uid!] = true
+  const handleBatchSelectAll = () =>
+    setBatch(
+      batchLength <= archives.length
+        ? archives.reduce<Record<uuid, boolean>>((acc, d) => {
+            acc[d.uid!] = true
 
-              return acc
-            }, {})
-          : {},
-      )
-    }
-  }
+            return acc
+          }, {})
+        : {},
+    )
 
   const handleBatchDelete = () =>
     setConfirm({
@@ -215,11 +217,10 @@ export default function Archives() {
 
   const onTabChange = (_: any, newValue: PanelType) => {
     navigate(`/archives?kind=${newValue}`)
-    setPanel(newValue)
   }
 
   return (
-    <TabContext value={panel}>
+    <TabContext value={kind}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <TabList onChange={onTabChange}>
           <Tab label={i18n('workflows.title')} value="workflow" />
@@ -233,7 +234,7 @@ export default function Archives() {
           variant="outlined"
           startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
           onClick={handleBatchSelect}
-          disabled={archives?.length === 0}
+          disabled={archives.length === 0}
         >
           {i18n(`common.${isBatchEmpty ? 'batchOperation' : 'cancel'}`)}
         </Button>
@@ -249,26 +250,25 @@ export default function Archives() {
         )}
       </Space>
 
-      {archives &&
-        Object.entries(_.groupBy(archives, 'kind')).map(([kind, archivesByKind]) => (
-          <Box
-            key={kind}
-            sx={{
-              mb: 6,
-            }}
-          >
-            <Typography variant="overline">{transByKind(kind as any)}</Typography>
-            <RWList
-              style={{ width: '100%', height: archivesByKind.length > 3 ? 300 : archivesByKind.length * 70 }}
-              rowCount={archivesByKind.length}
-              rowHeight={70}
-              rowComponent={Row}
-              rowProps={{ data: archivesByKind }}
-            />
-          </Box>
-        ))}
+      {Object.entries(_.groupBy(archives, 'kind')).map(([kind, archivesByKind]) => (
+        <Box
+          key={kind}
+          sx={{
+            mb: 6,
+          }}
+        >
+          <Typography variant="overline">{transByKind(kind as any)}</Typography>
+          <RWList
+            style={{ width: '100%', height: archivesByKind.length > 3 ? 300 : archivesByKind.length * 70 }}
+            rowCount={archivesByKind.length}
+            rowHeight={70}
+            rowComponent={Row}
+            rowProps={{ data: archivesByKind }}
+          />
+        </Box>
+      ))}
 
-      {!loading && archives && (
+      {!loading && archives.length === 0 && (
         <NotFound illustrated sx={{ textAlign: 'center' }}>
           <Typography>{i18n('archives.notFound')}</Typography>
         </NotFound>

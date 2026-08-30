@@ -21,14 +21,17 @@ import Loading from '@/mui-extends/Loading'
 import { useGetCommonConfig } from '@/openapi'
 import { useAuthActions, useAuthStore } from '@/zustand/auth'
 import { useComponentActions, useComponentStore } from '@/zustand/component'
+import { useSystemStore } from '@/zustand/system'
 import Box from '@mui/joy/Box'
 import CssBaseline from '@mui/joy/CssBaseline'
-import { CssVarsProvider } from '@mui/joy/styles'
-import { Alert, Portal, Snackbar } from '@mui/material'
+import { CssVarsProvider, useColorScheme } from '@mui/joy/styles'
+import { Portal } from '@mui/material'
 import Cookies from 'js-cookie'
 import { lazy, useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 
+import AppSnackbar from '@/components/AppSnackbar'
+import { RouteHeadTitle } from '@/components/HeadTitle'
 import Sidebar from '@/components/Layout/Sidebar'
 import { TokenFormValues } from '@/components/Token'
 
@@ -37,14 +40,31 @@ import LS from '@/lib/localStorage'
 
 const Auth = lazy(() => import('./Auth'))
 
+type JoyThemeMode = 'light' | 'dark' | 'system'
+
+const JoyThemeSync = ({ mode }: { mode: JoyThemeMode }) => {
+  const { mode: joyMode, setMode } = useColorScheme()
+
+  useEffect(() => {
+    if (joyMode !== mode) {
+      setMode(mode)
+    }
+  }, [joyMode, mode, setMode])
+
+  return null
+}
+
 const TopContainer = () => {
   const alert = useComponentStore((state) => state.alert)
+  const alertId = useComponentStore((state) => state.alertId)
   const alertOpen = useComponentStore((state) => state.alertOpen)
   const confirm = useComponentStore((state) => state.confirm)
   const confirmOpen = useComponentStore((state) => state.confirmOpen)
   const { setAlert, setAlertOpen, setConfirmOpen } = useComponentActions()
   const authOpen = useAuthStore((state) => state.authOpen)
+  const theme = useSystemStore((state) => state.theme)
   const { setAuthOpen, setNameSpace, setTokenName, setTokens, removeToken } = useAuthActions()
+  const joyThemeMode: JoyThemeMode = theme === 'auto' ? 'system' : theme
 
   const [loading, setLoading] = useState(true)
 
@@ -116,7 +136,9 @@ const TopContainer = () => {
 
   return (
     <>
-      <CssVarsProvider disableTransitionOnChange>
+      <CssVarsProvider defaultMode={joyThemeMode} modeStorageKey="chaos-mesh-joy-theme-mode" disableTransitionOnChange>
+        <JoyThemeSync mode={joyThemeMode} />
+        <RouteHeadTitle />
         <CssBaseline />
         <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
           <Sidebar />
@@ -127,31 +149,27 @@ const TopContainer = () => {
               display: 'flex',
               flexDirection: 'column',
               height: '100dvh',
-              p: { xs: 2, md: 4 },
+              p: 2,
+              pt: 8,
+              '@media (min-width: 768px)': {
+                p: 4,
+                pt: 4,
+              },
             }}
           >
             {loading || authOpen ? <Loading /> : <Outlet />}
           </Box>
         </Box>
+        <AppSnackbar
+          key={alertId}
+          message={alert.message}
+          open={alertOpen}
+          severity={alert.type}
+          onClose={() => setAlertOpen(false)}
+        />
       </CssVarsProvider>
 
       <Auth open={authOpen} />
-
-      <Portal>
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          autoHideDuration={6000}
-          open={alertOpen}
-          onClose={() => setAlertOpen(false)}
-        >
-          <Alert severity={alert.type} onClose={() => setAlertOpen(false)}>
-            {alert.message}
-          </Alert>
-        </Snackbar>
-      </Portal>
 
       <Portal>
         <ConfirmDialog

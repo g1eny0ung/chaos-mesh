@@ -22,9 +22,11 @@ import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsU
 import { Box, Grid, Grow } from '@mui/material'
 import * as yaml from 'js-yaml'
 import { lazy } from 'react'
+import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
+import HeadTitle from '@/components/HeadTitle'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
 import i18n from '@/components/T'
 
@@ -34,16 +36,25 @@ const YAMLEditor = lazy(() => import('@/components/YAMLEditor'))
 
 const Single = () => {
   const { uuid } = useParams()
+  const intl = useIntl()
   const query = useQuery()
-  const kind = query.get('kind') || 'experiment'
-  const useGetArchives =
-    kind === 'workflow'
-      ? useGetArchivesWorkflowsUid
-      : kind === 'schedule'
-        ? useGetArchivesSchedulesUid
-        : useGetArchivesUid
+  const requestedKind = query.get('kind')
+  const kind =
+    requestedKind === 'workflow' || requestedKind === 'schedule' || requestedKind === 'experiment'
+      ? requestedKind
+      : 'experiment'
 
-  const { data: archive, isLoading: loadingArchives } = useGetArchives(uuid!)
+  const experimentArchiveQuery = useGetArchivesUid(uuid!, {
+    query: { enabled: kind === 'experiment' },
+  })
+  const scheduleArchiveQuery = useGetArchivesSchedulesUid(uuid!, {
+    query: { enabled: kind === 'schedule' },
+  })
+  const workflowArchiveQuery = useGetArchivesWorkflowsUid(uuid!, {
+    query: { enabled: kind === 'workflow' },
+  })
+  const { data: archive, isLoading: loadingArchives } =
+    kind === 'workflow' ? workflowArchiveQuery : kind === 'schedule' ? scheduleArchiveQuery : experimentArchiveQuery
   const { data: events, isLoading: loadingEvents } = useGetEvents(
     {
       object_id: uuid,
@@ -51,7 +62,7 @@ const Single = () => {
     },
     { query: { enabled: kind !== 'workflow' } },
   )
-  const loading = kind === 'workflow' ? loadingArchives : loadingArchives && loadingEvents
+  const loading = loadingArchives || (kind !== 'workflow' && loadingEvents)
 
   const YAML = () => (
     <Paper sx={{ height: kind === 'workflow' ? (theme) => `calc(100vh - 56px - ${theme.spacing(18)})` : 600, p: 0 }}>
@@ -77,9 +88,9 @@ const Single = () => {
 
   return (
     <>
+      <HeadTitle title={`${i18n('archives.single', intl)}${archive?.name ? ` ${archive.name}` : ''}`} />
       <Grow in={!loading} style={{ transformOrigin: '0 0 0' }}>
         <div>
-          {archive && <title>{`Archive ${archive.name}`}</title>}
           {kind !== 'workflow' ? (
             <Space spacing={6}>
               {archive && (

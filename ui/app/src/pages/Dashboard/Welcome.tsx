@@ -14,14 +14,28 @@
  * limitations under the License.
  *
  */
+import { getTutorialCardVisibility, setTutorialCardVisibility } from '@/utils/tutorial'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Button, Card, IconButton, Typography } from '@mui/joy'
 import { useTour } from '@reactour/tour'
+import { useState } from 'react'
+import { useIntl } from 'react-intl'
 
 import WelcomeSVG from '@/images/assets/undraw_server_down_s-4-lk.svg'
 
 const Welcome = () => {
   const { setIsOpen } = useTour()
+  const intl = useIntl()
+  const [visible, setVisible] = useState(getTutorialCardVisibility)
+
+  if (!visible) {
+    return null
+  }
+
+  const close = () => {
+    setTutorialCardVisibility(false)
+    setVisible(false)
+  }
 
   return (
     <Card
@@ -78,7 +92,12 @@ const Welcome = () => {
           <img src={WelcomeSVG} alt="Welcome" style={{ position: 'relative', bottom: 30, height: 175 }} />
         </Box>
 
-        <IconButton variant="outlined" size="sm">
+        <IconButton
+          variant="outlined"
+          size="sm"
+          aria-label={intl.formatMessage({ id: 'common.close' })}
+          onClick={close}
+        >
           <CloseIcon />
         </IconButton>
       </Box>

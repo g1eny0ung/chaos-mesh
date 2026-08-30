@@ -63,7 +63,7 @@ export default function Experiments() {
   const batchLength = Object.keys(batch).length
   const isBatchEmpty = batchLength === 0
 
-  const { data: experiments, isLoading: loading, refetch } = useGetExperiments()
+  const { data: experiments = [], isLoading: loading, refetch } = useGetExperiments()
   const { mutateAsync: deleteExperimentsByUUID } = useDeleteExperimentsUid()
   const { mutateAsync: deleteExperiments } = useDeleteExperiments()
   const { mutateAsync: pauseExperiments } = usePutExperimentsPauseUid()
@@ -119,12 +119,16 @@ export default function Experiments() {
     }
   }
 
-  const handleBatchSelect = () => setBatch(isBatchEmpty ? { [experiments![0].uid!]: true } : {})
+  const handleBatchSelect = () => {
+    if (experiments.length > 0) {
+      setBatch(isBatchEmpty ? { [experiments[0].uid!]: true } : {})
+    }
+  }
 
   const handleBatchSelectAll = () =>
     setBatch(
-      batchLength <= experiments!.length
-        ? experiments!.reduce<Record<uuid, boolean>>((acc, d) => {
+      batchLength <= experiments.length
+        ? experiments.reduce<Record<uuid, boolean>>((acc, d) => {
             acc[d.uid!] = true
 
             return acc
@@ -183,7 +187,7 @@ export default function Experiments() {
           variant="outlined"
           startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
           onClick={handleBatchSelect}
-          disabled={experiments?.length === 0}
+          disabled={experiments.length === 0}
         >
           {i18n(`common.${isBatchEmpty ? 'batchOperation' : 'cancel'}`)}
         </Button>
@@ -204,8 +208,7 @@ export default function Experiments() {
         )}
       </Space>
 
-      {experiments &&
-        experiments.length > 0 &&
+      {experiments.length > 0 &&
         Object.entries(_.groupBy(experiments, 'kind')).map(([kind, experimentsByKind]) => (
           <Box
             key={kind}
@@ -224,7 +227,7 @@ export default function Experiments() {
           </Box>
         ))}
 
-      {!loading && experiments?.length === 0 && (
+      {!loading && experiments.length === 0 && (
         <NotFound illustrated sx={{ textAlign: 'center' }}>
           <Typography>{i18n('experiments.notFound')}</Typography>
         </NotFound>

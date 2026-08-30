@@ -44,14 +44,17 @@ const router = createHashRouter([
       {
         path: 'dashboard',
         Component: Dashboard,
+        handle: { title: 'dashboard.title' },
       },
       {
         path: 'workflows/new',
         Component: NewWorkflow,
+        handle: { title: 'newW.title' },
       },
       {
         path: 'workflows',
         Component: Workflows,
+        handle: { title: 'workflows.title' },
       },
       {
         path: 'workflows/:uuid',
@@ -60,10 +63,12 @@ const router = createHashRouter([
       {
         path: 'schedules/new',
         Component: NewSchedule,
+        handle: { title: 'newS.title' },
       },
       {
         path: 'schedules',
         Component: Schedules,
+        handle: { title: 'schedules.title' },
       },
       {
         path: 'schedules/:uuid',
@@ -72,10 +77,12 @@ const router = createHashRouter([
       {
         path: 'experiments/new',
         Component: NewExperiment,
+        handle: { title: 'newE.title' },
       },
       {
         path: 'experiments',
         Component: Experiments,
+        handle: { title: 'experiments.title' },
       },
       {
         path: 'experiments/:uuid',
@@ -84,10 +91,12 @@ const router = createHashRouter([
       {
         path: 'events',
         Component: Events,
+        handle: { title: 'events.title' },
       },
       {
         path: 'archives',
         Component: Archives,
+        handle: { title: 'archives.title' },
       },
       {
         path: 'archives/:uuid',
@@ -96,6 +105,7 @@ const router = createHashRouter([
       {
         path: 'settings',
         Component: Settings,
+        handle: { title: 'settings.title' },
       },
     ],
   },

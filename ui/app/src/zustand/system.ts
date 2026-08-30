@@ -14,15 +14,43 @@
  * limitations under the License.
  *
  */
+import { useSyncExternalStore } from 'react'
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
 
 import LS from '@/lib/localStorage'
 
-export type SystemTheme = 'light' | 'dark'
+export type SystemTheme = 'auto' | 'light' | 'dark'
+export type ResolvedSystemTheme = Exclude<SystemTheme, 'auto'>
+
+const colorSchemeQuery = '(prefers-color-scheme: dark)'
+
+const getInitialTheme = (): SystemTheme => {
+  const storedTheme = LS.get('theme')
+
+  return storedTheme === 'auto' || storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'auto'
+}
+
+const getBrowserTheme = (): ResolvedSystemTheme =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia(colorSchemeQuery).matches
+    ? 'dark'
+    : 'light'
+
+const subscribeToBrowserTheme = (onStoreChange: () => void) => {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return () => undefined
+  }
+
+  const mediaQuery = window.matchMedia(colorSchemeQuery)
+  mediaQuery.addEventListener('change', onStoreChange)
+
+  return () => mediaQuery.removeEventListener('change', onStoreChange)
+}
 
 export const useSystemStore = create(
-  combine({ theme: (LS.get('theme') || 'light') as SystemTheme, lang: LS.get('lang') || 'en' }, (set) => ({
+  combine({ theme: getInitialTheme(), lang: LS.get('lang') || 'en' }, (set) => ({
     actions: {
       setTheme: (theme: SystemTheme) => {
         set({ theme })
@@ -37,3 +65,14 @@ export const useSystemStore = create(
 )
 
 export const useSystemActions = () => useSystemStore((state) => state.actions)
+
+export const useResolvedTheme = (): ResolvedSystemTheme => {
+  const theme = useSystemStore((state) => state.theme)
+  const browserTheme = useSyncExternalStore(
+    subscribeToBrowserTheme,
+    getBrowserTheme,
+    (): ResolvedSystemTheme => 'light',
+  )
+
+  return theme === 'auto' ? browserTheme : theme
+}

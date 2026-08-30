@@ -15,11 +15,12 @@
  *
  */
 import { resetAPIAuthentication } from '@/api/interceptors'
-import PaperTop from '@/mui-extends/PaperTop'
 import { useAuthActions, useAuthStore } from '@/zustand/auth'
 import { useComponentActions } from '@/zustand/component'
 import GoogleIcon from '@mui/icons-material/Google'
-import { Box, Button } from '@mui/material'
+import Box from '@mui/joy/Box'
+import Button from '@mui/joy/Button'
+import Typography from '@mui/joy/Typography'
 import Cookies from 'js-cookie'
 import _ from 'lodash'
 import { useIntl } from 'react-intl'
@@ -71,17 +72,17 @@ const Token = () => {
   }
 
   return (
-    <PaperTop title={i18n('settings.addToken.token')} subtitle={tokenDesc}>
-      <Button
-        variant="outlined"
-        size="small"
-        color="secondary"
-        sx={{ width: 64, height: 32 }}
-        onClick={handleRemoveToken}
-      >
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+      <Box sx={{ minWidth: 0 }}>
+        <Typography level="title-lg">{i18n('settings.addToken.token')}</Typography>
+        <Typography component="div" level="body-sm" textColor="text.tertiary">
+          {tokenDesc}
+        </Typography>
+      </Box>
+      <Button variant="outlined" size="sm" color="danger" sx={{ width: 64, height: 32 }} onClick={handleRemoveToken}>
         {i18n('common.logout')}
       </Button>
-    </PaperTop>
+    </Box>
   )
 }
 

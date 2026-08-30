@@ -1,15 +1,24 @@
 {
   "sidebar": {
     "insights": "Insights",
-    "resources": "Resources"
+    "resources": "Resources",
+    "navigation": "Main navigation",
+    "open": "Open navigation",
+    "close": "Close navigation",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "dashboard": {
     "title": "Dashboard",
     "tutorial": {
       "title": "Tutorial",
       "desc": "📖 Take a quick look at the functions of Chaos Mesh Dashboard",
+      "previous": "Previous",
+      "next": "Next",
+      "finish": "Finish",
+      "progress": "Step {current} of {total}",
       "steps": {
-        "overview": "Dashboard is an overview of Chaos Mesh, where you can observe the running status of all experiments.",
+        "dashboard": "Dashboard is an overview of Chaos Mesh, where you can observe the running status of all experiments.",
         "workflows": "Workflows manage all workflows. Here you can organize multiple experiments to simulate more realistic failures.",
         "schedules": "Schedules manage all schedules. Here you can run an experiment periodically.",
         "experiments": "Experiments manage all experiments, where you can perform various operations (pause, update, archive, etc.) on the experiment.",
@@ -214,6 +223,7 @@
   },
   "workflows": {
     "title": "Workflows",
+    "single": "Workflow",
     "notFound": "No workflows found",
     "deleteDesc": "You can still find this workflow in the archives."
   },
@@ -250,6 +260,7 @@
     "notFound": "No hosts found"
   },
   "settings": {
+    "updateSuccess": "Settings updated successfully.",
     "title": "Settings",
     "debugMode": {
       "title": "Debug mode",
@@ -263,9 +274,17 @@
       "title": "Use new PhysicalMachine CRD",
       "choose": "When creating PhysicalMachineChaos, retrieve the available PhysicalMachines instead of providing the address field."
     },
+    "tutorialCard": {
+      "title": "Show tutorial card",
+      "choose": "Show the tutorial card on the Dashboard so the tutorial can be started again."
+    },
+    "general": {
+      "title": "General"
+    },
     "theme": {
       "title": "Theme",
       "choose": "Choose a theme.",
+      "auto": "Auto",
       "light": "Light",
       "dark": "Dark"
     },

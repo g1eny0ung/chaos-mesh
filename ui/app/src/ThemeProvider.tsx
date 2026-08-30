@@ -14,17 +14,17 @@
  * limitations under the License.
  *
  */
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import { ThemeProvider as MuiThemeProvider, THEME_ID } from '@mui/material/styles'
 import { useMemo } from 'react'
 
 import theme, { darkTheme } from './theme'
-import { useSystemStore } from './zustand/system'
+import { useResolvedTheme } from './zustand/system'
 
 const ThemeProvider: ReactFCWithChildren = ({ children }) => {
-  const t = useSystemStore((state) => state.theme)
-  const globalTheme = useMemo(() => (t === 'light' ? theme : darkTheme), [t])
+  const resolvedTheme = useResolvedTheme()
+  const globalTheme = useMemo(() => (resolvedTheme === 'light' ? theme : darkTheme), [resolvedTheme])
 
-  return <MuiThemeProvider theme={globalTheme}>{children}</MuiThemeProvider>
+  return <MuiThemeProvider theme={{ [THEME_ID]: globalTheme }}>{children}</MuiThemeProvider>
 }
 
 export default ThemeProvider

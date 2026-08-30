@@ -15,7 +15,7 @@
  *
  */
 import type { CoreEvent as Event } from '@/openapi/index.schemas'
-import type { SystemTheme } from '@/zustand/system'
+import type { ResolvedSystemTheme } from '@/zustand/system'
 import { Box, Typography } from '@mui/material'
 import * as d3 from 'd3'
 import _ from 'lodash'
@@ -32,7 +32,7 @@ import wrapText from './wrapText'
  * @param {{
  *   root: HTMLElement
  *   events: Event[]
- *   theme: SystemTheme
+ *   theme: ResolvedSystemTheme
  *   options?: {
  *     enableLegends?: boolean
  *     onSelectEvent?: (e: Event) => () => void
@@ -58,7 +58,7 @@ export default function gen({
 }: {
   root: HTMLElement
   events: Event[]
-  theme: SystemTheme
+  theme: ResolvedSystemTheme
   options?: {
     enableLegends?: boolean
     onSelectEvent?: (e: Event) => () => void
@@ -243,7 +243,13 @@ export default function gen({
    *
    * @param {Event[]} events
    */
-  function update(events: Event[]) {
+  function update(events: Event[], nextTheme: ResolvedSystemTheme = theme) {
+    const darkClassName = nextTheme === 'dark' ? ' dark' : ''
+
+    svg.attr('class', `chaos-chart${darkClassName}`)
+    legendsRoot.attr('class', `chaos-events-legends${darkClassName}`)
+    tooltip.attr('class', `chaos-event-tooltip${darkClassName}`)
+
     const circles = gMain
       .selectAll('circle')
       .data(events)

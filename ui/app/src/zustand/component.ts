@@ -36,6 +36,7 @@ export const useComponentStore = create(
         type: 'success',
         message: '' as React.ReactNode,
       } as Alert,
+      alertId: 0,
       alertOpen: false,
       confirm: {
         title: '',
@@ -45,7 +46,12 @@ export const useComponentStore = create(
     },
     (set) => ({
       actions: {
-        setAlert: (alert: Alert) => set({ alert, alertOpen: true }),
+        setAlert: (alert: Alert) =>
+          set((state) => ({
+            alert,
+            alertId: state.alertId + 1,
+            alertOpen: true,
+          })),
         setAlertOpen: (open: boolean) => set({ alertOpen: open }),
         setConfirm: (confirm: Confirm) => set({ confirm, confirmOpen: true }),
         setConfirmOpen: (open: boolean) => set({ confirmOpen: open }),

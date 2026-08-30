@@ -35,6 +35,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
+import HeadTitle from '@/components/HeadTitle'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
 import i18n from '@/components/T'
 
@@ -126,9 +127,9 @@ const Single = () => {
 
   return (
     <>
+      <HeadTitle title={`${i18n('schedules.single', intl)}${schedule?.name ? ` ${schedule.name}` : ''}`} />
       <Grow in={!loading} style={{ transformOrigin: '0 0 0' }}>
         <div>
-          {schedule && <title>{`Schedule ${schedule.name}`}</title>}
           <Space spacing={6}>
             <Space direction="row">
               <Button

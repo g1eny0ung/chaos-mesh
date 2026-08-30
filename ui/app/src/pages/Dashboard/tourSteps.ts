@@ -14,9 +14,11 @@
  * limitations under the License.
  *
  */
+import type { StepType } from '@reactour/tour'
+
 import i18n from '@/components/T'
 
-export const steps = [
+export const steps: StepType[] = [
   {
     selector: '.tutorial-dashboard',
     content: i18n('dashboard.tutorial.steps.dashboard'),
@@ -42,31 +44,8 @@ export const steps = [
     content: i18n('dashboard.tutorial.steps.archives'),
   },
   {
-    selector: '.tutorial-newW',
-    content: i18n('dashboard.tutorial.steps.newW'),
-  },
-  {
-    selector: '.tutorial-newS',
-    content: i18n('dashboard.tutorial.steps.newS'),
-  },
-  {
-    selector: '.tutorial-newE',
-    content: i18n('dashboard.tutorial.steps.newE'),
-  },
-  {
-    selector: '.tutorial-search',
-    content: i18n('dashboard.tutorial.steps.search'),
-  },
-  {
-    selector: '.tutorial-namespace',
-    content: i18n('dashboard.tutorial.steps.namespace'),
-  },
-  {
-    selector: '.tutorial-predefined',
-    content: i18n('dashboard.tutorial.steps.predefined'),
-  },
-  {
     selector: '.tutorial-end',
     content: i18n('dashboard.tutorial.steps.end'),
+    position: 'center',
   },
 ]

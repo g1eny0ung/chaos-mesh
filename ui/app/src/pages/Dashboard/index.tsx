@@ -16,22 +16,54 @@
  */
 import { useGetEvents, useGetExperiments, useGetSchedules, useGetWorkflows } from '@/openapi'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
-import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
-import { Box, Card, CardContent, Grid, IconButton, Typography } from '@mui/joy'
-import { TourProvider } from '@reactour/tour'
+import { Box, Card, CardContent, Grid, Typography } from '@mui/joy'
+import GlobalStyles from '@mui/joy/GlobalStyles'
+import { TourProvider, useTour } from '@reactour/tour'
 import _ from 'lodash'
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
 
 import EventsTimeline from '@/components/EventsTimeline'
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 
 import TotalStatus from './TotalStatus'
+import TutorialCard from './TutorialCard'
 import Welcome from './Welcome'
 import { steps } from './tourSteps'
+
+const tutorialTargetCardClassName = 'tutorial-target-card'
+
+function TutorialTargetCard() {
+  const { currentStep, isOpen, steps: tourSteps } = useTour()
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    const selector = tourSteps[currentStep]?.selector
+    const target = typeof selector === 'string' ? document.querySelector(selector) : selector
+
+    target?.classList.add(tutorialTargetCardClassName)
+
+    return () => target?.classList.remove(tutorialTargetCardClassName)
+  }, [currentStep, isOpen, tourSteps])
+
+  return (
+    <GlobalStyles
+      styles={{
+        [`.${tutorialTargetCardClassName}`]: {
+          position: 'relative',
+          backgroundColor: 'var(--joy-palette-background-surface)',
+          borderRadius: 'var(--joy-radius-md)',
+          boxShadow: 'var(--joy-shadow-sm)',
+        },
+      }}
+    />
+  )
+}
 
 const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; status?: [string, number] }> = ({
   icon,
@@ -113,28 +145,35 @@ export default function Dashboard() {
   return (
     <TourProvider
       steps={steps}
-      prevButton={({ setCurrentStep }) => (
-        <IconButton onClick={() => setCurrentStep((s) => s + 1)}>
-          <ArrowBackOutlinedIcon />
-        </IconButton>
-      )}
-      nextButton={({ setCurrentStep }) => (
-        <IconButton onClick={() => setCurrentStep((s) => s + 1)}>
-          <ArrowForwardOutlinedIcon />
-        </IconButton>
-      )}
-      showCloseButton={false}
+      ContentComponent={TutorialCard}
+      position="right"
+      styles={{
+        popover: (base) => ({
+          ...base,
+          maxWidth: 'calc(100vw - 24px)',
+          padding: 0,
+          backgroundColor: 'transparent',
+          color: 'inherit',
+          borderRadius: 'var(--joy-radius-md)',
+          boxShadow: 'none',
+        }),
+        maskArea: (base) => ({
+          ...base,
+          rx: 12,
+        }),
+      }}
     >
+      <TutorialTargetCard />
       <Grid container spacing={3}>
-        <Grid xs={12} lg={9}>
+        <Grid xs={12} xl={9}>
           <Welcome />
         </Grid>
       </Grid>
       <Grid container spacing={3}>
-        <Grid xs={12} sm={6} lg={3}>
+        <Grid xs={12} sm={6} md={4} xl={3}>
           <NumCard title={i18n('workflows.title')} num={workflows?.length} icon={<AccountTreeOutlinedIcon />} />
         </Grid>
-        <Grid xs={12} sm={6} lg={3}>
+        <Grid xs={12} sm={6} md={4} xl={3}>
           <NumCard
             title={i18n('schedules.title')}
             num={schedules?.length}
@@ -142,13 +181,13 @@ export default function Dashboard() {
             status={calculateStatus(schedules)}
           />
         </Grid>
-        <Grid xs={12} sm={6} lg={3}>
+        <Grid xs={12} sm={6} md={4} xl={3}>
           <NumCard title={i18n('experiments.title')} num={experiments?.length} icon={<ScienceOutlinedIcon />} />
         </Grid>
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid xs={12} lg={4}>
+        <Grid xs={12} md={6} xl={4}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
             <Typography
               level="h2"
@@ -161,7 +200,7 @@ export default function Dashboard() {
             <TotalStatus height={300} />
           </Card>
         </Grid>
-        <Grid xs={12} lg={5}>
+        <Grid xs={12} md={6} xl={5}>
           <Card variant="outlined" sx={{ my: 1.5 }}>
             <Typography
               level="h2"

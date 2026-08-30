@@ -16,16 +16,24 @@
  */
 import { Stale } from '@/api/queryUtils'
 import messages from '@/i18n/messages'
-import Checkbox from '@/mui-extends/Checkbox'
-import PaperTop from '@/mui-extends/PaperTop'
-import SelectField from '@/mui-extends/SelectField'
-import Space from '@/mui-extends/Space'
 import { useGetCommonConfig } from '@/openapi'
+import { getTutorialCardVisibility, setTutorialCardVisibility } from '@/utils/tutorial'
 import { useAuthStore } from '@/zustand/auth'
+import { useComponentActions } from '@/zustand/component'
 import { useSettingActions, useSettingStore } from '@/zustand/setting'
-import { type SystemTheme, useSystemActions, useSystemStore } from '@/zustand/system'
-import { Box, Chip, Divider, Grow, MenuItem, Typography } from '@mui/material'
-import type { SelectChangeEvent } from '@mui/material'
+import { type SystemTheme, useResolvedTheme, useSystemActions, useSystemStore } from '@/zustand/system'
+import Box from '@mui/joy/Box'
+import Checkbox from '@mui/joy/Checkbox'
+import Chip from '@mui/joy/Chip'
+import Divider from '@mui/joy/Divider'
+import FormControl from '@mui/joy/FormControl'
+import FormHelperText from '@mui/joy/FormHelperText'
+import FormLabel from '@mui/joy/FormLabel'
+import Option from '@mui/joy/Option'
+import Select from '@mui/joy/Select'
+import Stack from '@mui/joy/Stack'
+import Typography from '@mui/joy/Typography'
+import { useState } from 'react'
 
 import { T } from '@/components/T'
 
@@ -34,15 +42,44 @@ import logo from '@/images/logo.svg'
 
 import Token from './Token'
 
+interface SettingCheckboxProps {
+  checked: boolean
+  helperText: React.ReactNode
+  label: React.ReactNode
+  onChange: () => void
+}
+
+function SettingCheckbox({ checked, helperText, label, onChange }: SettingCheckboxProps) {
+  return (
+    <Checkbox
+      checked={checked}
+      label={
+        <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ fontSize: 'sm', fontWeight: 'md', lineHeight: 'md' }}>{label}</Box>
+          <Typography level="body-xs" textColor="text.tertiary" sx={{ mt: 0.25 }}>
+            {helperText}
+          </Typography>
+        </Box>
+      }
+      onChange={onChange}
+      size="sm"
+      sx={{ alignItems: 'flex-start', '& .MuiCheckbox-checkbox': { mt: '2px' } }}
+    />
+  )
+}
+
 const Settings = () => {
   const theme = useSystemStore((state) => state.theme)
+  const resolvedTheme = useResolvedTheme()
   const lang = useSystemStore((state) => state.lang)
   const { setTheme, setLang } = useSystemActions()
+  const { setAlert } = useComponentActions()
   const debugMode = useSettingStore((state) => state.debugMode)
   const enableKubeSystemNS = useSettingStore((state) => state.enableKubeSystemNS)
   const useNewPhysicalMachine = useSettingStore((state) => state.useNewPhysicalMachine)
   const { setDebugMode, setEnableKubeSystemNS, setUseNewPhysicalMachine } = useSettingActions()
   const tokenName = useAuthStore((state) => state.tokenName)
+  const [showTutorialCard, setShowTutorialCard] = useState(getTutorialCardVisibility)
 
   const { data: config } = useGetCommonConfig({
     query: {
@@ -51,91 +88,177 @@ const Settings = () => {
     },
   })
 
-  const handleChangeDebugMode = () => setDebugMode(!debugMode)
-  const handleChangeEnableKubeSystemNS = () => setEnableKubeSystemNS(!enableKubeSystemNS)
-  const handleChangeUseNewPhysicalMachine = () => setUseNewPhysicalMachine(!useNewPhysicalMachine)
-  const handleChangeTheme = (e: SelectChangeEvent) => setTheme(e.target.value as SystemTheme)
-  const handleChangeLang = (e: SelectChangeEvent) => setLang(e.target.value)
+  const showUpdateSuccess = () =>
+    setAlert({
+      type: 'success',
+      message: <T id="settings.updateSuccess" />,
+    })
+  const handleChangeDebugMode = () => {
+    setDebugMode(!debugMode)
+    showUpdateSuccess()
+  }
+  const handleChangeEnableKubeSystemNS = () => {
+    setEnableKubeSystemNS(!enableKubeSystemNS)
+    showUpdateSuccess()
+  }
+  const handleChangeUseNewPhysicalMachine = () => {
+    setUseNewPhysicalMachine(!useNewPhysicalMachine)
+    showUpdateSuccess()
+  }
+  const handleChangeShowTutorialCard = () => {
+    const nextVisibility = !showTutorialCard
+
+    setTutorialCardVisibility(nextVisibility)
+    setShowTutorialCard(nextVisibility)
+    showUpdateSuccess()
+  }
+  const handleChangeTheme = (_event: React.SyntheticEvent | null, value: SystemTheme | null) => {
+    if (value) {
+      setTheme(value)
+      showUpdateSuccess()
+    }
+  }
+  const handleChangeLang = (_event: React.SyntheticEvent | null, value: string | null) => {
+    if (value) {
+      setLang(value)
+      showUpdateSuccess()
+    }
+  }
 
   return (
-    <Grow in={true} style={{ transformOrigin: '0 0 0' }}>
-      <div style={{ height: '100%' }}>
-        <Space>
-          <PaperTop title={<T id="settings.title" />} h1 />
-          <Divider />
-          {config?.security_mode && tokenName && <Token />}
-          <PaperTop title={<T id="experiments.title" />} />
-          <Checkbox
+    <Box sx={{ height: '100%' }}>
+      <Stack spacing={3}>
+        <Typography component="h1" level="h3">
+          <T id="settings.title" />
+        </Typography>
+        <Divider />
+
+        <Typography component="h2" level="title-lg">
+          <T id="dashboard.title" />
+        </Typography>
+        <SettingCheckbox
+          label={<T id="settings.tutorialCard.title" />}
+          helperText={<T id="settings.tutorialCard.choose" />}
+          checked={showTutorialCard}
+          onChange={handleChangeShowTutorialCard}
+        />
+
+        {config?.security_mode && tokenName && <Token />}
+
+        <Typography component="h2" level="title-lg">
+          <T id="experiments.title" />
+        </Typography>
+        <Stack spacing={2}>
+          <SettingCheckbox
             label={<T id="settings.debugMode.title" />}
             helperText={<T id="settings.debugMode.choose" />}
             checked={debugMode}
             onChange={handleChangeDebugMode}
           />
-          <Checkbox
+          <SettingCheckbox
             label={<T id="settings.enableKubeSystemNS.title" />}
             helperText={<T id="settings.enableKubeSystemNS.choose" />}
             checked={enableKubeSystemNS}
             onChange={handleChangeEnableKubeSystemNS}
           />
-          <Checkbox
+          <SettingCheckbox
             label={
-              <Space spacing={1} direction="row" sx={{ alignItems: 'center' }}>
+              <Stack spacing={1} direction="row" sx={{ alignItems: 'center' }}>
                 <Box>
                   <T id="settings.useNewPhysicalMachineCRD.title" />
                 </Box>
-                <Chip label="Preview" color="primary" size="small" />
-              </Space>
+                <Chip color="primary" size="sm" variant="soft">
+                  Preview
+                </Chip>
+              </Stack>
             }
             helperText={<T id="settings.useNewPhysicalMachineCRD.choose" />}
             checked={useNewPhysicalMachine}
             onChange={handleChangeUseNewPhysicalMachine}
           />
-          <PaperTop title={<T id="settings.theme.title" />} />
-          <SelectField
-            label={<T id="settings.theme.title" />}
-            helperText={<T id="settings.theme.choose" />}
-            value={theme}
-            onChange={handleChangeTheme}
-            sx={{ width: 300 }}
-          >
-            <MenuItem value="light">
-              <Typography>
-                <T id="settings.theme.light" />
-              </Typography>
-            </MenuItem>
-            <MenuItem value="dark">
-              <Typography>
-                <T id="settings.theme.dark" />
-              </Typography>
-            </MenuItem>
-          </SelectField>
-          <PaperTop title={<T id="settings.lang.title" />} />
-          <SelectField
-            label={<T id="settings.lang.title" />}
-            helperText={<T id="settings.lang.choose" />}
-            value={lang}
-            onChange={handleChangeLang}
-            sx={{ width: 300 }}
-          >
-            {Object.keys(messages).map((lang) => (
-              <MenuItem key={lang} value={lang}>
-                <Typography>
-                  <T id={`settings.lang.${lang}`} />
-                </Typography>
-              </MenuItem>
-            ))}
-          </SelectField>
+        </Stack>
 
-          <PaperTop title={<T id="common.version" />} />
-          <Box>
-            <img src={theme === 'light' ? logo : logoWhite} alt="Chaos Mesh" style={{ width: 192 }} />
-            <Typography variant="body2" color="textSecondary">
-              Git Version: {config?.version}
-            </Typography>
-          </Box>
-        </Space>
-      </div>
-    </Grow>
+        <Typography component="h2" level="title-lg">
+          <T id="settings.general.title" />
+        </Typography>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: 'flex-start' }}>
+          <FormControl sx={{ width: 'min(300px, 100%)' }}>
+            <FormLabel>
+              <T id="settings.theme.title" />
+            </FormLabel>
+            <Select<SystemTheme>
+              value={theme}
+              onChange={handleChangeTheme}
+              renderValue={(selected) => (
+                <Typography level="body-sm">
+                  <T id={`settings.theme.${selected?.value ?? theme}`} />
+                </Typography>
+              )}
+            >
+              <Option value="auto">
+                <Typography level="body-sm">
+                  <T id="settings.theme.auto" />
+                </Typography>
+              </Option>
+              <Option value="light">
+                <Typography level="body-sm">
+                  <T id="settings.theme.light" />
+                </Typography>
+              </Option>
+              <Option value="dark">
+                <Typography level="body-sm">
+                  <T id="settings.theme.dark" />
+                </Typography>
+              </Option>
+            </Select>
+            <FormHelperText>
+              <T id="settings.theme.choose" />
+            </FormHelperText>
+          </FormControl>
+
+          <FormControl sx={{ width: 'min(300px, 100%)' }}>
+            <FormLabel>
+              <T id="settings.lang.title" />
+            </FormLabel>
+            <Select
+              value={lang}
+              onChange={handleChangeLang}
+              renderValue={(selected) => (
+                <Typography level="body-sm">
+                  <T id={`settings.lang.${selected?.value ?? lang}`} />
+                </Typography>
+              )}
+            >
+              {Object.keys(messages).map((language) => (
+                <Option key={language} value={language}>
+                  <Typography level="body-sm">
+                    <T id={`settings.lang.${language}`} />
+                  </Typography>
+                </Option>
+              ))}
+            </Select>
+            <FormHelperText>
+              <T id="settings.lang.choose" />
+            </FormHelperText>
+          </FormControl>
+        </Stack>
+
+        <Typography component="h2" level="title-lg">
+          <T id="common.version" />
+        </Typography>
+        <Box>
+          <Box
+            component="img"
+            src={resolvedTheme === 'light' ? logo : logoWhite}
+            alt="Chaos Mesh"
+            sx={{ width: 192 }}
+          />
+          <Typography level="body-sm" textColor="text.tertiary">
+            Git Version: {config?.version}
+          </Typography>
+        </Box>
+      </Stack>
+    </Box>
   )
 }
 

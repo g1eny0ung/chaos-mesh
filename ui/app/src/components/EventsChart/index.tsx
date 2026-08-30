@@ -15,7 +15,7 @@
  *
  */
 import type { CoreEvent } from '@/openapi/index.schemas'
-import { useSystemStore } from '@/zustand/system'
+import { useResolvedTheme } from '@/zustand/system'
 import { Box, BoxProps } from '@mui/material'
 import { useEffect, useRef } from 'react'
 
@@ -29,7 +29,7 @@ interface EventsChartProps extends BoxProps {
 }
 
 const EventsChart: ReactFCWithChildren<EventsChartProps> = ({ events, ...rest }) => {
-  const theme = useSystemStore((state) => state.theme)
+  const theme = useResolvedTheme()
 
   const chartRef = useRef<any>(null)
 
@@ -38,7 +38,7 @@ const EventsChart: ReactFCWithChildren<EventsChartProps> = ({ events, ...rest })
       const chart = chartRef.current!
 
       if (typeof chart === 'function') {
-        chart(events)
+        chart(events, theme)
 
         return
       }

@@ -30,6 +30,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
+import HeadTitle from '@/components/HeadTitle'
 import NodeConfiguration from '@/components/ObjectConfiguration/Node'
 import i18n from '@/components/T'
 
@@ -159,9 +160,9 @@ const Single = () => {
 
   return (
     <Root>
+      <HeadTitle title={`${i18n('workflows.single', intl)}${workflow?.name ? ` ${workflow.name}` : ''}`} />
       <Grow in={true} style={{ transformOrigin: '0 0 0' }}>
         <div style={{ height: '100%' }}>
-          {workflow && <title>{`Workflow ${workflow.name}`}</title>}
           <Space spacing={6} className={classes.root}>
             <Space direction="row">
               <Button

@@ -64,7 +64,7 @@ const Schedules = () => {
   const batchLength = Object.keys(batch).length
   const isBatchEmpty = batchLength === 0
 
-  const { data: schedules, isLoading: loading, refetch } = useGetSchedules()
+  const { data: schedules = [], isLoading: loading, refetch } = useGetSchedules()
   const { mutateAsync: deleteSchedulesByUUID } = useDeleteSchedulesUid()
   const { mutateAsync: deleteSchedules } = useDeleteSchedules()
   const { mutateAsync: pauseSchedules } = usePutSchedulesPauseUid()
@@ -122,12 +122,16 @@ const Schedules = () => {
     }
   }
 
-  const handleBatchSelect = () => setBatch(isBatchEmpty ? { [schedules![0].uid!]: true } : {})
+  const handleBatchSelect = () => {
+    if (schedules.length > 0) {
+      setBatch(isBatchEmpty ? { [schedules[0].uid!]: true } : {})
+    }
+  }
 
   const handleBatchSelectAll = () =>
     setBatch(
-      batchLength <= schedules!.length
-        ? schedules!.reduce<Record<uuid, boolean>>((acc, d) => {
+      batchLength <= schedules.length
+        ? schedules.reduce<Record<uuid, boolean>>((acc, d) => {
             acc[d.uid!] = true
 
             return acc
@@ -186,7 +190,7 @@ const Schedules = () => {
           variant="outlined"
           startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
           onClick={handleBatchSelect}
-          disabled={schedules?.length === 0}
+          disabled={schedules.length === 0}
         >
           {i18n(`common.${isBatchEmpty ? 'batchOperation' : 'cancel'}`)}
         </Button>
@@ -202,8 +206,7 @@ const Schedules = () => {
         )}
       </Space>
 
-      {schedules &&
-        schedules.length > 0 &&
+      {schedules.length > 0 &&
         Object.entries(_.groupBy(schedules, 'kind')).map(([type, schedulesByType]) => (
           <Box
             key={type}
@@ -222,7 +225,7 @@ const Schedules = () => {
           </Box>
         ))}
 
-      {!loading && schedules?.length === 0 && (
+      {!loading && schedules.length === 0 && (
         <NotFound illustrated sx={{ textAlign: 'center' }}>
           <Typography>{i18n('schedules.notFound')}</Typography>
         </NotFound>

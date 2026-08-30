@@ -189,7 +189,12 @@ const Workflows = () => {
               <PaperTop title="All Workflows" subtitle="Manage your workflows." h1 divider>
                 <NewWorkflow />
               </PaperTop>
-              <DataTable columns={columns} rows={workflows} onRowClick={jumpToSingleWorkflow} />
+              <DataTable
+                columns={columns}
+                rows={workflows}
+                getRowId={(row) => row.uid ?? row.id!}
+                onRowClick={jumpToSingleWorkflow}
+              />
             </Space>
           ) : (
             <NotFound illustrated>

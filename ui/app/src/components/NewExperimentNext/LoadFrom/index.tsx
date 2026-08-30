@@ -59,7 +59,9 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
 
   const { data: experiments, isLoading: loading1 } = useGetExperiments()
   const { data: schedules, isLoading: loading2 } = useGetSchedules(undefined, { query: { enabled: inSchedule } })
-  const { data: archives, isLoading: loading3 } = (inSchedule ? useGetArchivesSchedules : useGetArchives)()
+  const experimentArchivesQuery = useGetArchives(undefined, { query: { enabled: !inSchedule } })
+  const scheduleArchivesQuery = useGetArchivesSchedules(undefined, { query: { enabled: inSchedule } })
+  const { data: archives, isLoading: loading3 } = inSchedule ? scheduleArchivesQuery : experimentArchivesQuery
   const loading = loading1 || loading2 || loading3
 
   const { data: scheduleData } = useGetSchedulesUid(metaInfo.id, {

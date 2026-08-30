@@ -36,6 +36,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
+import HeadTitle from '@/components/HeadTitle'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
 import i18n from '@/components/T'
 
@@ -127,9 +128,9 @@ export default function Single() {
 
   return (
     <>
+      <HeadTitle title={`${i18n('experiments.single', intl)}${experiment?.name ? ` ${experiment.name}` : ''}`} />
       <Grow in={!loading} style={{ transformOrigin: '0 0 0' }}>
         <div>
-          {experiment && <title>{`Experiment ${experiment.name}`}</title>}
           <Space spacing={6}>
             <Space direction="row">
               <Button

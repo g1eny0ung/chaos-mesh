@@ -1,9 +1,22 @@
 {
+  "sidebar": {
+    "insights": "概览",
+    "resources": "资源",
+    "navigation": "主导航",
+    "open": "打开导航",
+    "close": "关闭导航",
+    "collapse": "折叠侧边栏",
+    "expand": "展开侧边栏"
+  },
   "dashboard": {
     "title": "仪表盘",
     "tutorial": {
       "title": "教程",
       "desc": "📖 快速浏览 Chaos Mesh Dashboard 的各项功能",
+      "previous": "上一步",
+      "next": "下一步",
+      "finish": "完成",
+      "progress": "第 {current} 步，共 {total} 步",
       "steps": {
         "dashboard": "仪表盘是对 Chaos Mesh 的概览，这里你可以观察到所有实验的运行状态。",
         "workflows": "工作流页面管理着所有的工作流。这里允许你编排多个实验来模拟更加真实的故障。",
@@ -214,6 +227,7 @@
   },
   "workflows": {
     "title": "工作流",
+    "single": "工作流",
     "notFound": "未发现工作流",
     "deleteDesc": "你仍然可以在归档中找到此工作流"
   },
@@ -252,6 +266,7 @@
     "notFound": "未发现物理机"
   },
   "settings": {
+    "updateSuccess": "设置已更新。",
     "title": "设置",
     "debugMode": {
       "title": "调试模式",
@@ -265,9 +280,17 @@
       "title": "使用新的 PhysicalMachine CRD",
       "choose": "创建 PhysicalMachineChaos 时，检索可用的 PhysicalMachines 而不是提供地址字段。"
     },
+    "tutorialCard": {
+      "title": "显示教程卡片",
+      "choose": "在首页显示教程卡片，以便重新开始教程。"
+    },
+    "general": {
+      "title": "通用"
+    },
     "theme": {
       "title": "主题",
       "choose": "选择主题。",
+      "auto": "跟随系统",
       "light": "浅色",
       "dark": "暗色"
     },
