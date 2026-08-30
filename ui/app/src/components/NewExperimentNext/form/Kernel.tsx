@@ -19,7 +19,7 @@ import Space from '@/mui-extends/Space'
 import { useExperimentStore } from '@/zustand/experiment'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
-import { Box, IconButton, InputAdornment, MenuItem, Typography } from '@mui/material'
+import { Box, IconButton, Option, Typography } from '@mui/joy'
 import { Form, Formik } from 'formik'
 import { useEffect, useState } from 'react'
 
@@ -83,7 +83,7 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                 }}
               >
                 <Typography component="div">Callchain</Typography>
-                <IconButton color="primary" size="small" onClick={addFrame}>
+                <IconButton color="primary" size="sm" onClick={addFrame}>
                   <AddCircleIcon />
                 </IconButton>
               </Box>
@@ -98,8 +98,8 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                           alignItems: 'center',
                         }}
                       >
-                        <Typography variant="body2">Frame {i + 1}</Typography>
-                        <IconButton color="secondary" size="small" onClick={removeFrame(i)}>
+                        <Typography level="body-sm">Frame {i + 1}</Typography>
+                        <IconButton color="danger" size="sm" onClick={removeFrame(i)}>
                           <RemoveCircleIcon />
                         </IconButton>
                       </Box>
@@ -118,9 +118,9 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                 helperText="What to fail, can be set to 0 / 1 / 2"
               >
                 {[0, 1, 2].map((option) => (
-                  <MenuItem key={option} value={option}>
+                  <Option key={option} value={option}>
                     {option}
-                  </MenuItem>
+                  </Option>
                 ))}
               </SelectField>
               <LabelField
@@ -132,12 +132,12 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                 type="number"
                 name="failKernRequest.probability"
                 helperText="The fails with probability"
-                endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                endDecorator={<Typography level="body-sm">%</Typography>}
               />
               <TextField type="number" name="failKernRequest.times" helperText="The max times of failures" />
             </Space>
 
-            <Submit />
+            <Submit sx={{ mt: 3 }} />
           </Form>
         )
       }}

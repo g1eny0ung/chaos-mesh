@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { Box, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/joy'
 import _ from 'lodash'
 
 const RadioLabel = (label: string, uuid?: string) => (
@@ -32,7 +32,7 @@ const RadioLabel = (label: string, uuid?: string) => (
           ml: 3,
         }}
       >
-        <Typography variant="body2" color="textSecondary" title={uuid}>
+        <Typography level="body-sm" color="neutral" title={uuid}>
           {_.truncate(uuid)}
         </Typography>
       </Box>

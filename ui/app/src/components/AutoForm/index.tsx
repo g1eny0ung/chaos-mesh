@@ -368,7 +368,7 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
                 <>
                   <Divider />
                   <Typography variant="h6">
-                    <T id="newE.steps.scope" />
+                    <T id="newE.sections.targetScope" />
                   </Typography>
                   {hasSelector ? (
                     <Scope

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { InputAdornment, MenuItem } from '@mui/material'
+import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 
 import { SelectField, TextField } from '@/components/FormField'
@@ -30,35 +30,36 @@ const modesWithAdornment = ['fixed-percent', 'random-max-percent']
 
 interface ModeProps {
   modeScope: string
-  scope: string
+  scope?: string
 }
 
-const Mode: ReactFCWithChildren<ModeProps> = ({ modeScope, scope }) => {
+const Mode: ReactFCWithChildren<ModeProps> = ({ modeScope }) => {
   const { values } = useFormikContext()
+  const modePath = modeScope ? `${modeScope}.mode` : 'mode'
+  const valuePath = modeScope ? `${modeScope}.value` : 'value'
+  const mode = getIn(values, modePath)
 
   return (
     <>
       <SelectField
-        name={modeScope ? `${modeScope}.mode` : 'mode'}
-        label={<T id="newE.scope.mode" />}
-        helperText={<T id="newE.scope.modeHelper" />}
+        name={modePath}
+        label={<T id="newE.scope.injectionMode" />}
+        helperText={<T id="newE.scope.injectionModeHelper" />}
       >
-        <MenuItem value="all">All</MenuItem>
+        <Option value="all">All</Option>
         {modes.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
+          <Option key={option.value} value={option.value}>
             {option.name}
-          </MenuItem>
+          </Option>
         ))}
       </SelectField>
 
-      {!['all', 'one'].includes(getIn(values, modeScope).mode) && (
+      {!['all', 'one'].includes(mode) && (
         <TextField
-          name={modeScope ? `${modeScope}.value` : 'value'}
-          label={<T id="newE.scope.modeValue" />}
-          helperText={<T id="newE.scope.modeValueHelper" />}
-          endAdornment={
-            modesWithAdornment.includes(getIn(values, scope).mode) && <InputAdornment position="end">%</InputAdornment>
-          }
+          name={valuePath}
+          label={<T id="newE.scope.countOrPercentage" />}
+          helperText={<T id="newE.scope.countOrPercentageHelper" />}
+          endDecorator={modesWithAdornment.includes(mode) && <Typography level="body-sm">%</Typography>}
         />
       )}
     </>

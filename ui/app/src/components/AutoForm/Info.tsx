@@ -65,7 +65,7 @@ export default function Info({ belong, kind, action }: InfoProps) {
               <SelectField
                 name="metadata.namespace"
                 label={<T id="k8s.namespace" />}
-                helperText={<T id="newE.basic.namespaceHelper" />}
+                helperText={<T id="newE.basic.resourceNamespaceHelper" />}
               >
                 {namespaces.map((n) => (
                   <MenuItem key={n} value={n}>

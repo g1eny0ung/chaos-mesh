@@ -18,13 +18,14 @@ import { useGetEvents, useGetExperiments, useGetSchedules, useGetWorkflows } fro
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
-import { Box, Card, CardContent, Grid, Typography } from '@mui/joy'
+import { Box, CardContent, Grid, Typography } from '@mui/joy'
 import GlobalStyles from '@mui/joy/GlobalStyles'
 import { TourProvider, useTour } from '@reactour/tour'
 import _ from 'lodash'
 import { type ReactNode, useEffect } from 'react'
 
 import EventsTimeline from '@/components/EventsTimeline'
+import PanelCard from '@/components/PanelCard'
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 
@@ -71,7 +72,7 @@ const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; statu
   num,
   status,
 }) => (
-  <Card variant="outlined">
+  <PanelCard>
     <Box
       sx={{
         display: 'flex',
@@ -117,7 +118,7 @@ const NumCard: React.FC<{ icon: ReactNode; title: ReactNode; num?: number; statu
         </Box>
       )}
     </CardContent>
-  </Card>
+  </PanelCard>
 )
 
 export default function Dashboard() {
@@ -188,7 +189,7 @@ export default function Dashboard() {
 
       <Grid container spacing={3}>
         <Grid xs={12} md={6} xl={4}>
-          <Card variant="outlined" sx={{ my: 1.5 }}>
+          <PanelCard sx={{ my: 1.5 }}>
             <Typography
               level="h2"
               sx={{
@@ -198,10 +199,10 @@ export default function Dashboard() {
               {i18n('dashboard.totalStatus')}
             </Typography>
             <TotalStatus height={300} />
-          </Card>
+          </PanelCard>
         </Grid>
         <Grid xs={12} md={6} xl={5}>
-          <Card variant="outlined" sx={{ my: 1.5 }}>
+          <PanelCard sx={{ my: 1.5 }}>
             <Typography
               level="h2"
               sx={{
@@ -211,7 +212,7 @@ export default function Dashboard() {
               {i18n('dashboard.recentEvents')}
             </Typography>
             <EventsTimeline events={events} height={300} />
-          </Card>
+          </PanelCard>
         </Grid>
       </Grid>
     </TourProvider>

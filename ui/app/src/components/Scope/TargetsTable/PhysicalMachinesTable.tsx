@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-import PaperContainer from '@/mui-extends/PaperContainer'
 import type { TypesPhysicalMachine } from '@/openapi/index.schemas'
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Checkbox, Sheet, Table } from '@mui/joy'
 
 import { T } from '@/components/T'
 
@@ -28,39 +27,44 @@ interface PhysicalMachinesTableProps extends TargetsTableActions {
 
 export default function PhysicalMachinesTable({ data, handleSelect, isSelected }: PhysicalMachinesTableProps) {
   return (
-    <TableContainer component={PaperContainer}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell />
-            <TableCell>
+    <Sheet variant="outlined" sx={{ maxHeight: 768, overflow: 'auto', borderRadius: 'sm' }}>
+      <Table hoverRow stickyHeader size="sm">
+        <thead>
+          <tr>
+            <th style={{ width: 40 }} />
+            <th>
               <T id="common.name" />
-            </TableCell>
-            <TableCell>
+            </th>
+            <th>
               <T id="k8s.namespace" />
-            </TableCell>
-            <TableCell>
+            </th>
+            <th>
               <T id="physic.address" />
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((d) => {
-            const key = `${d.namespace}:${d.name}`
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((machine) => {
+            const key = `${machine.namespace}:${machine.name}`
 
             return (
-              <TableRow key={key} onClick={handleSelect(key)}>
-                <TableCell padding="checkbox">
-                  <Checkbox checked={isSelected(key)} />
-                </TableCell>
-                <TableCell>{d.name}</TableCell>
-                <TableCell>{d.namespace}</TableCell>
-                <TableCell>{d.address}</TableCell>
-              </TableRow>
+              <tr key={key} onClick={handleSelect(key)} style={{ cursor: 'pointer' }}>
+                <td>
+                  <Checkbox
+                    checked={isSelected(key)}
+                    readOnly
+                    color="primary"
+                    slotProps={{ input: { 'aria-label': `Select ${machine.name}` } }}
+                  />
+                </td>
+                <td>{machine.name}</td>
+                <td>{machine.namespace}</td>
+                <td>{machine.address}</td>
+              </tr>
             )
           })}
-        </TableBody>
+        </tbody>
       </Table>
-    </TableContainer>
+    </Sheet>
   )
 }

@@ -17,7 +17,7 @@
 import Space from '@/mui-extends/Space'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import { Box, Button } from '@mui/material'
+import { Box, Button } from '@mui/joy'
 import { useState } from 'react'
 
 import { T } from '@/components/T'
@@ -55,7 +55,12 @@ const MoreOptions: ReactFCWithChildren<MoreOptionsProps> = ({
           textAlign: 'right',
         }}
       >
-        <Button color="primary" startIcon={open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} onClick={setOpen}>
+        <Button
+          color="primary"
+          variant="plain"
+          startDecorator={open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+          onClick={setOpen}
+        >
           {title ? title : <T id="common.moreOptions" />}
         </Button>
       </Box>

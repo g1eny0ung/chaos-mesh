@@ -181,7 +181,7 @@ export default function Experiments() {
     <>
       <Space direction="row" sx={{ mb: 6 }}>
         <Button variant="outlined" startIcon={<AddIcon />} onClick={() => navigate('/experiments/new')}>
-          {i18n('newE.title')}
+          {i18n('newE.create')}
         </Button>
         <Button
           variant="outlined"

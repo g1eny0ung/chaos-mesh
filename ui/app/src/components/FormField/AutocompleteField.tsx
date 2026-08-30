@@ -14,47 +14,94 @@
  * limitations under the License.
  *
  */
-import MuiExtendsAutocompleteField from '@/mui-extends/AutocompleteField'
-import type { AutocompleteFieldProps as MuiExtendsAutocompleteFieldProps } from '@/mui-extends/AutocompleteField'
+import { Autocomplete, Chip, ChipDelete, FormControl, FormHelperText, FormLabel } from '@mui/joy'
+import type { AutocompleteProps } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 
 import { T } from '@/components/T'
 
-export interface AutocompleteFieldProps extends MuiExtendsAutocompleteFieldProps {
+export interface AutocompleteFieldProps extends Omit<
+  AutocompleteProps<string, true, boolean, boolean>,
+  'color' | 'multiple' | 'onChange' | 'renderTags' | 'size' | 'value'
+> {
   name: string
+  label?: React.ReactNode
+  helperText?: React.ReactNode
+  error?: boolean
+  fullWidth?: boolean
+  multiple?: true
+  size?: AutocompleteProps<string, true, boolean, boolean>['size'] | 'small' | 'medium'
 }
 
-const AutocompleteField: ReactFCWithChildren<AutocompleteFieldProps> = ({ name, multiple, options, ...props }) => {
-  const { values, setFieldValue } = useFormikContext()
-  const value = getIn(values, name) || []
-
-  const onChange = (_: any, newVal: string | string[] | null, reason: string) => {
-    if (reason === 'clear') {
-      setFieldValue(name, multiple ? [] : '')
-
-      return
-    }
-
-    setFieldValue(name, newVal)
+const normalizeSize = (
+  size: AutocompleteFieldProps['size'],
+): AutocompleteProps<string, true, boolean, boolean>['size'] => {
+  if (size === 'small') {
+    return 'sm'
   }
 
-  const onDelete = (val: string) => () =>
+  if (size === 'medium') {
+    return 'md'
+  }
+
+  return size ?? 'sm'
+}
+
+const AutocompleteField: ReactFCWithChildren<AutocompleteFieldProps> = ({
+  name,
+  label,
+  helperText,
+  error = false,
+  fullWidth,
+  options,
+  disabled,
+  size,
+  sx,
+  ...props
+}) => {
+  const { values, setFieldTouched, setFieldValue } = useFormikContext<Record<string, unknown>>()
+  const value = (getIn(values, name) || []) as string[]
+
+  const removeValue = (item: string) =>
     setFieldValue(
       name,
-      value.filter((d: string) => d !== val),
+      value.filter((valueItem) => valueItem !== item),
     )
 
   return (
-    <MuiExtendsAutocompleteField
-      name={name}
-      {...props}
-      multiple={multiple}
-      options={!props.disabled ? options : []}
-      noOptionsText={<T id="common.noOptions" />}
-      value={value}
-      onChange={onChange}
-      onRenderValueDelete={onDelete}
-    />
+    <FormControl disabled={disabled} error={Boolean(error)} sx={fullWidth ? { width: '100%' } : undefined}>
+      {label && <FormLabel>{label}</FormLabel>}
+      <Autocomplete
+        {...props}
+        name={name}
+        multiple
+        disabled={disabled}
+        options={!disabled ? options : []}
+        noOptionsText={<T id="common.noOptions" />}
+        value={value}
+        size={normalizeSize(size)}
+        sx={sx}
+        onBlur={() => setFieldTouched(name, true)}
+        onChange={(_event, newValue) => setFieldValue(name, newValue)}
+        renderTags={(selected, getTagProps) =>
+          selected.map((item, index) => {
+            const tagProps = getTagProps({ index })
+
+            return (
+              <Chip
+                key={tagProps.key}
+                color="primary"
+                size="sm"
+                endDecorator={<ChipDelete onDelete={() => removeValue(item)} />}
+              >
+                {item}
+              </Chip>
+            )
+          })
+        }
+      />
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
+    </FormControl>
   )
 }
 

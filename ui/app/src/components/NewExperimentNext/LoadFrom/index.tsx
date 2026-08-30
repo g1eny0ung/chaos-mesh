@@ -29,7 +29,7 @@ import {
 } from '@/openapi'
 import type { TypesArchiveDetail, TypesExperimentDetail, TypesScheduleDetail } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
-import { Box, Divider, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material'
+import { Box, Divider, Radio, RadioGroup, Typography } from '@mui/joy'
 import { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 
@@ -174,16 +174,17 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
                   }}
                 >
                   {schedules.map((d) => (
-                    <FormControlLabel
+                    <Radio
                       key={d.uid}
                       value={`s+${d.uid}`}
-                      control={<Radio color="primary" />}
                       label={RadioLabel(d.name!, d.uid)}
+                      color="primary"
+                      sx={{ mr: 2, mb: 1 }}
                     />
                   ))}
                 </Box>
               ) : (
-                <Typography variant="body2" color="textSecondary">
+                <Typography level="body-sm" color="neutral">
                   {i18n('schedules.notFound')}
                 </Typography>
               )}
@@ -206,16 +207,17 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
                   }}
                 >
                   {experiments.map((d) => (
-                    <FormControlLabel
+                    <Radio
                       key={d.uid}
                       value={`e+${d.uid}`}
-                      control={<Radio color="primary" />}
                       label={RadioLabel(d.name!, d.uid)}
+                      color="primary"
+                      sx={{ mr: 2, mb: 1 }}
                     />
                   ))}
                 </Box>
               ) : (
-                <Typography variant="body2" color="textSecondary">
+                <Typography level="body-sm" color="neutral">
                   {i18n('experiments.notFound')}
                 </Typography>
               )}
@@ -236,16 +238,17 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
               }}
             >
               {archives.map((d) => (
-                <FormControlLabel
+                <Radio
                   key={d.uid}
                   value={`a+${d.uid}`}
-                  control={<Radio color="primary" />}
                   label={RadioLabel(d.name!, d.uid)}
+                  color="primary"
+                  sx={{ mr: 2, mb: 1 }}
                 />
               ))}
             </Box>
           ) : (
-            <Typography variant="body2" color="textSecondary">
+            <Typography level="body-sm" color="neutral">
               {i18n('archives.notFound')}
             </Typography>
           )}

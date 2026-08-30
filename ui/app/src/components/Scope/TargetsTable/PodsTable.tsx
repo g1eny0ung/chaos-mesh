@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-import PaperContainer from '@/mui-extends/PaperContainer'
 import type { TypesPod } from '@/openapi/index.schemas'
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Checkbox, Sheet, Table } from '@mui/joy'
 
 import { T } from '@/components/T'
 
@@ -26,45 +25,50 @@ interface PodsTableProps extends TargetsTableActions {
   data: TypesPod[]
 }
 
-export default function PosTable({ data, handleSelect, isSelected }: PodsTableProps) {
+export default function PodsTable({ data, handleSelect, isSelected }: PodsTableProps) {
   return (
-    <TableContainer component={PaperContainer}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell />
-            <TableCell>
+    <Sheet variant="outlined" sx={{ maxHeight: 768, overflow: 'auto', borderRadius: 'sm' }}>
+      <Table hoverRow stickyHeader size="sm">
+        <thead>
+          <tr>
+            <th style={{ width: 40 }} />
+            <th>
               <T id="common.name" />
-            </TableCell>
-            <TableCell>
+            </th>
+            <th>
               <T id="k8s.namespace" />
-            </TableCell>
-            <TableCell>
+            </th>
+            <th>
               <T id="common.ip" />
-            </TableCell>
-            <TableCell>
+            </th>
+            <th>
               <T id="common.state" />
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((d) => {
-            const key = `${d.namespace}:${d.name}`
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((pod) => {
+            const key = `${pod.namespace}:${pod.name}`
 
             return (
-              <TableRow key={key} onClick={handleSelect(key)}>
-                <TableCell padding="checkbox">
-                  <Checkbox checked={isSelected(key)} />
-                </TableCell>
-                <TableCell>{d.name}</TableCell>
-                <TableCell>{d.namespace}</TableCell>
-                <TableCell>{d.ip}</TableCell>
-                <TableCell>{d.state}</TableCell>
-              </TableRow>
+              <tr key={key} onClick={handleSelect(key)} style={{ cursor: 'pointer' }}>
+                <td>
+                  <Checkbox
+                    checked={isSelected(key)}
+                    readOnly
+                    color="primary"
+                    slotProps={{ input: { 'aria-label': `Select ${pod.name}` } }}
+                  />
+                </td>
+                <td>{pod.name}</td>
+                <td>{pod.namespace}</td>
+                <td>{pod.ip}</td>
+                <td>{pod.state}</td>
+              </tr>
             )
           })}
-        </TableBody>
+        </tbody>
       </Table>
-    </TableContainer>
+    </Sheet>
   )
 }

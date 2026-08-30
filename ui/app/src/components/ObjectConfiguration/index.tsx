@@ -74,7 +74,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
         {!inNode && (
           <Grid size={vertical ? 12 : 3}>
             <Typography variant="subtitle2" gutterBottom>
-              {i18n('newE.steps.basic')}
+              {i18n('newE.sections.basicInformation')}
             </Typography>
 
             <Table size="small">
@@ -113,7 +113,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
         {(hasAddress || experiment?.selector) && (
           <Grid size={vertical ? 12 : 3}>
             <Typography variant="subtitle2" gutterBottom>
-              {i18n('newE.steps.scope')}
+              {i18n('newE.sections.targetScope')}
             </Typography>
 
             {experiment?.selector && <Selector data={experiment.selector} />}
@@ -150,7 +150,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
 
         <Grid size={vertical ? 12 : 3}>
           <Typography variant="subtitle2" gutterBottom>
-            {i18n('newE.steps.run')}
+            {i18n('newE.sections.runSettings')}
           </Typography>
 
           <Table size="small">
@@ -160,7 +160,11 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
                   <TableCell>{i18n(inNode ? 'newW.node.deadline' : 'common.duration')}</TableCell>
                   <TableCell>
                     <Typography variant="body2" color="textSecondary">
-                      {inNode ? (config as any).deadline : spec.duration ? spec.duration : i18n('newE.run.continuous')}
+                      {inNode
+                        ? (config as any).deadline
+                        : spec.duration
+                          ? spec.duration
+                          : i18n('newE.run.continuousWithoutDuration')}
                     </Typography>
                   </TableCell>
                 </TableRow>

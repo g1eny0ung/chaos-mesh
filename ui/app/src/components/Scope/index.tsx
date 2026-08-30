@@ -23,7 +23,7 @@ import {
 } from '@/openapi'
 import type { Env } from '@/zustand/experiment'
 import { useSettingStore } from '@/zustand/setting'
-import { MenuItem, Typography } from '@mui/material'
+import { Option, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import { useEffect, useMemo } from 'react'
 
@@ -46,13 +46,16 @@ interface ScopeProps {
   previewTitle?: string | React.JSX.Element
 }
 
+const emptySelectors: string[] = []
+
 const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTitle }: ScopeProps) => {
   const { values, setFieldValue, errors, touched } = useFormikContext()
   const {
-    namespaces: currentNamespaces,
-    labelSelectors: currentLabels,
-    annotationSelectors: currentAnnotations,
-  } = getIn(values, scope)
+    namespaces: currentNamespaces = emptySelectors,
+    labelSelectors: currentLabels = emptySelectors,
+    annotationSelectors: currentAnnotations = emptySelectors,
+    podPhaseSelectors: currentPodPhases = emptySelectors,
+  } = getIn(values, scope) || {}
 
   const enableKubeSystemNS = useSettingStore((state) => state.enableKubeSystemNS)
 
@@ -90,11 +93,11 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
   useEffect(() => {
     // Set namespaces automatically when `targetNamespace` is set because there is only one namespace.
     if (namespaces.length === 1) {
-      setFieldValue(`${scope}.namespace`, namespaces)
+      setFieldValue(`${scope}.namespaces`, namespaces)
 
       // Set namespace in metadata automatically too.
       if (scope === 'spec.selector') {
-        setFieldValue('namespace', namespaces[0])
+        setFieldValue('metadata.namespace', namespaces[0])
       }
     }
   }, [namespaces, scope, setFieldValue])
@@ -108,6 +111,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
             namespaces: currentNamespaces,
             labelSelectors: arrToObjBySep(currentLabels, kvSeparator),
             annotationSelectors: arrToObjBySep(currentAnnotations, kvSeparator),
+            podPhaseSelectors: currentPodPhases,
           },
         })
       } else {
@@ -120,7 +124,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
         })
       }
     }
-  }, [currentNamespaces, currentLabels, currentAnnotations, env, postPods, postPhysicalMachines])
+  }, [currentNamespaces, currentLabels, currentAnnotations, currentPodPhases, env, postPods, postPhysicalMachines])
 
   return (
     <Space>
@@ -167,9 +171,9 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
           fullWidth
         >
           {podPhases.map((option) => (
-            <MenuItem key={option} value={option}>
+            <Option key={option} value={option}>
               {option}
-            </MenuItem>
+            </Option>
           ))}
         </SelectField>
       </MoreOptions>
@@ -184,7 +188,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
         >
           {previewTitle || <T id={`newE.scope.target${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}Preview`} />}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+        <Typography level="body-sm" color="neutral">
           <T id={`newE.scope.target${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}PreviewHelper`} />
         </Typography>
       </div>
@@ -193,7 +197,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
         <TargetsTable env={env} scope={scope} data={targets} />
       ) : (
         <Typography
-          variant="body2"
+          level="body-sm"
           sx={{
             fontWeight: 'medium',
           }}
@@ -215,12 +219,7 @@ const ConditionalScope = ({ kind, ...rest }: ConditionalScopeProps) => {
   const useNewPhysicalMachine = useSettingStore((state) => state.useNewPhysicalMachine)
 
   if (disabled) {
-    return (
-      <Typography
-        variant="body2"
-        sx={{ color: 'text.disabled' }}
-      >{`${kind} does not need to define the scope.`}</Typography>
-    )
+    return <Typography level="body-sm" color="neutral">{`${kind} does not need to define the scope.`}</Typography>
   }
 
   if (rest.env === 'physic' && !useNewPhysicalMachine) {

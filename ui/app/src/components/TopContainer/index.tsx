@@ -140,7 +140,7 @@ const TopContainer = () => {
         <JoyThemeSync mode={joyThemeMode} />
         <RouteHeadTitle />
         <CssBaseline />
-        <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
+        <Box sx={{ display: 'flex', height: '100dvh', overflow: 'hidden' }}>
           <Sidebar />
           <Box
             component="main"
@@ -149,6 +149,9 @@ const TopContainer = () => {
               display: 'flex',
               flexDirection: 'column',
               height: '100dvh',
+              minWidth: 0,
+              minHeight: 0,
+              overflowY: 'auto',
               p: 2,
               pt: 8,
               '@media (min-width: 768px)': {

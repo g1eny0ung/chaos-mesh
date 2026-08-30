@@ -15,7 +15,7 @@
  *
  */
 import { useExperimentStore } from '@/zustand/experiment'
-import { Box, FormControlLabel, Link, Switch, Typography } from '@mui/material'
+import { Box, Link, Switch, Typography } from '@mui/joy'
 import { FormikErrors, FormikTouched, getIn, useFormikContext } from 'formik'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
@@ -80,17 +80,23 @@ const Scheduler: ReactFCWithChildren<SchedulerProps> = ({ errors, touched, inSch
             fontWeight: 500,
           }}
         >
-          {i18n('newE.steps.run')}
+          {i18n('newE.sections.runSettings')}
         </Typography>
         {!inSchedule && (
-          <FormControlLabel
-            style={{ marginRight: 0 }}
-            control={
-              <Switch name="continuous" color="primary" size="small" checked={continuous} onChange={handleChecked} />
-            }
-            label={i18n('newE.run.continuous')}
-            disabled={instant}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography level="body-sm" color={instant ? 'neutral' : undefined}>
+              {i18n('newE.run.continuousWithoutDuration')}
+            </Typography>
+            <Switch
+              color={continuous ? 'primary' : 'neutral'}
+              variant={continuous ? 'solid' : 'outlined'}
+              size="sm"
+              checked={continuous}
+              disabled={instant}
+              onChange={handleChecked}
+              slotProps={{ input: { name: 'continuous' } }}
+            />
+          </Box>
         )}
       </Box>
 

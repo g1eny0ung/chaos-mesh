@@ -15,17 +15,15 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import Paper from '@/mui-extends/Paper'
 import { useGetCommonConfig } from '@/openapi'
 import { Env, useExperimentActions, useExperimentStore } from '@/zustand/experiment'
-import CheckIcon from '@mui/icons-material/Check'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined'
 import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined'
-import UndoIcon from '@mui/icons-material/Undo'
-import { Box, Card, Divider, Typography } from '@mui/material'
-import { styled } from '@mui/material/styles'
-import clsx from 'clsx'
+import { Box, Button, Card, Divider, Grid, Typography } from '@mui/joy'
 
+import PanelCard from '@/components/PanelCard'
 import i18n from '@/components/T'
 
 import { iconByKind, transByKind } from '@/lib/byKind'
@@ -35,43 +33,43 @@ import Kernel from './form/Kernel'
 import Stress from './form/Stress'
 import TargetGenerated from './form/TargetGenerated'
 
-const PREFIX = 'Step1'
-
-const classes = {
-  card: `${PREFIX}-card`,
-  cardActive: `${PREFIX}-cardActive`,
-  submit: `${PREFIX}-submit`,
-  submitIcon: `${PREFIX}-submitIcon`,
-  asButton: `${PREFIX}-asButton`,
-}
-
-const StyledPaper = styled(Paper)(({ theme }) => {
-  const cardActive = {
-    color: theme.palette.primary.main,
-    borderColor: theme.palette.primary.main,
-  }
-
-  return {
-    [`& .${classes.card}`]: {
-      cursor: 'pointer',
-      marginTop: theme.spacing(3),
-      marginRight: theme.spacing(3),
-      '&:hover': cardActive,
-    },
-    [`& .${classes.cardActive}`]: cardActive,
-    [`& .${classes.submit}`]: {
-      borderColor: theme.palette.success.main,
-    },
-    [`& .${classes.submitIcon}`]: {
-      color: theme.palette.success.main,
-    },
-    [`& .${classes.asButton}`]: {
-      cursor: 'pointer',
-    },
-  }
+const cardSx = (active: boolean, minHeight = 64) => ({
+  cursor: 'pointer',
+  width: '100%',
+  minWidth: 0,
+  minHeight,
+  height: '100%',
+  p: 1.5,
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 1.5,
+  font: 'inherit',
+  textAlign: 'left',
+  ...(active && {
+    color: 'primary.500',
+    borderColor: 'primary.outlinedBorder',
+    bgcolor: 'primary.softBg',
+  }),
+  '&:hover': {
+    color: 'primary.500',
+    borderColor: 'primary.outlinedBorder',
+    bgcolor: 'primary.softHoverBg',
+  },
 })
 
-const submitDirectly = ['pod-failure']
+const iconSx = (active: boolean) => ({
+  display: 'grid',
+  placeItems: 'center',
+  flex: '0 0 auto',
+  width: 36,
+  height: 36,
+  borderRadius: 'sm',
+  color: active ? 'primary.softColor' : 'neutral.600',
+  bgcolor: active ? 'primary.softHoverBg' : 'neutral.softBg',
+  '& svg': {
+    fontSize: 'xl2',
+  },
+})
 
 interface TypeCardProp {
   name: Env
@@ -81,39 +79,19 @@ interface TypeCardProp {
 
 const TypeCard: ReactFCWithChildren<TypeCardProp> = ({ name, handleSwitchEnv, env }) => {
   const title = name === 'k8s' ? 'k8s.title' : 'physics.single'
+  const active = env === name
+
   return (
     <Card
-      className={clsx(classes.card, env === name ? classes.cardActive : '')}
+      component="button"
+      type="button"
+      aria-pressed={active}
       variant="outlined"
+      sx={cardSx(active)}
       onClick={handleSwitchEnv(name)}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: 225,
-          height: 75,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            flex: 1,
-          }}
-        >
-          {iconByKind(name)}
-        </Box>
-        <Box
-          sx={{
-            flex: 1.5,
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="button">{i18n(title)}</Typography>
-        </Box>
-      </Box>
+      <Box sx={iconSx(active)}>{iconByKind(name)}</Box>
+      <Typography level="title-sm">{i18n(title)}</Typography>
     </Card>
   )
 }
@@ -145,10 +123,6 @@ const Step1 = () => {
 
   const handleSelectAction = (newAction: string) => () => {
     setKindAction([kind, newAction])
-
-    if (submitDirectly.includes(newAction)) {
-      handleSubmitStep1({ action: newAction })
-    }
   }
 
   const handleSubmitStep1 = (values: Record<string, any>) => {
@@ -167,7 +141,7 @@ const Step1 = () => {
     setStep1(true)
   }
 
-  const handleUndo = () => setStep1(false)
+  const handleEdit = () => setStep1(false)
 
   const handleSwitchEnv = (env: Env) => () => {
     setKindAction(['', ''])
@@ -175,89 +149,68 @@ const Step1 = () => {
   }
 
   return (
-    <StyledPaper className={step1 ? classes.submit : ''}>
+    <PanelCard sx={{ p: step1 ? 1.5 : undefined }}>
       <Box
         sx={{
           display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          mb: step1 ? 0 : 3,
+          mb: step1 ? 0 : 2,
         }}
       >
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
+            gap: 1,
           }}
         >
-          {step1 && (
-            <Box
-              sx={{
-                display: 'flex',
-                mr: 3,
-              }}
-            >
-              <CheckIcon className={classes.submitIcon} />
-            </Box>
-          )}
-          <Typography>{i18n('newE.titleStep1')}</Typography>
+          {step1 && <CheckCircleRoundedIcon sx={{ color: 'var(--joy-palette-success-500)' }} />}
+          <Typography level="title-md" component="div">
+            {i18n('newE.sections.injectionTarget')}
+          </Typography>
         </Box>
-        {step1 && <UndoIcon className={classes.asButton} onClick={handleUndo} />}
+        {step1 && (
+          <Button
+            size="sm"
+            variant="plain"
+            color="neutral"
+            startDecorator={<EditOutlinedIcon sx={{ fontSize: 18 }} />}
+            onClick={handleEdit}
+          >
+            {i18n('common.edit')}
+          </Button>
+        )}
       </Box>
       <Box hidden={step1}>
-        <Box
-          sx={{
-            display: 'flex',
-          }}
-        >
-          <TypeCard name="k8s" handleSwitchEnv={handleSwitchEnv} env={env} />
-          <TypeCard name="physic" handleSwitchEnv={handleSwitchEnv} env={env} />
-        </Box>
-        <Divider sx={{ my: 6 }} />
+        <Grid container spacing={3}>
+          <Grid xs={12} sm={6} md={4} xl={3}>
+            <TypeCard name="k8s" handleSwitchEnv={handleSwitchEnv} env={env} />
+          </Grid>
+          <Grid xs={12} sm={6} md={4} xl={3}>
+            <TypeCard name="physic" handleSwitchEnv={handleSwitchEnv} env={env} />
+          </Grid>
+        </Grid>
+        <Divider sx={{ my: 4 }} />
       </Box>
       <Box hidden={step1}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-          }}
-        >
+        <Grid container spacing={3}>
           {typesDataEntries.map(([key]) => (
-            <Card
-              key={key}
-              className={clsx(classes.card, kind === key ? classes.cardActive : '')}
-              variant="outlined"
-              onClick={handleSelectTarget(key)}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: 280,
-                  height: 75,
-                }}
+            <Grid key={key} xs={12} sm={6} md={4} xl={3}>
+              <Card
+                component="button"
+                type="button"
+                aria-pressed={kind === key}
+                variant="outlined"
+                sx={cardSx(kind === key)}
+                onClick={handleSelectTarget(key)}
               >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    flex: 1,
-                  }}
-                >
-                  {iconByKind(key)}
-                </Box>
-                <Box
-                  sx={{
-                    flex: 1.5,
-                    textAlign: 'center',
-                  }}
-                >
-                  <Typography variant="button">{transByKind(key)}</Typography>
-                </Box>
-              </Box>
-            </Card>
+                <Box sx={iconSx(kind === key)}>{iconByKind(key)}</Box>
+                <Typography level="title-sm">{transByKind(key)}</Typography>
+              </Card>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
         {kind && (
           <Box
             sx={{
@@ -266,57 +219,32 @@ const Step1 = () => {
           >
             <Box
               sx={{
-                mt: 6,
+                mt: 4,
                 mb: 3,
               }}
             >
               <Divider />
             </Box>
             {(typesData as any)[kind].categories ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                }}
-              >
+              <Grid container spacing={3}>
                 {(typesData as any)[kind].categories!.map((d: any) => (
-                  <Card
-                    key={d.key}
-                    className={clsx(classes.card, action === d.key ? classes.cardActive : '')}
-                    variant="outlined"
-                    onClick={handleSelectAction(d.key)}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: 210,
-                        height: 50,
-                      }}
+                  <Grid key={d.key} xs={12} sm={6} md={4} xl={3}>
+                    <Card
+                      component="button"
+                      type="button"
+                      aria-pressed={action === d.key}
+                      variant="outlined"
+                      sx={cardSx(action === d.key, 52)}
+                      onClick={handleSelectAction(d.key)}
                     >
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          flex: 0.5,
-                        }}
-                      >
+                      <Box sx={{ display: 'grid', placeItems: 'center', flex: '0 0 auto' }}>
                         {action === d.key ? <RadioButtonCheckedOutlinedIcon /> : <RadioButtonUncheckedOutlinedIcon />}
                       </Box>
-                      <Box
-                        sx={{
-                          flex: 1.5,
-                          textAlign: 'center',
-                        }}
-                      >
-                        <Typography variant="button">{d.name}</Typography>
-                      </Box>
-                    </Box>
-                  </Card>
+                      <Typography level="title-sm">{d.name}</Typography>
+                    </Card>
+                  </Grid>
                 ))}
-              </Box>
+              </Grid>
             ) : kind === 'KernelChaos' ? (
               <Box
                 sx={{
@@ -363,9 +291,9 @@ const Step1 = () => {
             ) : null}
           </Box>
         )}
-        {action && !submitDirectly.includes(action) && (
+        {action && (
           <>
-            <Divider sx={{ my: 6 }} />
+            <Divider sx={{ my: 4 }} />
             <TargetGenerated
               // Force re-rendered after action changed
               key={kind + action}
@@ -380,7 +308,7 @@ const Step1 = () => {
           </>
         )}
       </Box>
-    </StyledPaper>
+    </PanelCard>
   )
 }
 

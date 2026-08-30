@@ -118,7 +118,7 @@ const Token: ReactFCWithChildren<TokenProps> = ({ onSubmitCallback }) => {
               error={errors.token && touched.token ? true : false}
             />
           </Space>
-          <Submit fullWidth />
+          <Submit sx={{ mt: 3 }} />
         </Form>
       )}
     </Formik>

@@ -77,7 +77,7 @@ const router = createHashRouter([
       {
         path: 'experiments/new',
         Component: NewExperiment,
-        handle: { title: 'newE.title' },
+        handle: { title: 'newE.create' },
       },
       {
         path: 'experiments',

@@ -38,7 +38,7 @@ const SimpleNode = ({ template: t }: NodeConfigurationProps) => (
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>{i18n('newE.target.kind')}</TableCell>
+        <TableCell>{i18n('newE.target.faultType')}</TableCell>
         <TableCell>
           <Typography variant="body2" color="textSecondary">
             {t.templateType}
@@ -65,7 +65,7 @@ const Custom = ({ template: t }: NodeConfigurationProps) => {
   return (
     <>
       <Typography variant="subtitle2" gutterBottom>
-        {i18n('newE.steps.basic')}
+        {i18n('newE.sections.basicInformation')}
       </Typography>
       <Table size="small">
         <TableBody>

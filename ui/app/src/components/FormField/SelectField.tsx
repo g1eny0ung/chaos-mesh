@@ -14,19 +14,116 @@
  * limitations under the License.
  *
  */
-import MuiExtendsSelectField, { SelectFieldProps } from '@/mui-extends/SelectField'
-import { Field, getIn, useFormikContext } from 'formik'
+import { Chip, ChipDelete, FormControl, FormHelperText, FormLabel, Option, Select } from '@mui/joy'
+import type { SelectProps } from '@mui/joy'
+import type { SelectOption } from '@mui/joy/Select'
+import { getIn, useFormikContext } from 'formik'
+import { Children, isValidElement } from 'react'
 
-function SelectField<T>(props: SelectFieldProps<T>) {
-  const { values, setFieldValue } = useFormikContext()
+export type SelectFieldProps<T = string> = Omit<
+  SelectProps<any, boolean>,
+  'color' | 'defaultValue' | 'multiple' | 'name' | 'onChange' | 'renderValue' | 'size' | 'value'
+> & {
+  name: string
+  label?: React.ReactNode
+  helperText?: React.ReactNode
+  error?: boolean
+  fullWidth?: boolean
+  multiple?: boolean
+  defaultValue?: T
+  size?: SelectProps<any, boolean>['size'] | 'small' | 'medium'
+}
 
-  const onDelete = (val: string) => () =>
+const normalizeSize = (size: SelectFieldProps['size']): SelectProps<any, boolean>['size'] => {
+  if (size === 'small') {
+    return 'sm'
+  }
+
+  if (size === 'medium') {
+    return 'md'
+  }
+
+  return size ?? 'sm'
+}
+
+function SelectField<T>({
+  name,
+  label,
+  helperText,
+  error = false,
+  fullWidth,
+  multiple = false,
+  defaultValue,
+  children,
+  size,
+  sx,
+  ...rest
+}: SelectFieldProps<T>) {
+  const { values, setFieldTouched, setFieldValue } = useFormikContext<Record<string, unknown>>()
+  const currentValue = getIn(values, name) ?? (multiple ? [] : (defaultValue ?? null))
+
+  const options = Children.map(children, (child) => {
+    if (!isValidElement<{ children?: React.ReactNode; disabled?: boolean; value?: unknown }>(child)) {
+      return child
+    }
+
+    return (
+      <Option key={child.key} value={child.props.value as any} disabled={child.props.disabled}>
+        {child.props.children}
+      </Option>
+    )
+  })
+
+  const removeValue = (value: unknown) =>
     setFieldValue(
-      props.name!,
-      (getIn(values, props.name!) as string[]).filter((d) => d !== val),
+      name,
+      (currentValue as unknown[]).filter((item) => item !== value),
     )
 
-  return <Field {...props} as={MuiExtendsSelectField} onRenderValueDelete={onDelete} />
+  return (
+    <FormControl disabled={rest.disabled} error={Boolean(error)} sx={fullWidth ? { width: '100%' } : undefined}>
+      {label && <FormLabel>{label}</FormLabel>}
+      <Select
+        {...rest}
+        name={name}
+        value={currentValue as any}
+        multiple={multiple}
+        size={normalizeSize(size)}
+        sx={sx}
+        onBlur={() => setFieldTouched(name, true)}
+        onChange={(_event, value) => setFieldValue(name, value)}
+        renderValue={
+          multiple
+            ? (selected) => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {(selected as SelectOption<any>[]).map((option) => (
+                    <Chip
+                      key={String(option.value)}
+                      color="primary"
+                      size="sm"
+                      endDecorator={
+                        <ChipDelete
+                          onMouseDown={(event) => event.stopPropagation()}
+                          onDelete={(event) => {
+                            event.stopPropagation()
+                            removeValue(option.value)
+                          }}
+                        />
+                      }
+                    >
+                      {option.label}
+                    </Chip>
+                  ))}
+                </div>
+              )
+            : undefined
+        }
+      >
+        {options}
+      </Select>
+      {helperText && <FormHelperText>{helperText}</FormHelperText>}
+    </FormControl>
+  )
 }
 
 export default SelectField

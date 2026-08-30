@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { Stack, StackProps } from '@mui/material'
+import { Stack, StackProps } from '@mui/joy'
 
 function Space(props: StackProps) {
   return <Stack spacing={3} {...props} />

@@ -14,24 +14,15 @@
  * limitations under the License.
  *
  */
-import { Box, Button } from '@mui/material'
-import type { ButtonProps } from '@mui/material'
+import { Button } from '@mui/joy'
+import type { ButtonProps } from '@mui/joy'
 
 import { T } from '@/components/T'
 
 export default function Submit({ sx, ...rest }: ButtonProps) {
   return (
-    <Box>
-      <Button
-        {...rest}
-        type={rest.onClick ? undefined : 'submit'}
-        variant="contained"
-        size="small"
-        fullWidth
-        sx={{ mt: 3, ...sx }}
-      >
-        <T id="common.submit" />
-      </Button>
-    </Box>
+    <Button {...rest} type={rest.onClick ? undefined : 'submit'} variant="solid" size="sm" fullWidth sx={sx}>
+      <T id="common.submit" />
+    </Button>
   )
 }

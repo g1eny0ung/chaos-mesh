@@ -19,7 +19,7 @@ import { useComponentActions } from '@/zustand/component'
 import { useResolvedTheme } from '@/zustand/system'
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import PublishIcon from '@mui/icons-material/Publish'
-import { Box, Button } from '@mui/material'
+import { Box, Button } from '@mui/joy'
 import { type Editor } from 'ace-builds'
 import ace from 'ace-builds/src-noconflict/ace'
 import 'ace-builds/src-noconflict/mode-yaml'
@@ -99,22 +99,25 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
         {...aceProps}
       />
       {(typeof onUpdate === 'function' || download) && (
-        <Space
-          direction="row"
-          sx={{ position: 'absolute', top: (theme) => theme.spacing(1.5), right: (theme) => theme.spacing(3) }}
-        >
+        <Space direction="row" sx={{ position: 'absolute', top: 1.5, right: 3 }}>
           {download && (
             <Button
               variant="outlined"
-              size="small"
-              startIcon={<CloudDownloadOutlinedIcon />}
+              size="sm"
+              startDecorator={<CloudDownloadOutlinedIcon />}
               onClick={handleDownloadExperiment}
             >
               {i18n('common.download')}
             </Button>
           )}
           {typeof onUpdate === 'function' && (
-            <Button variant="outlined" color="primary" size="small" startIcon={<PublishIcon />} onClick={handleSelect}>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="sm"
+              startDecorator={<PublishIcon />}
+              onClick={handleSelect}
+            >
               {i18n('common.update')}
             </Button>
           )}

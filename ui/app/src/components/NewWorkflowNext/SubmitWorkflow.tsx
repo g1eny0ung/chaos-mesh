@@ -158,7 +158,11 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
                       name="namespace"
                       label={<T id="k8s.namespace" />}
                       helperText={
-                        errors.namespace && touched.namespace ? errors.namespace : <T id="newE.basic.namespaceHelper" />
+                        errors.namespace && touched.namespace ? (
+                          errors.namespace
+                        ) : (
+                          <T id="newE.basic.resourceNamespaceHelper" />
+                        )
                       }
                       error={errors.namespace && touched.namespace ? true : false}
                     >

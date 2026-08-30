@@ -16,7 +16,7 @@
  */
 import Space from '@/mui-extends/Space'
 import { useExperimentStore } from '@/zustand/experiment'
-import { Typography } from '@mui/material'
+import { Typography } from '@mui/joy'
 import { Form, Formik, getIn } from 'formik'
 import { useEffect, useState } from 'react'
 
@@ -72,7 +72,7 @@ const Stress: ReactFCWithChildren<StressProps> = ({ onSubmit }) => {
       {({ errors }) => (
         <Form>
           <Space>
-            <Typography>CPU</Typography>
+            <Typography level="title-sm">CPU</Typography>
             <TextField
               type="number"
               name="stressors.cpu.workers"
@@ -90,7 +90,7 @@ const Stress: ReactFCWithChildren<StressProps> = ({ onSubmit }) => {
               helperText="Type and end with Enter to generate the stress-ng options"
             />
 
-            <Typography>Memory</Typography>
+            <Typography level="title-sm">Memory</Typography>
             <TextField
               type="number"
               name="stressors.memory.workers"
@@ -126,7 +126,7 @@ const Stress: ReactFCWithChildren<StressProps> = ({ onSubmit }) => {
             />
           </MoreOptions>
 
-          <Submit />
+          <Submit sx={{ mt: 3 }} />
         </Form>
       )}
     </Formik>

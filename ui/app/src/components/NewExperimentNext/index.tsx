@@ -16,11 +16,7 @@
  */
 import Space from '@/mui-extends/Space'
 import { useExperimentActions } from '@/zustand/experiment'
-import TabContext from '@mui/lab/TabContext'
-import TabList from '@mui/lab/TabList'
-import TabPanel from '@mui/lab/TabPanel'
-import { Box } from '@mui/material'
-import Tab from '@mui/material/Tab'
+import { Box, Tab, TabList, TabPanel, Tabs } from '@mui/joy'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 
 import i18n from '@/components/T'
@@ -58,8 +54,10 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
     setPanel,
   }))
 
-  const onChange = (_: any, newValue: PanelType) => {
-    setPanel(newValue)
+  const onChange = (_event: React.SyntheticEvent | null, newValue: string | number | null) => {
+    if (newValue) {
+      setPanel(newValue as PanelType)
+    }
   }
 
   const fillExperiment = (original: any) => {
@@ -79,30 +77,30 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
   }
 
   return (
-    <TabContext value={panel}>
+    <Tabs value={panel} onChange={onChange}>
       {loadFrom && (
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={onChange}>
-            <Tab label={i18n(`${inSchedule ? 'newS' : 'newE'}.title`)} value="initial" />
-            <Tab label={i18n('newE.loadFrom')} value="existing" />
-            <Tab label={i18n('newE.byYAML')} value="yaml" />
+        <Box>
+          <TabList variant="soft">
+            <Tab value="initial">{i18n(inSchedule ? 'newS.title' : 'newE.create')}</Tab>
+            <Tab value="existing">{i18n('newE.loadExistingExperiment')}</Tab>
+            <Tab value="yaml">{i18n('newE.createFromYAML')}</Tab>
           </TabList>
         </Box>
       )}
-      <TabPanel value="initial" sx={{ p: 0, pt: 6 }}>
-        <Space spacing={6}>
+      <TabPanel value="initial" sx={{ p: 0, pt: 3 }}>
+        <Space spacing={3}>
           <Step1 />
           <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
           <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} />
         </Space>
       </TabPanel>
-      <TabPanel value="existing" sx={{ p: 0, pt: 6 }}>
+      <TabPanel value="existing" sx={{ p: 0, pt: 3 }}>
         {loadFrom && <LoadFrom callback={fillExperiment} inSchedule={inSchedule} inWorkflow={inWorkflow} />}
       </TabPanel>
-      <TabPanel value="yaml" sx={{ p: 0, pt: 6 }}>
+      <TabPanel value="yaml" sx={{ p: 0, pt: 3 }}>
         <ByYAML callback={fillExperiment} />
       </TabPanel>
-    </TabContext>
+    </Tabs>
   )
 }
 

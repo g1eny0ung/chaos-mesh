@@ -310,7 +310,7 @@ export const Experiment = ({ kind, data }: { kind: ExperimentKind; data: any }) 
   <Table size="small">
     <TableBody>
       <TableRow>
-        <TableCell>{i18n('newE.target.kind')}</TableCell>
+        <TableCell>{i18n('newE.target.faultType')}</TableCell>
         <TableCell>
           <Typography variant="body2" color="textSecondary">
             {kind}
@@ -319,7 +319,7 @@ export const Experiment = ({ kind, data }: { kind: ExperimentKind; data: any }) 
       </TableRow>
       {['PodChaos', 'NetworkChaos', 'IOChaos'].includes(kind) && (
         <TableRow>
-          <TableCell>{i18n('newE.target.action')}</TableCell>
+          <TableCell>{i18n('newE.target.faultAction')}</TableCell>
           <TableCell>
             <Typography variant="body2" color="textSecondary">
               {data.action}

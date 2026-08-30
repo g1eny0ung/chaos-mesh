@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import { InputAdornment, MenuItem } from '@mui/material'
+import { Option, Typography } from '@mui/joy'
 import { FormikProps, FormikValues, getIn } from 'formik'
 import { number, string } from 'yup'
 
@@ -63,22 +63,22 @@ export const Fields = ({ errors, touched }: Pick<FormikProps<FormikValues>, 'err
       }
       error={getIn(errors, 'spec.concurrencyPolicy') && getIn(touched, 'spec.concurrencyPolicy')}
     >
-      <MenuItem value="Forbid">
+      <Option value="Forbid">
         <T id="newS.basic.forbid" />
-      </MenuItem>
-      <MenuItem value="Allow">
+      </Option>
+      <Option value="Allow">
         <T id="newS.basic.allow" />
-      </MenuItem>
+      </Option>
     </SelectField>
     <TextField
       fast
       type="number"
       name="spec.startingDeadlineSeconds"
       label={<T id="newS.basic.startingDeadlineSeconds" />}
-      endAdornment={
-        <InputAdornment position="end">
+      endDecorator={
+        <Typography level="body-sm">
           <T id="common.seconds" />
-        </InputAdornment>
+        </Typography>
       }
       helperText={
         getIn(errors, 'spec.startingDeadlineSeconds') && getIn(touched, 'spec.startingDeadlineSeconds') ? (

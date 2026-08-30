@@ -16,15 +16,15 @@
  */
 import { useComponentActions } from '@/zustand/component'
 import FileOpenIcon from '@mui/icons-material/FileOpen'
-import Button from '@mui/material/Button'
-import type { ButtonProps as MuiButtonProps } from '@mui/material/Button'
+import Button from '@mui/joy/Button'
+import type { ButtonProps as JoyButtonProps } from '@mui/joy/Button'
 import { useState } from 'react'
 
 import { T } from '@/components/T'
 
 interface YAMLProps {
   callback: (y: any) => void
-  ButtonProps?: MuiButtonProps<'label'>
+  ButtonProps?: JoyButtonProps<'label'>
 }
 
 const YAML: ReactFCWithChildren<YAMLProps> = ({ children, callback, ButtonProps }) => {
@@ -59,8 +59,8 @@ const YAML: ReactFCWithChildren<YAMLProps> = ({ children, callback, ButtonProps 
       component="label"
       loading={loading}
       variant="outlined"
-      size="small"
-      startIcon={<FileOpenIcon />}
+      size="sm"
+      startDecorator={<FileOpenIcon />}
     >
       {children || <T id="common.upload" />}
       <input type="file" hidden onChange={handleUploadYAML} />

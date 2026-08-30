@@ -18,7 +18,7 @@ import Paper from '@/mui-extends/Paper'
 import Space from '@/mui-extends/Space'
 import { useComponentActions } from '@/zustand/component'
 import PublishIcon from '@mui/icons-material/Publish'
-import { Button, Typography } from '@mui/material'
+import { Button, Typography } from '@mui/joy'
 import { type Editor } from 'ace-builds'
 import { lazy, useState } from 'react'
 import { useIntl } from 'react-intl'
@@ -60,20 +60,20 @@ const ByYAML: ReactFCWithChildren<ByYAMLProps> = ({ callback }) => {
   }
 
   return (
-    <Space spacing={6}>
-      <Typography variant="body2" color="textSecondary">
-        {i18n('newE.byYAMLDesc')}
+    <Space spacing={3}>
+      <Typography level="body-sm" color="neutral">
+        {i18n('newE.createFromYAMLDescription')}
       </Typography>
-      <Paper sx={{ height: 600, p: 0 }}>
+      <Paper sx={{ height: { xs: 320, md: 400 }, p: 0 }}>
         <YAMLEditor mountEditor={setYAMLEditor} aceProps={{ onChange }} />
       </Paper>
       <Space direction="row" sx={{ justifyContent: 'flex-end' }}>
         <YAML callback={handleUploadYAMLCallback} />
         <Button
-          variant="contained"
+          variant="solid"
           color="primary"
-          startIcon={<PublishIcon />}
-          size="small"
+          startDecorator={<PublishIcon />}
+          size="sm"
           disabled={empty}
           onClick={handleSubmit}
         >

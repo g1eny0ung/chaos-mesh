@@ -42,40 +42,40 @@
     "recent": "最近事件"
   },
   "newE": {
-    "title": "新的实验",
-    "titleStep1": "注入到",
-    "titleStep2": "实验信息",
-    "steps": {
-      "basic": "元信息",
-      "scope": "范围",
-      "run": "运行"
+    "create": "创建实验",
+    "sections": {
+      "injectionTarget": "选择注入目标",
+      "configuration": "配置实验",
+      "basicInformation": "基本信息",
+      "targetScope": "作用范围",
+      "runSettings": "运行设置"
     },
-    "loadFrom": "加载自",
-    "byYAML": "通过 YAML",
-    "byYAMLDesc": "通过填写或上传 YAML 的方式创建实验或计划",
+    "loadExistingExperiment": "从已有实验加载",
+    "createFromYAML": "通过 YAML 创建",
+    "createFromYAMLDescription": "填写或上传 YAML，以创建实验或定时任务。",
     "basic": {
-      "nameHelper": "实验的名称",
-      "namespaceHelper": "选择命名空间"
+      "nameHelper": "填写实验名称。",
+      "resourceNamespaceHelper": "选择用于创建实验资源的命名空间。"
     },
     "scope": {
-      "namespaceSelectorsHelper": "指定目标 Pod 所属的命名空间（namespace）。",
-      "labelSelectorsHelper": "指定目标 Pod 带有的标签（label）。",
-      "annotationSelectorsHelper": "指定目标 Pod 带有的注解（annotation）。",
-      "phaseSelectorsHelper": "指定目标 Pod 所处的阶段（phase）。",
-      "mode": "模式",
-      "modeHelper": "选择实验模式",
-      "modeValue": "模式值",
-      "modeValueHelper": "请填写模式值",
-      "targetPodsPreview": "预览目标 Pod",
-      "targetPodsPreviewHelper": "通过勾选 Pod 来进一步限制范围",
-      "noPodsFound": "未发现 Pod",
-      "targetPhysicalMachinesPreview": "预览目标物理机",
-      "targetPhysicalMachinesPreviewHelper": "通过勾选物理机来进一步限制范围",
-      "noPhysicalMachinesFound": "未发现物理机"
+      "namespaceSelectorsHelper": "选择目标 Pod 所在的命名空间。",
+      "labelSelectorsHelper": "选择目标 Pod 必须匹配的标签。",
+      "annotationSelectorsHelper": "选择目标 Pod 必须匹配的注解。",
+      "phaseSelectorsHelper": "选择目标 Pod 必须处于的运行阶段。",
+      "injectionMode": "注入模式",
+      "injectionModeHelper": "选择如何从匹配的对象中注入故障。",
+      "countOrPercentage": "数量或百分比",
+      "countOrPercentageHelper": "根据注入模式填写固定数量或百分比。",
+      "targetPodsPreview": "目标 Pod 预览",
+      "targetPodsPreviewHelper": "取消勾选不希望注入故障的 Pod，以进一步缩小作用范围。",
+      "noPodsFound": "没有找到符合当前条件的 Pod。",
+      "targetPhysicalMachinesPreview": "目标物理机预览",
+      "targetPhysicalMachinesPreviewHelper": "取消勾选不希望注入故障的物理机，以进一步缩小作用范围。",
+      "noPhysicalMachinesFound": "没有找到符合当前条件的物理机。"
     },
     "target": {
-      "kind": "类别",
-      "action": "行为",
+      "faultType": "故障类型",
+      "faultAction": "故障动作",
       "aws": {
         "title": "AWS 故障"
       },
@@ -89,7 +89,7 @@
         "title": "GCP 故障"
       },
       "io": {
-        "title": "文件系统注入"
+        "title": "I/O 故障"
       },
       "jvm": {
         "title": "JVM 故障"
@@ -103,8 +103,8 @@
       "network": {
         "title": "网络攻击",
         "target": {
-          "title": "目标",
-          "podsPreview": "预览目标 Pod"
+          "scope": "目标作用范围",
+          "podsPreview": "目标 Pod 预览"
         }
       },
       "http": {
@@ -127,9 +127,9 @@
       }
     },
     "run": {
-      "continuous": "持续运行"
+      "continuousWithoutDuration": "持续运行（不设时长）"
     },
-    "complete": "所有步骤已完成"
+    "configurationComplete": "实验配置已完成"
   },
   "experiments": {
     "title": "实验",

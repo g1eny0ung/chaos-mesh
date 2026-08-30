@@ -12,17 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-import { Skeleton } from '@mui/joy'
+import Card, { CardProps } from '@mui/joy/Card'
 
-const SkeletonN: ReactFCWithChildren<{ n: number }> = ({ n }) => (
-  <>
-    {n > 0 &&
-      Array(n)
-        .fill(0)
-        .map((_, i) => <Skeleton key={i} variant="text" level="body-sm" />)}
-  </>
+const PanelCard: ReactFCWithChildren<CardProps> = ({ children, ...props }) => (
+  <Card variant="outlined" {...props}>
+    {children}
+  </Card>
 )
 
-export default SkeletonN
+export default PanelCard

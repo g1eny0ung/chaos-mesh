@@ -17,7 +17,7 @@
 import Space from '@/mui-extends/Space'
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone'
 import RemoveCircleTwoToneIcon from '@mui/icons-material/RemoveCircleTwoTone'
-import { Box, Button, FormHelperText, IconButton, Typography } from '@mui/material'
+import { Box, Button, FormHelperText, IconButton, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import _ from 'lodash'
 
@@ -52,7 +52,7 @@ export default function TextTextField({ name, label, helperText, valueLabeled }:
     <>
       <Box>
         <Typography
-          variant="body2"
+          level="body-sm"
           sx={{
             fontWeight: 500,
           }}
@@ -70,7 +70,7 @@ export default function TextTextField({ name, label, helperText, valueLabeled }:
             ) : (
               <TextField fast name={`${name}.${key}.value`} />
             )}
-            <IconButton color="error" onClick={handleRemoveKV(key)}>
+            <IconButton color="danger" onClick={handleRemoveKV(key)}>
               <RemoveCircleTwoToneIcon />
             </IconButton>
             {i === entries.length - 1 && (
@@ -82,7 +82,7 @@ export default function TextTextField({ name, label, helperText, valueLabeled }:
         ))
       ) : (
         <Box>
-          <Button variant="contained" onClick={handleAddKV(0)}>
+          <Button variant="solid" onClick={handleAddKV(0)}>
             {`Add Key/Value${valueLabeled ? 's' : ''} Pair`}
           </Button>
         </Box>

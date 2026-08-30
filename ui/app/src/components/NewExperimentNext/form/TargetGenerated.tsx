@@ -15,10 +15,11 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
+import SkeletonN from '@/mui-extends/SkeletonN'
 import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { type Env, useExperimentStore } from '@/zustand/experiment'
-import { MenuItem } from '@mui/material'
+import { Option } from '@mui/joy'
 import { Form, Formik, FormikErrors, FormikTouched, getIn, setIn } from 'formik'
 import { useEffect, useState } from 'react'
 import { AnyObjectSchema } from 'yup'
@@ -157,13 +158,13 @@ const TargetGenerated: ReactFCWithChildren<TargetGeneratedProps> = ({
               >
                 {v.items?.map((option: string | { label: string; value: any }) =>
                   option instanceof Object ? (
-                    <MenuItem key={option.label} value={option.value}>
+                    <Option key={option.label} value={option.value}>
                       {option.label}
-                    </MenuItem>
+                    </Option>
                   ) : (
-                    <MenuItem key={option} value={option}>
+                    <Option key={option} value={option}>
                       {option}
-                    </MenuItem>
+                    </Option>
                   ),
                 )}
               </SelectField>
@@ -219,26 +220,31 @@ const TargetGenerated: ReactFCWithChildren<TargetGeneratedProps> = ({
 
         return (
           <Form>
-            <Space>{parseDataToFormFields(errors, touched)}</Space>
-            {env === 'k8s' && kind === 'NetworkChaos' && (
-              <MoreOptions
-                title={i18n('newE.target.network.target.title')}
-                beforeOpen={beforeTargetOpen}
-                afterClose={afterTargetClose}
-              >
-                {values.target && (
-                  <Scope
-                    env="k8s"
-                    kind={kind}
-                    namespaces={namespaces!}
-                    scope="target.selector"
-                    modeScope="target"
-                    previewTitle={i18n('newE.target.network.target.podsPreview')}
-                  />
-                )}
-              </MoreOptions>
-            )}
-            <Submit />
+            <Space>
+              {parseDataToFormFields(errors, touched)}
+              {env === 'k8s' && kind === 'NetworkChaos' && (
+                <MoreOptions
+                  title={i18n('newE.target.network.target.scope')}
+                  beforeOpen={beforeTargetOpen}
+                  afterClose={afterTargetClose}
+                >
+                  {values.target &&
+                    (namespaces ? (
+                      <Scope
+                        env="k8s"
+                        kind={kind}
+                        namespaces={namespaces}
+                        scope="target.selector"
+                        modeScope="target"
+                        previewTitle={i18n('newE.target.network.target.podsPreview')}
+                      />
+                    ) : (
+                      <SkeletonN n={4} />
+                    ))}
+                </MoreOptions>
+              )}
+              <Submit />
+            </Space>
           </Form>
         )
       }}

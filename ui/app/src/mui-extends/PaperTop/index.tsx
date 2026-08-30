@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-import { Box, Typography } from '@mui/material'
-import type { BoxProps } from '@mui/material'
+import { Box, Typography } from '@mui/joy'
+import type { BoxProps } from '@mui/joy'
 
 interface PaperTopProps {
   title: React.ReactNode
@@ -43,7 +43,7 @@ const PaperTop: ReactFCWithChildren<PaperTopProps> = ({ title, subtitle, h1, box
       }}
     >
       <Typography
-        variant={h1 ? 'h5' : 'h6'}
+        level={h1 ? 'h3' : 'title-lg'}
         component={h1 ? 'h1' : 'div'}
         sx={{
           fontWeight: h1 ? 'bold' : undefined,
@@ -52,7 +52,7 @@ const PaperTop: ReactFCWithChildren<PaperTopProps> = ({ title, subtitle, h1, box
         {title}
       </Typography>
       {subtitle && (
-        <Typography variant="body2" color="textSecondary">
+        <Typography level="body-sm" color="neutral">
           {subtitle}
         </Typography>
       )}

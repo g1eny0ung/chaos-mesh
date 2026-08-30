@@ -14,18 +14,13 @@
  * limitations under the License.
  *
  */
-import { Grid } from '@mui/material'
+import { Grid } from '@mui/joy'
 
 import NewExperiment from '@/components/NewExperimentNext'
 
 const New = () => (
-  <Grid container>
-    <Grid
-      size={{
-        xs: 12,
-        lg: 8,
-      }}
-    >
+  <Grid container spacing={3}>
+    <Grid xs={12} xl={9}>
       <NewExperiment />
     </Grid>
   </Grid>

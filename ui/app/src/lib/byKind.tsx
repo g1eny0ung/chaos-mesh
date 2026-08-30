@@ -16,7 +16,7 @@
  */
 import LinearScaleIcon from '@mui/icons-material/LinearScale'
 import TimelapseIcon from '@mui/icons-material/Timelapse'
-import { SvgIcon } from '@mui/material'
+import { SvgIcon } from '@mui/joy'
 
 import { type ExperimentKind } from '@/components/NewExperiment/types'
 import i18n from '@/components/T'
@@ -100,7 +100,14 @@ export function iconByKind(kind: string, size: 'small' | 'inherit' | 'medium' | 
       return <TimelapseIcon fontSize={size} />
   }
 
-  return <SvgIcon fontSize={size}>{icon}</SvgIcon>
+  return (
+    <SvgIcon
+      size={size === 'small' ? 'sm' : size === 'large' ? 'lg' : 'md'}
+      fontSize={size === 'inherit' ? 'inherit' : undefined}
+    >
+      {icon}
+    </SvgIcon>
+  )
 }
 
 export function transByKind(kind: ExperimentKind | 'Workflow' | 'Schedule') {

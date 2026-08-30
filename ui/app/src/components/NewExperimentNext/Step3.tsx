@@ -14,19 +14,18 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import PaperTop from '@/mui-extends/PaperTop'
 import { usePostExperiments } from '@/openapi'
 import { useComponentActions } from '@/zustand/component'
 import { useExperimentActions, useExperimentStore } from '@/zustand/experiment'
 import { useSettingStore } from '@/zustand/setting'
 import DoneAllIcon from '@mui/icons-material/DoneAll'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/joy'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 
 import { Submit } from '@/components/FormField'
 import { type ExperimentKind } from '@/components/NewExperiment/types'
+import PanelCard from '@/components/PanelCard'
 import i18n from '@/components/T'
 
 import { parseSubmit } from '@/lib/formikhelpers'
@@ -100,18 +99,20 @@ const Step3: ReactFCWithChildren<Step3Props> = ({ onSubmit, inSchedule }) => {
   return (
     <>
       {step1 && step2 && (
-        <Paper>
-          <PaperTop title={i18n('common.submit')} boxProps={{ sx: { mb: 6 } }} />
+        <PanelCard>
+          <Typography level="title-md" component="div" sx={{ mb: 6 }}>
+            {i18n('common.submit')}
+          </Typography>
           <Box
             sx={{
               textAlign: 'center',
             }}
           >
             <DoneAllIcon fontSize="large" />
-            <Typography>{i18n('newE.complete')}</Typography>
+            <Typography>{i18n('newE.configurationComplete')}</Typography>
           </Box>
-          <Submit onClick={submitExperiment} />
-        </Paper>
+          <Submit sx={{ mt: 3 }} onClick={submitExperiment} />
+        </PanelCard>
       )}
     </>
   )

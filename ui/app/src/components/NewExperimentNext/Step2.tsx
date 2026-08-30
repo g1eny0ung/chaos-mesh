@@ -15,21 +15,20 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import Paper from '@/mui-extends/Paper'
 import SkeletonN from '@/mui-extends/SkeletonN'
 import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { useExperimentActions, useExperimentStore } from '@/zustand/experiment'
-import CheckIcon from '@mui/icons-material/Check'
-import PublishIcon from '@mui/icons-material/Publish'
-import UndoIcon from '@mui/icons-material/Undo'
-import { Box, Button, Divider, Grid, MenuItem, Typography } from '@mui/material'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import { Box, Button, Divider, Grid, Option, Typography } from '@mui/joy'
 import { Form, Formik } from 'formik'
 import _ from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 
 import { LabelField, SelectField, TextField } from '@/components/FormField'
 import MoreOptions from '@/components/MoreOptions'
+import PanelCard from '@/components/PanelCard'
 import { Fields as ScheduleSpecificFields, data as scheduleSpecificData } from '@/components/Schedule/types'
 import Scope from '@/components/Scope'
 import i18n from '@/components/T'
@@ -69,7 +68,6 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
 
   const { data: namespaces } = useGetCommonChaosAvailableNamespaces({
     query: {
-      enabled: false,
       staleTime: Stale.DAY,
     },
   })
@@ -104,36 +102,41 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
     setStep2(true)
   }
 
-  const handleUndo = () => setStep2(false)
+  const handleEdit = () => setStep2(false)
 
   return (
-    <Paper sx={{ borderColor: step2 ? 'success.main' : undefined }}>
+    <PanelCard sx={{ p: step2 ? 1.5 : undefined }}>
       <Box
         sx={{
           display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          mb: step2 ? 0 : 6,
+          mb: step2 ? 0 : 2,
         }}
       >
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
+            gap: 1,
           }}
         >
-          {step2 && (
-            <Box
-              sx={{
-                display: 'flex',
-                mr: 3,
-              }}
-            >
-              <CheckIcon sx={{ color: 'success.main' }} />
-            </Box>
-          )}
-          <Typography>{i18n(`${inSchedule ? 'newS' : 'newE'}.titleStep2`)}</Typography>
+          {step2 && <CheckCircleRoundedIcon sx={{ color: 'var(--joy-palette-success-500)' }} />}
+          <Typography level="title-md" component="div">
+            {i18n(inSchedule ? 'newS.titleStep2' : 'newE.sections.configuration')}
+          </Typography>
         </Box>
-        {step2 && <UndoIcon onClick={handleUndo} sx={{ cursor: 'pointer' }} />}
+        {step2 && (
+          <Button
+            size="sm"
+            variant="plain"
+            color="neutral"
+            startDecorator={<EditOutlinedIcon sx={{ fontSize: 18 }} />}
+            onClick={handleEdit}
+          >
+            {i18n('common.edit')}
+          </Button>
+        )}
       </Box>
       <Box
         hidden={step2}
@@ -150,15 +153,15 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
         >
           {({ errors, touched }) => (
             <Form>
-              <Grid container spacing={6}>
-                <Grid size={6}>
+              <Grid container spacing={3}>
+                <Grid xs={12} md={6}>
                   <Space>
                     <Typography
                       sx={{
                         fontWeight: 500,
                       }}
                     >
-                      {i18n('newE.steps.scope')}
+                      {i18n('newE.sections.targetScope')}
                     </Typography>
                     {namespaces ? (
                       <Scope env={env} kind={kind} namespaces={namespaces} scope="spec.selector" modeScope="spec" />
@@ -167,14 +170,14 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                     )}
                   </Space>
                 </Grid>
-                <Grid size={6}>
+                <Grid xs={12} md={6}>
                   <Space>
                     <Typography
                       sx={{
                         fontWeight: 500,
                       }}
                     >
-                      {i18n('newE.steps.basic')}
+                      {i18n('newE.sections.basicInformation')}
                     </Typography>
                     <TextField
                       fast
@@ -206,12 +209,12 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                         <SelectField
                           name="metadata.namespace"
                           label={i18n('k8s.namespace')}
-                          helperText={i18n('newE.basic.namespaceHelper')}
+                          helperText={i18n('newE.basic.resourceNamespaceHelper')}
                         >
                           {namespaces.map((n) => (
-                            <MenuItem key={n} value={n}>
+                            <Option key={n} value={n}>
                               {n}
-                            </MenuItem>
+                            </Option>
                           ))}
                         </SelectField>
                       )}
@@ -239,7 +242,7 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                       textAlign: 'right',
                     }}
                   >
-                    <Button type="submit" variant="contained" color="primary" startIcon={<PublishIcon />}>
+                    <Button type="submit" variant="solid" color="primary">
                       {i18n('common.submit')}
                     </Button>
                   </Box>
@@ -249,7 +252,7 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
           )}
         </Formik>
       </Box>
-    </Paper>
+    </PanelCard>
   )
 }
 
