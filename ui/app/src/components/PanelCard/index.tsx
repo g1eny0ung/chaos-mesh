@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Card, { CardProps } from '@mui/joy/Card'
+import Card from '@mui/joy/Card'
+import type { CardProps } from '@mui/joy/Card'
 
-const PanelCard: ReactFCWithChildren<CardProps> = ({ children, ...props }) => (
-  <Card variant="outlined" {...props}>
+const PanelCard: ReactFCWithChildren<CardProps> = ({ children, sx, ...props }) => (
+  <Card {...props} sx={[{ borderRadius: 'lg' }, ...(Array.isArray(sx) ? sx : [sx])]}>
     {children}
   </Card>
 )

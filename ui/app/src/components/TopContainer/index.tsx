@@ -25,7 +25,6 @@ import { useSystemStore } from '@/zustand/system'
 import Box from '@mui/joy/Box'
 import CssBaseline from '@mui/joy/CssBaseline'
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles'
-import { Portal } from '@mui/material'
 import Cookies from 'js-cookie'
 import { lazy, useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
@@ -170,11 +169,7 @@ const TopContainer = () => {
           severity={alert.type}
           onClose={() => setAlertOpen(false)}
         />
-      </CssVarsProvider>
-
-      <Auth open={authOpen} />
-
-      <Portal>
+        <Auth open={authOpen} />
         <ConfirmDialog
           open={confirmOpen}
           close={() => setConfirmOpen(false)}
@@ -182,7 +177,7 @@ const TopContainer = () => {
           description={confirm.description}
           onConfirm={confirm.handle}
         />
-      </Portal>
+      </CssVarsProvider>
     </>
   )
 }

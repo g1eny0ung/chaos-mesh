@@ -14,19 +14,25 @@
  * limitations under the License.
  *
  */
-import { PauseCircleOutlined, TaskAltOutlined } from '@mui/icons-material'
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined'
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined'
+import PauseCircleOutlinedIcon from '@mui/icons-material/PauseCircleOutlined'
+import PlayCircleOutlineOutlinedIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
+import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined'
 import { Chip, ColorPaletteProp } from '@mui/joy'
 
 import { T } from '@/components/T'
 
 const statusColors: Record<string, ColorPaletteProp> = {
   injecting: 'neutral',
-  running: 'success',
+  running: 'primary',
   paused: 'warning',
-  finished: 'primary',
+  finished: 'success',
   deleting: 'neutral',
   failed: 'danger',
 }
+const statusIconSx = { fontSize: 14 }
 
 interface StatusLabelProps {
   status: string | [string, number]
@@ -56,13 +62,29 @@ const StatusLabel: React.FC<StatusLabelProps> = ({ status }) => {
   let icon
   switch (_status) {
     case 'injecting':
-    case 'running':
     case 'deleting':
-      icon = <TaskAltOutlined />
+      icon = <HourglassEmptyOutlinedIcon sx={statusIconSx} />
+
+      break
+    case 'running':
+      icon = <PlayCircleOutlineOutlinedIcon sx={statusIconSx} />
 
       break
     case 'paused':
-      icon = <PauseCircleOutlined />
+      icon = <PauseCircleOutlinedIcon sx={statusIconSx} />
+
+      break
+    case 'finished':
+      icon = <TaskAltOutlinedIcon sx={statusIconSx} />
+
+      break
+    case 'failed':
+      icon = <ErrorOutlineOutlinedIcon sx={statusIconSx} />
+
+      break
+    case 'unknown':
+    default:
+      icon = <HelpOutlineOutlinedIcon sx={statusIconSx} />
 
       break
   }

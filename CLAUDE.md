@@ -154,3 +154,13 @@ Keep API validation/defaulting in `api/v1alpha1/`, orchestration and status tran
 - **Generated build inventory:** change `cmd/generate-makefile/`, run `make generate-makefile`, and inspect all three generated Makefiles.
 
 If creating commits, use `git commit --signoff` for DCO compliance. Do not create commits unless the task explicitly asks for them.
+
+## Dashboard UI conventions
+
+- Use `@/components/PanelCard` for major page-section surfaces instead of creating one-off card or paper wrappers. Major section cards must keep the shared rounded treatment.
+- Keep page controls compact. Use `size="sm"` for buttons and icon buttons unless a deliberately oversized call to action is part of the design.
+- Scale button decorators with compact controls. Icons inside `size="sm"` buttons and icon buttons should normally use `sx={{ fontSize: 16 }}` instead of retaining the default icon size.
+- Scale every inline icon with its surrounding typography, not only button icons. Compact status-chip icons should normally be about `14px`; reserve larger icons for deliberate page or section markers.
+- Keep actions in the same compact group visually consistent. Table-row icon buttons should share `size="sm"` and `variant="plain"`; use color to communicate the one primary action rather than mixing variants.
+- Give the primary page action the prominent Joy UI primary treatment (`color="primary"` with the solid/default variant). Use `variant="soft"` for secondary actions; combine it with semantic colors such as `danger` when appropriate.
+- Reserve `danger` for destructive, irreversible operations such as deletion. Archiving is reversible and should use the normal neutral treatment.

@@ -19,14 +19,14 @@ import Space from '@/mui-extends/Space'
 import type { TypesArchiveDetail, TypesExperimentDetail } from '@/openapi/index.schemas'
 import { useSettingStore } from '@/zustand/setting'
 import { useSystemStore } from '@/zustand/system'
-import { Grid, Table, TableBody, TableRow, Typography } from '@mui/material'
+import { Grid } from '@mui/joy'
 
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 
 import { format } from '@/lib/luxon'
 
-import { Experiment, Selector, TableCell } from './common'
+import { Experiment, Selector, Table, TableBody, TableCell, TableRow, Typography } from './common'
 
 type Config = TypesExperimentDetail | TypesArchiveDetail
 
@@ -36,6 +36,7 @@ interface ObjectConfigurationProps {
   inSchedule?: boolean
   inArchive?: boolean
   vertical?: boolean
+  hideHeader?: boolean
 }
 
 const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
@@ -44,6 +45,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
   inSchedule,
   inArchive,
   vertical,
+  hideHeader,
 }) => {
   const lang = useSystemStore((state) => state.lang)
   const useNewPhysicalMachine = useSettingStore((state) => state.useNewPhysicalMachine)
@@ -62,17 +64,17 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
 
   return (
     <>
-      {!inNode && (
-        <Space direction="row" sx={{ mb: 3 }}>
+      {!inNode && !hideHeader && (
+        <Space direction="row" sx={{ mb: 2 }}>
           <Typography>{config.name}</Typography>
 
           {!inArchive && <StatusLabel status={(config as any).status} />}
         </Space>
       )}
 
-      <Grid container spacing={vertical ? 3 : 0}>
+      <Grid container spacing={vertical ? 2 : 1.5}>
         {!inNode && (
-          <Grid size={vertical ? 12 : 3}>
+          <Grid xs={12} md={vertical ? 12 : 6}>
             <Typography variant="subtitle2" gutterBottom>
               {i18n('newE.sections.basicInformation')}
             </Typography>
@@ -111,7 +113,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
         )}
 
         {(hasAddress || experiment?.selector) && (
-          <Grid size={vertical ? 12 : 3}>
+          <Grid xs={12} md={vertical ? 12 : 6}>
             <Typography variant="subtitle2" gutterBottom>
               {i18n('newE.sections.targetScope')}
             </Typography>
@@ -120,24 +122,26 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
 
             {hasAddress && (
               <Table>
-                <TableRow>
-                  <TableCell>{i18n('physic.address')}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="textSecondary">
-                      {inNode
-                        ? (config as any).physicalmachineChaos.address
-                        : inSchedule
-                          ? spec.physicalmachineChaos.address
-                          : spec.address}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{i18n('physic.address')}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="textSecondary">
+                        {inNode
+                          ? (config as any).physicalmachineChaos.address
+                          : inSchedule
+                            ? spec.physicalmachineChaos.address
+                            : spec.address}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
               </Table>
             )}
           </Grid>
         )}
 
-        <Grid size={vertical ? 12 : 3}>
+        <Grid xs={12} md={vertical ? 12 : 6}>
           <Typography variant="subtitle2" gutterBottom>
             {i18n('experiments.single')}
           </Typography>
@@ -148,7 +152,7 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
           />
         </Grid>
 
-        <Grid size={vertical ? 12 : 3}>
+        <Grid xs={12} md={vertical ? 12 : 6}>
           <Typography variant="subtitle2" gutterBottom>
             {i18n('newE.sections.runSettings')}
           </Typography>

@@ -394,7 +394,7 @@ export default function Sidebar() {
                     src={isCollapsed ? logoMini : theme === 'light' ? logo : logoWhite}
                     alt="Chaos Mesh"
                     sx={{
-                      width: isCollapsed ? 24 : 140,
+                      width: isCollapsed ? 24 : 120,
                       height: isCollapsed ? 24 : 'auto',
                     }}
                   />

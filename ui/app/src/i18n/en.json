@@ -131,6 +131,11 @@
     "single": "Experiment",
     "notFound": "No experiments found",
     "createdAt": "Created",
+    "totalCount": "{count} experiments",
+    "selectedCount": "{count} selected",
+    "type": "Type",
+    "typeFilter": "Filter by experiment type",
+    "allTypes": "All types",
     "deleteMulti": "Archive selected experiments",
     "deleteDesc": "You can still find this experiment in the archives",
     "pauseDesc": "You can restart the experiment in the same position",
@@ -273,6 +278,10 @@
     "useNewPhysicalMachineCRD": {
       "title": "Use new PhysicalMachine CRD",
       "choose": "When creating PhysicalMachineChaos, retrieve the available PhysicalMachines instead of providing the address field."
+    },
+    "eventTimeFormat": {
+      "title": "Specific time",
+      "choose": "Show event timestamps as specific date and time values instead of relative times."
     },
     "tutorialCard": {
       "title": "Show tutorial card",

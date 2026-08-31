@@ -14,29 +14,78 @@
  * limitations under the License.
  *
  */
-import {
-  ListItemProps,
-  ListProps,
-  List as MUIList,
-  ListItem as MUIListItem,
-  TableCell as MUITableCell,
-  Table,
-  TableBody,
-  TableCellProps,
-  TableRow,
-  Typography,
-} from '@mui/material'
+import { List as JoyList, ListItem as JoyListItem, Table as JoyTable, Typography as JoyTypography } from '@mui/joy'
+import type { ColorPaletteProp } from '@mui/joy'
 
 import { type ExperimentKind } from '@/components/NewExperiment/types'
 import i18n from '@/components/T'
 
 import { objToArrBySep } from '@/lib/utils'
 
-export const TableCell = (props: TableCellProps) => (
-  <MUITableCell sx={{ borderBottom: 'none', '&:first-child': { width: '50%' } }} {...props} />
+type TableProps = Omit<React.ComponentProps<typeof JoyTable>, 'size'> & {
+  size?: 'small' | 'medium' | 'large' | 'sm' | 'md' | 'lg'
+}
+
+type TypographyProps = Omit<React.ComponentProps<typeof JoyTypography>, 'color' | 'variant'> & {
+  variant?: 'body2' | 'subtitle2'
+  color?: ColorPaletteProp | 'textSecondary'
+  gutterBottom?: boolean
+}
+
+export const Table = ({ size, sx, children, ...props }: TableProps) => (
+  <JoyTable
+    {...props}
+    borderAxis="none"
+    size={size === 'small' ? 'sm' : size === 'medium' ? 'md' : size === 'large' ? 'lg' : size}
+    sx={[
+      {
+        '--TableCell-paddingX': 0,
+        '& td': { verticalAlign: 'middle' },
+        '& td:first-of-type': {
+          pr: 1.5,
+          color: 'text.tertiary',
+          overflowWrap: 'anywhere',
+        },
+        '& td:last-of-type': {
+          overflowWrap: 'anywhere',
+        },
+      },
+      ...(Array.isArray(sx) ? sx : [sx]),
+    ]}
+  >
+    <colgroup>
+      <col style={{ width: '7rem' }} />
+      <col />
+    </colgroup>
+    {children}
+  </JoyTable>
 )
-export const List = (props: ListProps) => <MUIList sx={{ p: 0 }} {...props} />
-export const ListItem = (props: ListItemProps) => <MUIListItem sx={{ p: 0 }} {...props} />
+
+export const TableBody = (props: React.ComponentPropsWithoutRef<'tbody'>) => <tbody {...props} />
+export const TableRow = (props: React.ComponentPropsWithoutRef<'tr'>) => <tr {...props} />
+export const TableCell = (props: React.ComponentPropsWithoutRef<'td'>) => <td {...props} />
+
+export const List = ({ sx, ...props }: React.ComponentProps<typeof JoyList>) => (
+  <JoyList {...props} size="sm" sx={[{ p: 0 }, ...(Array.isArray(sx) ? sx : [sx])]} />
+)
+export const ListItem = ({ sx, ...props }: React.ComponentProps<typeof JoyListItem>) => (
+  <JoyListItem {...props} sx={[{ p: 0 }, ...(Array.isArray(sx) ? sx : [sx])]} />
+)
+
+export const Typography = ({ variant, color, gutterBottom, sx, ...props }: TypographyProps) => (
+  <JoyTypography
+    {...props}
+    level={variant === 'subtitle2' ? 'title-sm' : variant === 'body2' ? 'body-sm' : undefined}
+    color={color === 'textSecondary' ? 'neutral' : color}
+    sx={[
+      {
+        mb: gutterBottom ? 1 : undefined,
+        overflowWrap: variant === 'body2' ? 'anywhere' : undefined,
+      },
+      ...(Array.isArray(sx) ? sx : [sx]),
+    ]}
+  />
+)
 
 export const Selector = ({ data }: any) => (
   <Table size="small">

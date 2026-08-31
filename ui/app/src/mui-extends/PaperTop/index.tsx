@@ -43,7 +43,7 @@ const PaperTop: ReactFCWithChildren<PaperTopProps> = ({ title, subtitle, h1, box
       }}
     >
       <Typography
-        level={h1 ? 'h3' : 'title-lg'}
+        level={h1 ? 'h3' : 'title-md'}
         component={h1 ? 'h1' : 'div'}
         sx={{
           fontWeight: h1 ? 'bold' : undefined,

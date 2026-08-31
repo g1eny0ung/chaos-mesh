@@ -77,7 +77,8 @@ const Settings = () => {
   const debugMode = useSettingStore((state) => state.debugMode)
   const enableKubeSystemNS = useSettingStore((state) => state.enableKubeSystemNS)
   const useNewPhysicalMachine = useSettingStore((state) => state.useNewPhysicalMachine)
-  const { setDebugMode, setEnableKubeSystemNS, setUseNewPhysicalMachine } = useSettingActions()
+  const eventTimeFormat = useSettingStore((state) => state.eventTimeFormat)
+  const { setDebugMode, setEnableKubeSystemNS, setUseNewPhysicalMachine, setEventTimeFormat } = useSettingActions()
   const tokenName = useAuthStore((state) => state.tokenName)
   const [showTutorialCard, setShowTutorialCard] = useState(getTutorialCardVisibility)
 
@@ -103,6 +104,10 @@ const Settings = () => {
   }
   const handleChangeUseNewPhysicalMachine = () => {
     setUseNewPhysicalMachine(!useNewPhysicalMachine)
+    showUpdateSuccess()
+  }
+  const handleChangeEventTimeFormat = () => {
+    setEventTimeFormat(eventTimeFormat === 'absolute' ? 'relative' : 'absolute')
     showUpdateSuccess()
   }
   const handleChangeShowTutorialCard = () => {
@@ -177,6 +182,16 @@ const Settings = () => {
             onChange={handleChangeUseNewPhysicalMachine}
           />
         </Stack>
+
+        <Typography component="h2" level="title-lg">
+          <T id="events.title" />
+        </Typography>
+        <SettingCheckbox
+          label={<T id="settings.eventTimeFormat.title" />}
+          helperText={<T id="settings.eventTimeFormat.choose" />}
+          checked={eventTimeFormat === 'absolute'}
+          onChange={handleChangeEventTimeFormat}
+        />
 
         <Typography component="h2" level="title-lg">
           <T id="settings.general.title" />

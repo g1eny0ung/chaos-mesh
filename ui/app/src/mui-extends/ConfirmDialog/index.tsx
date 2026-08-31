@@ -14,15 +14,15 @@
  * limitations under the License.
  *
  */
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogProps,
-  DialogTitle,
-} from '@mui/material'
+import { Button, DialogActions, DialogContent, DialogTitle, Modal, ModalDialog, Typography } from '@mui/joy'
+
+interface LegacyDialogProps {
+  slotProps?: {
+    paper?: {
+      style?: React.CSSProperties
+    }
+  }
+}
 
 interface ConfirmDialogProps {
   open: boolean
@@ -32,7 +32,7 @@ interface ConfirmDialogProps {
   cancelText?: string
   confirmText?: string
   onConfirm?: () => void
-  dialogProps?: Omit<DialogProps, 'open'>
+  dialogProps?: LegacyDialogProps
 }
 
 const ConfirmDialog: ReactFCWithChildren<ConfirmDialogProps> = ({
@@ -47,30 +47,48 @@ const ConfirmDialog: ReactFCWithChildren<ConfirmDialogProps> = ({
   dialogProps,
 }) => {
   const handleConfirm = () => {
-    typeof onConfirm === 'function' && onConfirm()
-    typeof close === 'function' && close()
+    if (typeof onConfirm === 'function') {
+      onConfirm()
+    }
+
+    if (typeof close === 'function') {
+      close()
+    }
   }
 
-  return (
-    <Dialog open={open} onClose={close} {...dialogProps}>
-      <DialogTitle sx={{ p: 4 }}>{title}</DialogTitle>
-      {(children || description) && (
-        <DialogContent sx={{ p: 4 }}>
-          {description ? <DialogContentText>{description}</DialogContentText> : children}
-        </DialogContent>
-      )}
+  const dialogStyle = dialogProps?.slotProps?.paper?.style
 
-      {onConfirm && (
-        <DialogActions>
-          <Button color="secondary" onClick={close}>
-            {cancelText}
-          </Button>
-          <Button autoFocus onClick={handleConfirm}>
-            {confirmText}
-          </Button>
-        </DialogActions>
-      )}
-    </Dialog>
+  return (
+    <Modal open={open} onClose={() => close?.()}>
+      <ModalDialog
+        style={dialogStyle}
+        sx={{ width: 440, maxWidth: 'calc(100vw - 32px)', maxHeight: 'calc(100dvh - 32px)', p: 0, borderRadius: 'lg' }}
+      >
+        <DialogTitle sx={{ px: 3, pt: 3, pb: 2 }}>{title}</DialogTitle>
+        {(children || description) && (
+          <DialogContent sx={{ px: 3, pb: onConfirm ? 1 : 3 }}>
+            {description ? (
+              <Typography level="body-sm" color="neutral">
+                {description}
+              </Typography>
+            ) : (
+              children
+            )}
+          </DialogContent>
+        )}
+
+        {onConfirm && (
+          <DialogActions orientation="horizontal" sx={{ justifyContent: 'flex-end', px: 3, pb: 3, pt: 2 }}>
+            <Button size="sm" variant="soft" color="neutral" onClick={close}>
+              {cancelText}
+            </Button>
+            <Button size="sm" color="primary" autoFocus onClick={handleConfirm}>
+              {confirmText}
+            </Button>
+          </DialogActions>
+        )}
+      </ModalDialog>
+    </Modal>
   )
 }
 

@@ -46,6 +46,8 @@ interface YAMLEditorProps {
   aceProps?: IAceEditorProps
 }
 
+const compactIconSx = { fontSize: 16 }
+
 const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
   name,
   data,
@@ -64,7 +66,9 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
   const handleOnLoad = (editor: Editor) => {
     setEditor(editor)
 
-    typeof mountEditor === 'function' && mountEditor(editor)
+    if (typeof mountEditor === 'function') {
+      mountEditor(editor)
+    }
   }
 
   const handleSelect = () => {
@@ -75,7 +79,9 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
   }
 
   const handleOnUpdate = () => {
-    typeof onUpdate === 'function' && onUpdate(loadYaml(editor!.getValue()))
+    if (typeof onUpdate === 'function') {
+      onUpdate(loadYaml(editor!.getValue()))
+    }
   }
 
   const handleDownloadExperiment = () => fileDownload(editor!.getValue(), `${name}.yaml`)
@@ -84,7 +90,6 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
     <Box
       sx={{
         position: 'relative',
-        width: '100%',
         height: '100%',
       }}
     >
@@ -102,9 +107,10 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
         <Space direction="row" sx={{ position: 'absolute', top: 1.5, right: 3 }}>
           {download && (
             <Button
-              variant="outlined"
               size="sm"
-              startDecorator={<CloudDownloadOutlinedIcon />}
+              variant="soft"
+              color="neutral"
+              startDecorator={<CloudDownloadOutlinedIcon sx={compactIconSx} />}
               onClick={handleDownloadExperiment}
             >
               {i18n('common.download')}
@@ -112,10 +118,9 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
           )}
           {typeof onUpdate === 'function' && (
             <Button
-              variant="outlined"
               color="primary"
               size="sm"
-              startDecorator={<PublishIcon />}
+              startDecorator={<PublishIcon sx={compactIconSx} />}
               onClick={handleSelect}
             >
               {i18n('common.update')}

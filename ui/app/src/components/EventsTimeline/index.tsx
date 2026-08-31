@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
 import PaperTop from '@/mui-extends/PaperTop'
 import { type CoreEvent } from '@/openapi/index.schemas'
-import { useSettingActions, useSettingStore } from '@/zustand/setting'
+import { useSettingStore } from '@/zustand/setting'
 import { useSystemStore } from '@/zustand/system'
-import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Switch, Typography } from '@mui/joy'
+import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Typography } from '@mui/joy'
 
+import PanelCard from '@/components/PanelCard'
 import i18n from '@/components/T'
 
 import { iconByKind } from '@/lib/byKind'
@@ -29,70 +29,43 @@ import { format, toRelative } from '@/lib/luxon'
 interface EventsTimelineProps {
   events?: CoreEvent[]
   height?: number
-  paperProps?: React.ComponentProps<typeof Paper>
+  paperProps?: React.ComponentProps<typeof PanelCard>
 }
 
 const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperProps }) => {
   const lang = useSystemStore((state) => state.lang)
   const eventTimeFormat = useSettingStore((state) => state.eventTimeFormat)
-  const { setEventTimeFormat } = useSettingActions()
-
-  const handleEventTimeFormatChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEventTimeFormat(event.target.checked ? 'absolute' : 'relative')
-  }
-
-  const toggle = (
-    <Switch
-      size="sm"
-      checked={eventTimeFormat === 'absolute'}
-      onChange={handleEventTimeFormatChange}
-      startDecorator={i18n('events.absoluteTime')}
-    />
-  )
 
   const eventList = (
     <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
       {events && events.length > 0 ? (
-        <List>
+        <List size="sm" sx={{ '--ListItem-paddingX': 0 }}>
           {events.map((event) => (
-            <ListItem key={event.id}>
-              <ListItemDecorator>{iconByKind(event.kind!)}</ListItemDecorator>
+            <ListItem key={event.id} sx={{ gap: 2 }}>
+              <ListItemDecorator sx={{ '& svg': { fontSize: 18 } }}>
+                {iconByKind(event.kind!, 'inherit')}
+              </ListItemDecorator>
               <ListItemContent>
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
+                    gap: 2,
                   }}
                 >
-                  <Typography>{event.name}</Typography>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography level="body-sm" title={event.message} sx={{ overflowWrap: 'anywhere' }}>
+                      {event.message}
+                    </Typography>
+                    <Typography level="body-xs" color="neutral" title={format(event.created_at!)} sx={{ mt: 0.5 }}>
+                      {eventTimeFormat === 'absolute'
+                        ? format(event.created_at!, lang)
+                        : toRelative(event.created_at!, lang)}
+                    </Typography>
+                  </Box>
                   <Chip variant="soft" size="sm">
                     {event.reason}
                   </Chip>
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Typography
-                    level="body-sm"
-                    noWrap
-                    title={event.message}
-                    sx={{
-                      maxWidth: '75%',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {event.message}
-                  </Typography>
-                  <Typography level="body-xs" title={format(event.created_at!)}>
-                    {eventTimeFormat === 'absolute'
-                      ? format(event.created_at!, lang)
-                      : toRelative(event.created_at!, lang)}
-                  </Typography>
                 </Box>
               </ListItemContent>
             </ListItem>
@@ -115,21 +88,14 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperPr
 
   if (paperProps) {
     return (
-      <Paper {...paperProps} sx={{ display: 'flex', flexDirection: 'column', ...paperProps.sx }}>
-        <PaperTop title={paperProps.title || i18n('events.title')} boxProps={{ sx: { mb: 3 } }}>
-          {toggle}
-        </PaperTop>
+      <PanelCard {...paperProps}>
+        <PaperTop title={paperProps.title || i18n('events.title')} />
         {eventList}
-      </Paper>
+      </PanelCard>
     )
   }
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>{toggle}</Box>
-      {eventList}
-    </Box>
-  )
+  return <Box sx={{ display: 'flex', flexDirection: 'column', height }}>{eventList}</Box>
 }
 
 export default EventsTimeline

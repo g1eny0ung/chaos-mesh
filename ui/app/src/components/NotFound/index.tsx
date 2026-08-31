@@ -14,8 +14,9 @@
  * limitations under the License.
  *
  */
-import { Box, useTheme } from '@mui/material'
-import type { BoxProps } from '@mui/material'
+import { Box } from '@mui/joy'
+import type { BoxProps } from '@mui/joy'
+import { useColorScheme } from '@mui/joy/styles'
 
 import EmptyStreetDark from '@/images/assets/undraw_empty_street-dark.svg'
 import undrawNotFound from '@/images/assets/undraw_not_found.svg'
@@ -25,7 +26,8 @@ interface NotFoundProps extends BoxProps {
 }
 
 const NotFound: ReactFCWithChildren<NotFoundProps> = ({ illustrated = false, children, ...rest }) => {
-  const theme = useTheme()
+  const { mode, systemMode } = useColorScheme()
+  const colorScheme = mode === 'system' ? systemMode : mode
 
   return (
     <Box
@@ -48,8 +50,8 @@ const NotFound: ReactFCWithChildren<NotFoundProps> = ({ illustrated = false, chi
           }}
         >
           <img
-            style={{ width: 450 }}
-            src={theme.palette.mode === 'light' ? undrawNotFound : EmptyStreetDark}
+            style={{ width: 450, maxWidth: '100%' }}
+            src={colorScheme === 'dark' ? EmptyStreetDark : undrawNotFound}
             alt="Not found"
           />
         </Box>

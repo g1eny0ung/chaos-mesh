@@ -15,12 +15,12 @@
  *
  */
 import { Branch } from '@/zustand/workflow'
-import { Box, Table, TableBody, TableRow, Typography } from '@mui/material'
+import { Box } from '@mui/joy'
 
 import i18n from '@/components/T'
 
 import ObjectConfiguration from '.'
-import { TableCell } from './common'
+import { Table, TableBody, TableCell, TableRow, Typography } from './common'
 
 interface NodeConfigurationProps {
   template: any
@@ -83,34 +83,36 @@ const Custom = ({ template: t }: NodeConfigurationProps) => {
         {i18n('newW.node.container.title')}
       </Typography>
       <Table size="small">
-        <TableRow>
-          <TableCell>{i18n('common.name')}</TableCell>
-          <TableCell>
-            <Typography variant="body2" color="textSecondary">
-              {container.name}
-            </Typography>
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>{i18n('newW.node.container.image')}</TableCell>
-          <TableCell>
-            <Typography variant="body2" color="textSecondary">
-              {container.image}
-            </Typography>
-          </TableCell>
-        </TableRow>
-        {container.command && (
+        <TableBody>
           <TableRow>
-            <TableCell>{i18n('newW.node.container.command')}</TableCell>
+            <TableCell>{i18n('common.name')}</TableCell>
             <TableCell>
-              {container.command.map((d: string, i: number) => (
-                <Typography key={i} variant="body2" color="textSecondary">
-                  - {d}
-                </Typography>
-              ))}
+              <Typography variant="body2" color="textSecondary">
+                {container.name}
+              </Typography>
             </TableCell>
           </TableRow>
-        )}
+          <TableRow>
+            <TableCell>{i18n('newW.node.container.image')}</TableCell>
+            <TableCell>
+              <Typography variant="body2" color="textSecondary">
+                {container.image}
+              </Typography>
+            </TableCell>
+          </TableRow>
+          {container.command && (
+            <TableRow>
+              <TableCell>{i18n('newW.node.container.command')}</TableCell>
+              <TableCell>
+                {container.command.map((d: string, i: number) => (
+                  <Typography key={i} variant="body2" color="textSecondary">
+                    - {d}
+                  </Typography>
+                ))}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
       </Table>
       <Typography variant="subtitle2" gutterBottom>
         {i18n('newW.node.conditionalBranches.title')}
@@ -122,22 +124,24 @@ const Custom = ({ template: t }: NodeConfigurationProps) => {
               {i18n('newW.node.conditionalBranches.branch')} {i + 1}
             </Typography>
             <Table size="small">
-              <TableRow>
-                <TableCell>{i18n('newW.node.conditionalBranches.target')}</TableCell>
-                <TableCell>
-                  <Typography variant="body2" color="textSecondary">
-                    {d.target}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>{i18n('newW.node.conditionalBranches.expression')}</TableCell>
-                <TableCell>
-                  <Typography variant="body2" color="textSecondary">
-                    {d.expression}
-                  </Typography>
-                </TableCell>
-              </TableRow>
+              <TableBody>
+                <TableRow>
+                  <TableCell>{i18n('newW.node.conditionalBranches.target')}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="textSecondary">
+                      {d.target}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{i18n('newW.node.conditionalBranches.expression')}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="textSecondary">
+                      {d.expression}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
             </Table>
           </Box>
         ))}

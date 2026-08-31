@@ -14,23 +14,23 @@
  * limitations under the License.
  *
  */
-import { Box, CircularProgress, styled } from '@mui/material'
-
-const StyledBox = styled(Box)({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  height: '100%',
-})
+import { Box, CircularProgress } from '@mui/joy'
 
 const Loading = () => (
-  <StyledBox>
-    <CircularProgress size={25} />
-  </StyledBox>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+    }}
+  >
+    <CircularProgress size="sm" />
+  </Box>
 )
 
 export default Loading

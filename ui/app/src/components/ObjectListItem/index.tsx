@@ -22,7 +22,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutlineOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
-import { Box, IconButton, Typography } from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/joy'
 import _ from 'lodash'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
@@ -45,6 +45,7 @@ interface ObjectListItemProps {
   data: TypesSchedule | TypesExperiment | TypesArchive
   onSelect: (info: ObjectListItemAction) => void
 }
+const compactIconSx = { fontSize: 16 }
 
 const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type = 'experiment', archive, onSelect }) => {
   const navigate = useNavigate()
@@ -52,7 +53,7 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
 
   const lang = useSystemStore((state) => state.lang)
 
-  const handleAction = (action: string) => (event: React.MouseEvent<HTMLSpanElement>) => {
+  const handleAction = (action: string) => (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation()
 
     switch (action) {
@@ -112,9 +113,9 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
     navigate(path)
   }
 
-  const Actions = () => (
-    <Space direction="row" sx={{ justifyContent: 'end', alignItems: 'center' }}>
-      <Typography variant="body2" title={format(data.created_at!)}>
+  const actions = (
+    <Space direction="row" sx={{ alignItems: 'center' }}>
+      <Typography level="body-sm" color="neutral" title={format(data.created_at!)}>
         {i18n('table.created')}{' '}
         {DateTime.fromISO(data.created_at!, {
           locale: lang,
@@ -122,27 +123,46 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
       </Typography>
       {(type === 'schedule' || type === 'experiment') &&
         ((data as any).status === 'paused' ? (
-          <IconButton color="primary" title={i18n('common.start', intl)} size="small" onClick={handleAction('start')}>
-            <PlayCircleOutlineIcon />
+          <IconButton
+            color="primary"
+            variant="plain"
+            title={i18n('common.start', intl)}
+            size="sm"
+            onClick={handleAction('start')}
+          >
+            <PlayCircleOutlineIcon sx={compactIconSx} />
           </IconButton>
-        ) : (data as any).status !== 'finished' ? (
-          <IconButton color="primary" title={i18n('common.pause', intl)} size="small" onClick={handleAction('pause')}>
-            <PauseCircleOutlineIcon />
+        ) : (data as any).status === 'running' || (data as any).status === 'injecting' ? (
+          <IconButton
+            color="neutral"
+            variant="plain"
+            title={i18n('common.pause', intl)}
+            size="sm"
+            onClick={handleAction('pause')}
+          >
+            <PauseCircleOutlineIcon sx={compactIconSx} />
           </IconButton>
         ) : null)}
-      {type !== 'archive' && (
+      {type !== 'archive' && (data as any).status !== 'deleting' && (
         <IconButton
-          color="primary"
+          color="neutral"
+          variant="plain"
           title={i18n('archives.single', intl)}
-          size="small"
+          size="sm"
           onClick={handleAction('archive')}
         >
-          <ArchiveOutlinedIcon />
+          <ArchiveOutlinedIcon sx={compactIconSx} />
         </IconButton>
       )}
       {type === 'archive' && (
-        <IconButton color="primary" title={i18n('common.delete', intl)} size="small" onClick={handleAction('delete')}>
-          <DeleteOutlinedIcon />
+        <IconButton
+          color="danger"
+          variant="plain"
+          title={i18n('common.delete', intl)}
+          size="sm"
+          onClick={handleAction('delete')}
+        >
+          <DeleteOutlinedIcon sx={compactIconSx} />
         </IconButton>
       )}
     </Space>
@@ -153,7 +173,7 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
       sx={{
         p: 0,
         ':hover': {
-          bgcolor: 'action.hover',
+          bgcolor: 'neutral.softHoverBg',
           cursor: 'pointer',
         },
       }}
@@ -169,15 +189,15 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
       >
         <Space direction="row" sx={{ alignItems: 'center' }}>
           {type !== 'archive' && <StatusLabel status={(data as any).status} />}
-          <Typography component="div" title={data.name}>
+          <Typography level="title-sm" component="div" title={data.name}>
             {_.truncate(data.name!)}
           </Typography>
-          <Typography component="div" variant="body2" color="textSecondary" title={data.uid}>
+          <Typography component="div" level="body-sm" color="neutral" title={data.uid}>
             {_.truncate(data.uid!)}
           </Typography>
         </Space>
 
-        <Actions />
+        {actions}
       </Box>
     </Paper>
   )

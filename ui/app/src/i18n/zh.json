@@ -135,6 +135,11 @@
     "title": "实验",
     "single": "实验",
     "notFound": "未发现实验",
+    "totalCount": "共 {count} 个实验",
+    "selectedCount": "已选择 {count} 个",
+    "type": "类型",
+    "typeFilter": "按实验类型筛选",
+    "allTypes": "全部类型",
     "deleteMulti": "归档所选实验",
     "deleteDesc": "你仍然可以在归档中找到此实验",
     "pauseDesc": "你可以在同一位置重启这个实验",
@@ -279,6 +284,10 @@
     "useNewPhysicalMachineCRD": {
       "title": "使用新的 PhysicalMachine CRD",
       "choose": "创建 PhysicalMachineChaos 时，检索可用的 PhysicalMachines 而不是提供地址字段。"
+    },
+    "eventTimeFormat": {
+      "title": "具体时间",
+      "choose": "使用具体的日期和时间显示事件时间，而不是相对时间。"
     },
     "tutorialCard": {
       "title": "显示教程卡片",
