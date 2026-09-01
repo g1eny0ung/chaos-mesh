@@ -16,8 +16,10 @@
 import Card from '@mui/joy/Card'
 import type { CardProps } from '@mui/joy/Card'
 
+const toSxArray = (sx: CardProps['sx']) => (Array.isArray(sx) ? sx : sx ? [sx] : [])
+
 const PanelCard: ReactFCWithChildren<CardProps> = ({ children, sx, ...props }) => (
-  <Card {...props} sx={[{ borderRadius: 'lg' }, ...(Array.isArray(sx) ? sx : [sx])]}>
+  <Card {...props} sx={[{ position: 'relative', borderRadius: 'lg' }, ...toSxArray(sx)]}>
     {children}
   </Card>
 )

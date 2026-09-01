@@ -14,11 +14,8 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
-import Paper from '@/mui-extends/Paper'
-import PaperTop from '@/mui-extends/PaperTop'
-import Space from '@/mui-extends/Space'
 import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsUid, useGetEvents } from '@/openapi'
+import { Stack } from '@mui/joy'
 import { Box, Grid, Grow } from '@mui/material'
 import * as yaml from 'js-yaml'
 import { lazy } from 'react'
@@ -27,7 +24,10 @@ import { useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
 import HeadTitle from '@/components/HeadTitle'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
+import PanelCard from '@/components/PanelCard'
+import PanelHeader from '@/components/PanelHeader'
 import i18n from '@/components/T'
 
 import { useQuery } from '@/lib/hooks'
@@ -65,10 +65,16 @@ const Single = () => {
   const loading = loadingArchives || (kind !== 'workflow' && loadingEvents)
 
   const YAML = () => (
-    <Paper sx={{ height: kind === 'workflow' ? (theme) => `calc(100vh - 56px - ${theme.spacing(18)})` : 600, p: 0 }}>
+    <PanelCard
+      sx={{
+        height: kind === 'workflow' ? (theme) => `calc(100vh - 56px - ${theme.spacing(9)})` : 600,
+        p: 0,
+        overflow: 'hidden',
+      }}
+    >
       {archive && (
-        <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <PaperTop title={i18n('common.definition')} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+        <Stack spacing={0} sx={{ height: '100%' }}>
+          <PanelHeader title={i18n('common.definition')} boxProps={{ sx: { p: 2.25, pb: 0 } }} />
           <Box
             sx={{
               flex: 1,
@@ -81,9 +87,9 @@ const Single = () => {
               aceProps={{ readOnly: true }}
             />
           </Box>
-        </Space>
+        </Stack>
       )}
-    </Paper>
+    </PanelCard>
   )
 
   return (
@@ -92,11 +98,11 @@ const Single = () => {
       <Grow in={!loading} style={{ transformOrigin: '0 0 0' }}>
         <div>
           {kind !== 'workflow' ? (
-            <Space spacing={6}>
+            <Stack spacing={3}>
               {archive && (
-                <Paper>
+                <PanelCard>
                   <ObjectConfiguration config={archive} inSchedule={kind === 'schedule'} inArchive={true} />
-                </Paper>
+                </PanelCard>
               )}
 
               <Grid container>
@@ -119,14 +125,14 @@ const Single = () => {
                   <YAML />
                 </Grid>
               </Grid>
-            </Space>
+            </Stack>
           ) : (
             <YAML />
           )}
         </div>
       </Grow>
 
-      {loading && <Loading />}
+      {loading && <LoadingOverlay />}
     </>
   )
 }

@@ -14,19 +14,18 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import Space from '@/mui-extends/Space'
 import type { TypesArchive, TypesExperiment, TypesSchedule } from '@/openapi/index.schemas'
 import { useSystemStore } from '@/zustand/system'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutlineOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
-import { Box, IconButton, Typography } from '@mui/joy'
+import { Box, IconButton, Stack, Typography } from '@mui/joy'
 import _ from 'lodash'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 
+import PanelCard from '@/components/PanelCard'
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 
@@ -114,7 +113,7 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
   }
 
   const actions = (
-    <Space direction="row" sx={{ alignItems: 'center' }}>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
       <Typography level="body-sm" color="neutral" title={format(data.created_at!)}>
         {i18n('table.created')}{' '}
         {DateTime.fromISO(data.created_at!, {
@@ -165,11 +164,11 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
           <DeleteOutlinedIcon sx={compactIconSx} />
         </IconButton>
       )}
-    </Space>
+    </Stack>
   )
 
   return (
-    <Paper
+    <PanelCard
       sx={{
         p: 0,
         ':hover': {
@@ -187,7 +186,7 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
           p: 3,
         }}
       >
-        <Space direction="row" sx={{ alignItems: 'center' }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
           {type !== 'archive' && <StatusLabel status={(data as any).status} />}
           <Typography level="title-sm" component="div" title={data.name}>
             {_.truncate(data.name!)}
@@ -195,11 +194,11 @@ const ObjectListItem: ReactFCWithChildren<ObjectListItemProps> = ({ data, type =
           <Typography component="div" level="body-sm" color="neutral" title={data.uid}>
             {_.truncate(data.uid!)}
           </Typography>
-        </Space>
+        </Stack>
 
         {actions}
       </Box>
-    </Paper>
+    </PanelCard>
   )
 }
 

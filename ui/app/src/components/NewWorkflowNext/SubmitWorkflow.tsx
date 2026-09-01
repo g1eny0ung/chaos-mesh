@@ -15,12 +15,10 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import ConfirmDialog from '@/mui-extends/ConfirmDialog'
-import Paper from '@/mui-extends/Paper'
-import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces, usePostWorkflows } from '@/openapi'
 import { useSettingStore } from '@/zustand/setting'
 import { useWorkflowActions } from '@/zustand/workflow'
+import { Stack } from '@mui/joy'
 import { Box, Divider, MenuItem, Typography } from '@mui/material'
 import { Form, Formik } from 'formik'
 import * as yaml from 'js-yaml'
@@ -28,8 +26,10 @@ import { lazy, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import * as Yup from 'yup'
 
+import AppDialog from '@/components/AppDialog'
 import { SelectField, Submit, TextField } from '@/components/FormField'
 import FormikEffect from '@/components/FormikEffect'
+import PanelCard from '@/components/PanelCard'
 import { T } from '@/components/T'
 
 import { loadYaml } from '@/lib/yaml'
@@ -114,19 +114,13 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
   }
 
   return (
-    <ConfirmDialog
+    <AppDialog
       open={open}
-      close={() => setOpen(false)}
+      onClose={() => setOpen(false)}
       title="Fill in the basic information and submit"
-      dialogProps={{
-        slotProps: {
-          paper: {
-            style: { width: 1024, height: 768, maxWidth: 'unset' },
-          },
-        },
-      }}
+      modalDialogProps={{ sx: { width: 1024, height: 'min(768px, calc(100dvh - 32px))' } }}
     >
-      <Space spacing={6} direction="row" sx={{ height: '100%' }}>
+      <Stack spacing={3} direction={{ xs: 'column', md: 'row' }} sx={{ height: '100%', minHeight: 0 }}>
         <Box
           sx={{
             flexGrow: 0,
@@ -147,7 +141,7 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
               <>
                 <FormikEffect didUpdate={setWorkflowBasic} />
                 <Form>
-                  <Space>
+                  <Stack spacing={1.5}>
                     <TextField
                       name="name"
                       label={<T id="common.name" />}
@@ -181,14 +175,14 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
                       error={errors.deadline && touched.deadline ? true : false}
                     />
                     <Submit />
-                  </Space>
+                  </Stack>
                 </Form>
               </>
             )}
           </Formik>
         </Box>
-        <Divider orientation="vertical" flexItem />
-        <Space spacing={1.5} sx={{ flex: 1 }}>
+        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', md: 'block' } }} />
+        <Stack spacing={0.75} sx={{ flex: 1, minHeight: 0 }}>
           <Typography
             variant="body2"
             sx={{
@@ -197,11 +191,11 @@ export default function SubmitWorkflow({ open, setOpen, workflow }: SubmitWorkfl
           >
             Preview
           </Typography>
-          <Paper sx={{ width: '100%', p: 0 }}>
+          <PanelCard sx={{ width: '100%', flex: 1, minHeight: 0, overflow: 'hidden', p: 0 }}>
             <YAMLEditor data={data} />
-          </Paper>
-        </Space>
-      </Space>
-    </ConfirmDialog>
+          </PanelCard>
+        </Stack>
+      </Stack>
+    </AppDialog>
   )
 }

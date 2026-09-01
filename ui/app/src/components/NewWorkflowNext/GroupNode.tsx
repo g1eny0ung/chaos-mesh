@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import Space from '@/mui-extends/Space'
+import { Sheet, Stack } from '@mui/joy'
 import { Box, Typography } from '@mui/material'
 import { Position } from '@xyflow/react'
 import type { Node, NodeProps } from '@xyflow/react'
@@ -104,7 +103,7 @@ export default function GroupNode({ data, isConnectable }: NodeProps<GroupNodeTy
           fontSize: 18,
         }}
       >
-        <Space direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
           {iconByKind(type, 'inherit')}
           <Typography
             component="div"
@@ -114,15 +113,20 @@ export default function GroupNode({ data, isConnectable }: NodeProps<GroupNodeTy
           >
             {name}
           </Typography>
-        </Space>
+        </Stack>
         {nodeControl}
       </Box>
       <Resizable className="re-resizable" handleClasses={handleClasses} defaultSize={{ width, height }}>
         <StyledHandle type="target" position={Position.Left} isConnectable={isConnectable} />
-        <Paper
+        <Sheet
+          variant="outlined"
           sx={{
+            width: '100%',
+            height: '100%',
+            p: 0,
+            borderRadius: 'sm',
             '&:hover': { cursor: 'pointer' },
-            ...(isOverCurrent && { bgcolor: 'background.default', borderColor: 'secondary.main' }),
+            ...(isOverCurrent && { bgcolor: 'primary.softBg', borderColor: 'primary.outlinedBorder' }),
           }}
         />
         <StyledHandle type="source" position={Position.Right} isConnectable={isConnectable} />

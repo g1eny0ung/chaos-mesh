@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
-import Space from '@/mui-extends/Space'
 import {
   useDeleteArchives,
   useDeleteArchivesSchedules,
@@ -32,6 +30,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
+import { Stack } from '@mui/joy'
 import TabContext from '@mui/lab/TabContext'
 import TabList from '@mui/lab/TabList'
 import { Box, Button, Checkbox, Typography, styled } from '@mui/material'
@@ -42,6 +41,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 import { List as RWList, type RowComponentProps as RWListRowComponentProps } from 'react-window'
 
+import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
 import ObjectListItem from '@/components/ObjectListItem'
 import type { ObjectListItemAction } from '@/components/ObjectListItem'
@@ -229,7 +229,7 @@ export default function Archives() {
         </TabList>
       </Box>
 
-      <Space direction="row" sx={{ my: 6 }}>
+      <Stack direction="row" spacing={1.5} sx={{ my: 3 }}>
         <Button
           variant="outlined"
           startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
@@ -248,7 +248,7 @@ export default function Archives() {
             </Button>
           </>
         )}
-      </Space>
+      </Stack>
 
       {Object.entries(_.groupBy(archives, 'kind')).map(([kind, archivesByKind]) => (
         <Box
@@ -274,7 +274,7 @@ export default function Archives() {
         </NotFound>
       )}
 
-      {loading && <Loading />}
+      {loading && <LoadingOverlay />}
     </TabContext>
   )
 }

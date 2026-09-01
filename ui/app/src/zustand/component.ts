@@ -26,7 +26,7 @@ export interface Alert {
 export interface Confirm {
   title: string
   description?: React.ReactNode
-  handle?: () => void
+  handle: () => void | Promise<void>
 }
 
 export const useComponentStore = create(
@@ -40,6 +40,7 @@ export const useComponentStore = create(
       alertOpen: false,
       confirm: {
         title: '',
+        handle: () => {},
       } as Confirm,
       authOpen: false,
       confirmOpen: false,

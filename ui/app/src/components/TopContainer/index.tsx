@@ -16,8 +16,6 @@
  */
 import { applyAPIAuthentication, applyErrorHandling, applyNSParam } from '@/api/interceptors'
 import { Stale } from '@/api/queryUtils'
-import ConfirmDialog from '@/mui-extends/ConfirmDialog'
-import Loading from '@/mui-extends/Loading'
 import { useGetCommonConfig } from '@/openapi'
 import { useAuthActions, useAuthStore } from '@/zustand/auth'
 import { useComponentActions, useComponentStore } from '@/zustand/component'
@@ -30,8 +28,10 @@ import { lazy, useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 
 import AppSnackbar from '@/components/AppSnackbar'
+import ConfirmDialog from '@/components/ConfirmDialog'
 import { RouteHeadTitle } from '@/components/HeadTitle'
 import Sidebar from '@/components/Layout/Sidebar'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import { TokenFormValues } from '@/components/Token'
 
 import insertCommonStyle from '@/lib/d3/insertCommonStyle'
@@ -159,7 +159,7 @@ const TopContainer = () => {
               },
             }}
           >
-            {loading || authOpen ? <Loading /> : <Outlet />}
+            {loading || authOpen ? <LoadingOverlay /> : <Outlet />}
           </Box>
         </Box>
         <AppSnackbar
@@ -172,7 +172,7 @@ const TopContainer = () => {
         <Auth open={authOpen} />
         <ConfirmDialog
           open={confirmOpen}
-          close={() => setConfirmOpen(false)}
+          onClose={() => setConfirmOpen(false)}
           title={confirm.title}
           description={confirm.description}
           onConfirm={confirm.handle}

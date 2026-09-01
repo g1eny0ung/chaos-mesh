@@ -14,16 +14,15 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import Space from '@/mui-extends/Space'
 import { useExperimentStore } from '@/zustand/experiment'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
-import { Box, IconButton, Option, Typography } from '@mui/joy'
+import { Box, IconButton, Option, Stack, Typography } from '@mui/joy'
 import { Form, Formik } from 'formik'
 import { useEffect, useState } from 'react'
 
 import { LabelField, SelectField, Submit, TextField } from '@/components/FormField'
+import PanelCard from '@/components/PanelCard'
 
 import typesData from '../data/types'
 
@@ -74,7 +73,7 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
 
         return (
           <Form>
-            <Paper sx={{ mb: 6 }}>
+            <PanelCard sx={{ mb: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
@@ -88,9 +87,9 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                 </IconButton>
               </Box>
               {callchain.length > 0 && (
-                <Space sx={{ mt: 6 }}>
+                <Stack spacing={1.5} sx={{ mt: 3 }}>
                   {callchain.map((_: any, i: number) => (
-                    <Space key={'frame' + i}>
+                    <Stack key={'frame' + i} spacing={1.5}>
                       <Box
                         sx={{
                           display: 'flex',
@@ -106,12 +105,12 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                       <TextField name={`failKernRequest.callchain[${i}].funcname`} label="funcname" />
                       <TextField name={`failKernRequest.callchain[${i}].parameters`} label="parameters" />
                       <TextField name={`failKernRequest.callchain[${i}].predicate`} label="predicate" />
-                    </Space>
+                    </Stack>
                   ))}
-                </Space>
+                </Stack>
               )}
-            </Paper>
-            <Space>
+            </PanelCard>
+            <Stack spacing={1.5}>
               <SelectField
                 name="failKernRequest.failtype"
                 label="Failtype"
@@ -135,7 +134,7 @@ const Kernel: ReactFCWithChildren<KernelProps> = ({ onSubmit }) => {
                 endDecorator={<Typography level="body-sm">%</Typography>}
               />
               <TextField type="number" name="failKernRequest.times" helperText="The max times of failures" />
-            </Space>
+            </Stack>
 
             <Submit sx={{ mt: 3 }} />
           </Form>

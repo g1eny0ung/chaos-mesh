@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
 import type { CoreEvent as Event } from '@/openapi/index.schemas'
 import FirstPageIcon from '@mui/icons-material/FirstPage'
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import LastPageIcon from '@mui/icons-material/LastPage'
+import { Sheet } from '@mui/joy'
 import {
   Box,
   IconButton,
@@ -214,7 +214,11 @@ const EventsTable: ReactFCWithChildren<EventsTableProps> = ({ events: allEvents 
   }
 
   return (
-    <TableContainer component={(props) => <Paper {...props} sx={{ p: 0 }} />}>
+    <TableContainer
+      component={(props) => (
+        <Sheet {...props} variant="outlined" sx={{ p: 0, overflowX: 'auto', borderRadius: 'lg' }} />
+      )}
+    >
       <Table stickyHeader>
         <Head order={order} orderBy={orderBy} onSort={handleSortEvents} />
 

@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
 import { useGetEvents } from '@/openapi'
 import { Grow, Typography } from '@mui/material'
 
 import EventsTable from '@/components/EventsTable'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
 import i18n from '@/components/T'
 
@@ -41,7 +41,7 @@ export default function Events() {
         </NotFound>
       )}
 
-      {loading && <Loading />}
+      {loading && <LoadingOverlay />}
     </>
   )
 }

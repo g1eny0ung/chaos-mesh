@@ -15,11 +15,10 @@
  *
  */
 import { templateTypeToFieldName } from '@/api/zz_generated.frontend.chaos-mesh'
-import Space from '@/mui-extends/Space'
 import type { TypesArchiveDetail, TypesExperimentDetail } from '@/openapi/index.schemas'
 import { useSettingStore } from '@/zustand/setting'
 import { useSystemStore } from '@/zustand/system'
-import { Grid } from '@mui/joy'
+import { Grid, Stack } from '@mui/joy'
 
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
@@ -65,11 +64,11 @@ const ObjectConfiguration: ReactFCWithChildren<ObjectConfigurationProps> = ({
   return (
     <>
       {!inNode && !hideHeader && (
-        <Space direction="row" sx={{ mb: 2 }}>
+        <Stack direction="row" spacing={1.5} sx={{ mb: 1 }}>
           <Typography>{config.name}</Typography>
 
           {!inArchive && <StatusLabel status={(config as any).status} />}
-        </Space>
+        </Stack>
       )}
 
       <Grid container spacing={vertical ? 2 : 1.5}>

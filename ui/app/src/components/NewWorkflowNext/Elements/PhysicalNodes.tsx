@@ -15,7 +15,7 @@
  *
  */
 import _actions from '@/formik/actions'
-import Space from '@/mui-extends/Space'
+import { Stack } from '@mui/joy'
 
 import DraggableBareNode from './DraggableBareNode'
 import { ElementTypes, ElementsProps } from './types'
@@ -24,7 +24,7 @@ const actions = _actions['PhysicalMachineChaos']
 
 export default function PhysicalNodes({ onElementClick }: ElementsProps) {
   return (
-    <Space>
+    <Stack spacing={1.5}>
       {actions.sort().map((action) => (
         <DraggableBareNode
           key={action}
@@ -36,6 +36,6 @@ export default function PhysicalNodes({ onElementClick }: ElementsProps) {
           {action}
         </DraggableBareNode>
       ))}
-    </Space>
+    </Stack>
   )
 }

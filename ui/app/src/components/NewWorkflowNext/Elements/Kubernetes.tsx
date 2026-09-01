@@ -15,7 +15,7 @@
  *
  */
 import _actions from '@/formik/actions'
-import Space from '@/mui-extends/Space'
+import { Stack } from '@mui/joy'
 import { Typography } from '@mui/material'
 import _ from 'lodash'
 
@@ -26,9 +26,9 @@ const actions: Record<string, string[]> = _.omit(_actions, 'PhysicalMachineChaos
 
 export default function Kubernetes({ onElementClick }: ElementsProps) {
   return (
-    <Space>
+    <Stack spacing={1.5}>
       {Object.entries(actions).map(([kind, list]) => (
-        <Space key={kind}>
+        <Stack key={kind} spacing={1.5}>
           <Typography
             variant="body2"
             sx={{
@@ -57,8 +57,8 @@ export default function Kubernetes({ onElementClick }: ElementsProps) {
               {kind}
             </DraggableBareNode>
           )}
-        </Space>
+        </Stack>
       ))}
-    </Space>
+    </Stack>
   )
 }

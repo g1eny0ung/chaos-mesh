@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import { useExperimentActions } from '@/zustand/experiment'
-import { Box, Tab, TabList, TabPanel, Tabs } from '@mui/joy'
+import { Box, Stack, Tab, TabList, TabPanel, Tabs } from '@mui/joy'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 
 import i18n from '@/components/T'
@@ -88,11 +87,11 @@ const NewExperiment: React.ForwardRefRenderFunction<NewExperimentHandles, NewExp
         </Box>
       )}
       <TabPanel value="initial" sx={{ p: 0, pt: 3 }}>
-        <Space spacing={3}>
+        <Stack spacing={3}>
           <Step1 />
           <Step2 inWorkflow={inWorkflow} inSchedule={inSchedule} />
           <Step3 onSubmit={onSubmit ? onSubmit : undefined} inSchedule={inSchedule} />
-        </Space>
+        </Stack>
       </TabPanel>
       <TabPanel value="existing" sx={{ p: 0, pt: 3 }}>
         {loadFrom && <LoadFrom callback={fillExperiment} inSchedule={inSchedule} inWorkflow={inWorkflow} />}

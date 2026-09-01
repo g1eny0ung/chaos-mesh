@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import MenuIcon from '@mui/icons-material/Menu'
 import MenuOpenIcon from '@mui/icons-material/MenuOpen'
+import { Stack } from '@mui/joy'
 import { AppBar, Box, IconButton, Toolbar } from '@mui/material'
 
 import Search from '@/components/Search'
@@ -42,10 +42,10 @@ const Navbar: ReactFCWithChildren<HeaderProps> = ({ openDrawer, handleDrawerTogg
         <IconButton size="large" onClick={handleDrawerToggle} sx={{ color: 'onSurfaceVariant.main' }}>
           {openDrawer ? <MenuOpenIcon fontSize="medium" /> : <MenuIcon fontSize="medium" />}
         </IconButton>
-        <Space direction="row">
+        <Stack direction="row" spacing={1.5}>
           <Search />
           <Namespace />
-        </Space>
+        </Stack>
       </Box>
     </Toolbar>
   </AppBar>

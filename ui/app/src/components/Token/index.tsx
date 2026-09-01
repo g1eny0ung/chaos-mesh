@@ -15,10 +15,10 @@
  *
  */
 import { applyAPIAuthentication, resetAPIAuthentication } from '@/api/interceptors'
-import Space from '@/mui-extends/Space'
 import { getExperimentsState } from '@/openapi'
 import { useAuthActions, useAuthStore } from '@/zustand/auth'
 import { useComponentActions } from '@/zustand/component'
+import { Stack } from '@mui/joy'
 import { Form, Formik, FormikHelpers } from 'formik'
 import { useIntl } from 'react-intl'
 
@@ -100,7 +100,7 @@ const Token: ReactFCWithChildren<TokenProps> = ({ onSubmitCallback }) => {
     <Formik initialValues={{ name: '', token: '' }} onSubmit={submitToken}>
       {({ errors, touched }) => (
         <Form>
-          <Space>
+          <Stack spacing={1.5}>
             <TextField
               name="name"
               label={i18n('common.name')}
@@ -117,7 +117,7 @@ const Token: ReactFCWithChildren<TokenProps> = ({ onSubmitCallback }) => {
               helperText={errors.token && touched.token ? errors.token : i18n('settings.addToken.tokenHelper')}
               error={errors.token && touched.token ? true : false}
             />
-          </Space>
+          </Stack>
           <Submit sx={{ mt: 3 }} />
         </Form>
       )}

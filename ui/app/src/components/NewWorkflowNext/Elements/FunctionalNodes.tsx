@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
+import { Stack } from '@mui/joy'
 
 import { SpecialTemplateType } from '../utils/convert'
 import DraggableBareNode from './DraggableBareNode'
@@ -22,7 +22,7 @@ import { ElementTypes, ElementsProps } from './types'
 
 export default function FunctionalNodes({ onElementClick }: ElementsProps) {
   return (
-    <Space>
+    <Stack spacing={1.5}>
       <DraggableBareNode
         elementType={SpecialTemplateType.Serial}
         kind={SpecialTemplateType.Serial}
@@ -40,6 +40,6 @@ export default function FunctionalNodes({ onElementClick }: ElementsProps) {
       <DraggableBareNode elementType={ElementTypes.Suspend} kind="Suspend" onNodeClick={onElementClick}>
         Suspend
       </DraggableBareNode>
-    </Space>
+    </Stack>
   )
 }

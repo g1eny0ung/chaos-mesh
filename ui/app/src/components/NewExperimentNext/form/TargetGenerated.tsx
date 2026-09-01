@@ -15,11 +15,9 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import SkeletonN from '@/mui-extends/SkeletonN'
-import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { type Env, useExperimentStore } from '@/zustand/experiment'
-import { Option } from '@mui/joy'
+import { Option, Skeleton, Stack } from '@mui/joy'
 import { Form, Formik, FormikErrors, FormikTouched, getIn, setIn } from 'formik'
 import { useEffect, useState } from 'react'
 import { AnyObjectSchema } from 'yup'
@@ -220,7 +218,7 @@ const TargetGenerated: ReactFCWithChildren<TargetGeneratedProps> = ({
 
         return (
           <Form>
-            <Space>
+            <Stack spacing={1.5}>
               {parseDataToFormFields(errors, touched)}
               {env === 'k8s' && kind === 'NetworkChaos' && (
                 <MoreOptions
@@ -239,12 +237,12 @@ const TargetGenerated: ReactFCWithChildren<TargetGeneratedProps> = ({
                         previewTitle={i18n('newE.target.network.target.podsPreview')}
                       />
                     ) : (
-                      <SkeletonN n={4} />
+                      Array.from({ length: 4 }, (_, index) => <Skeleton key={index} variant="text" level="body-sm" />)
                     ))}
                 </MoreOptions>
               )}
               <Submit />
-            </Space>
+            </Stack>
           </Form>
         )
       }}

@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-import Menu from '@/mui-extends/Menu'
-import Paper from '@/mui-extends/Paper'
 import { useComponentActions } from '@/zustand/component'
 import { useWorkflowActions, useWorkflowStore } from '@/zustand/workflow'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { Drawer, IconButton, ListItemIcon, ListItemText, MenuItem } from '@mui/material'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import { Dropdown, IconButton as JoyIconButton, ListItemDecorator, Menu, MenuButton, MenuItem, Sheet } from '@mui/joy'
+import { Drawer, IconButton as MaterialIconButton } from '@mui/material'
 import {
   Background,
   Controls,
@@ -75,66 +75,54 @@ const NodeControl = ({ id, type, onDelete, onCopy }: NodeControlProps) => {
   const intl = useIntl()
   const { setConfirm } = useComponentActions()
 
-  const onNode = (type: 'copy' | 'delete', onClose: any) => (e: React.SyntheticEvent) => {
+  const onCopyClick = (e: React.SyntheticEvent) => {
     e.stopPropagation()
+    onCopy(id)
+  }
 
-    let action: typeof onDelete
-    switch (type) {
-      case 'copy':
-        action = onCopy
-        break
-      case 'delete':
-        action = onDelete
-        break
-      default:
-        break
-    }
-
+  const onDeleteClick = (e: React.SyntheticEvent) => {
+    e.stopPropagation()
     setConfirm({
-      title: `${i18n(`common.${type}`, intl)} node ${id}`,
+      title: `${i18n('common.delete', intl)} node ${id}`,
       description: <T id="common.deleteDesc" />,
-      handle: () => {
-        action(id)
-
-        onClose()
-      },
+      handle: () => onDelete(id),
     })
   }
+
   return (
-    <Menu
-      IconButtonProps={{
-        size: 'small',
-        sx: type === 'flowNode' ? { position: 'absolute', top: 1, right: 4 } : undefined,
-      }}
-      IconProps={{ fontSize: 'inherit' }}
-    >
-      {({ onClose }: any) => [
-        <MenuItem key={'copy-' + id} onClick={onNode('copy', onClose)}>
-          <ListItemIcon sx={{ fontSize: 18 }}>
-            <ContentCopyIcon fontSize="inherit" />
-          </ListItemIcon>
-          <ListItemText
-            slotProps={{
-              primary: { variant: 'button', color: 'secondary' },
-            }}
-          >
-            <T id="common.copy" />
-          </ListItemText>
-        </MenuItem>,
-        <MenuItem key={'delete-' + id} onClick={onNode('delete', onClose)}>
-          <ListItemIcon sx={{ fontSize: 18 }}>
-            <DeleteIcon fontSize="inherit" />
-          </ListItemIcon>
-          <ListItemText
-            slotProps={{
-              primary: { variant: 'button', color: 'secondary' },
-            }}
-          >
-            <T id="common.delete" />
-          </ListItemText>
-        </MenuItem>,
-      ]}
-    </Menu>
+    <Dropdown>
+      <MenuButton
+        slots={{ root: JoyIconButton }}
+        slotProps={{
+          root: {
+            size: 'sm',
+            variant: 'plain',
+            'aria-label': i18n('common.moreOptions', intl),
+            onClick: (e: React.MouseEvent<HTMLButtonElement>) => e.stopPropagation(),
+            sx: {
+              ...(type === 'flowNode' ? { position: 'absolute', top: 1, right: 4 } : undefined),
+              '& svg': { fontSize: 16 },
+            },
+          },
+        }}
+      >
+        <MoreVertIcon />
+      </MenuButton>
+      <Menu placement="bottom-end" onClick={(e) => e.stopPropagation()}>
+        <MenuItem onClick={onCopyClick}>
+          <ListItemDecorator sx={{ '& svg': { fontSize: 16 } }}>
+            <ContentCopyIcon />
+          </ListItemDecorator>
+          <T id="common.copy" />
+        </MenuItem>
+        <MenuItem color="danger" onClick={onDeleteClick}>
+          <ListItemDecorator sx={{ '& svg': { fontSize: 16 } }}>
+            <DeleteIcon />
+          </ListItemDecorator>
+          <T id="common.delete" />
+        </MenuItem>
+      </Menu>
+    </Dropdown>
   )
 }
 
@@ -151,9 +139,9 @@ const EdgeControl = ({ id, onDelete }: ControlProps) => {
   }
 
   return (
-    <IconButton size="small" onClick={onEdgeDelete} title={i18n('common.delete', intl)} aria-label="delete">
+    <MaterialIconButton size="small" onClick={onEdgeDelete} title={i18n('common.delete', intl)} aria-label="delete">
       <DeleteIcon fontSize="inherit" />
-    </IconButton>
+    </MaterialIconButton>
   )
 }
 
@@ -496,7 +484,7 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
         <MiniMap style={{ top: 0, right: 0 }} />
       </ReactFlow>
       <Drawer anchor="right" open={openDrawer} onClose={closeDrawer}>
-        <Paper sx={{ width: 768, pr: 16, overflowY: 'auto' }}>
+        <Sheet sx={{ width: 768, maxWidth: '100vw', height: '100%', p: 2, pr: 8, overflowY: 'auto' }}>
           {identifier && (
             <AutoForm
               {...identifier}
@@ -504,7 +492,7 @@ export default function Whiteboard({ flowRef }: WhiteboardProps) {
               formikProps={{ initialValues: formInitialValues.current, onSubmit: updateNode }}
             />
           )}
-        </Paper>
+        </Sheet>
       </Drawer>
     </>
   )

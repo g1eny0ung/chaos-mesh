@@ -12,10 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-import { Theme } from '@mui/material/styles'
-
 declare module '@mui/material/styles' {
   interface Palette {
     secondaryContainer: Palette['primary']
@@ -26,10 +23,12 @@ declare module '@mui/material/styles' {
   }
 
   interface PaletteOptions {
-    secondaryContainer: PaletteOptions['primary']
-    onSecondaryContainer: PaletteOptions['primary']
-    surfaceVariant: PaletteOptions['primary']
-    onSurfaceVariant: PaletteOptions['primary']
-    outline: PaletteOptions['primary']
+    secondaryContainer?: PaletteOptions['primary']
+    onSecondaryContainer?: PaletteOptions['primary']
+    surfaceVariant?: PaletteOptions['primary']
+    onSurfaceVariant?: PaletteOptions['primary']
+    outline?: PaletteOptions['primary']
   }
 }
+
+export {}

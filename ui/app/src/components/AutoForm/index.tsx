@@ -15,11 +15,10 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import Checkbox from '@/mui-extends/Checkbox'
-import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { useSettingStore } from '@/zustand/setting'
 import AddIcon from '@mui/icons-material/Add'
+import { Checkbox, FormControl, FormHelperText as JoyFormHelperText, Stack } from '@mui/joy'
 import { Box, Button, Chip, Divider, FormHelperText, MenuItem, Typography } from '@mui/material'
 import { eval as expEval, parse } from 'expression-eval'
 import { Form, Formik, FormikProps, getIn } from 'formik'
@@ -89,7 +88,6 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
   })
   const hasSelector = !!initialValues.selector
   const [form, setForm] = useState<AtomFormData[]>([])
-  const [scheduled, setScheduled] = useState(false)
 
   const { data: namespaces } = useGetCommonChaosAvailableNamespaces({
     query: {
@@ -253,9 +251,9 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
                 {label}
               </Typography>
               {helperText && <FormHelperText>{helperText}</FormHelperText>}
-              <Space direction="row">
+              <Stack direction="row" spacing={1.5}>
                 <Divider orientation="vertical" flexItem />
-                <Space>
+                <Stack spacing={1.5}>
                   {isMultiple
                     ? value.map((_, index) => (
                         <Fragment key={index}>
@@ -287,27 +285,13 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
                       >{`Add ${label} Item`}</Button>
                     </Box>
                   )}
-                </Space>
-              </Space>
+                </Stack>
+              </Stack>
             </Box>
           )
         }
       }
     })
-  }
-
-  const switchToSchedule = () => {
-    if (!scheduled) {
-      setInitialValues((oldValues) => ({
-        ...oldValues,
-        scheduled: true,
-        ...scheduleInitialValues,
-      }))
-      setTimeout(() => setScheduled(true))
-    } else {
-      setScheduled(false)
-      setInitialValues((oldValues) => removeScheduleValues(oldValues))
-    }
   }
 
   return (
@@ -317,88 +301,104 @@ const AutoForm: ReactFCWithChildren<AutoFormProps> = ({
       validationSchema={chooseSchemaByBelong(belong, kind, action)}
       onSubmit={formikProps.onSubmit!}
     >
-      {(props) => (
-        <Form>
-          <Space>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 'bold',
-              }}
-            >
-              {kindAction}
-            </Typography>
-            {action && (
-              <SelectField
-                name="action"
-                label="action"
-                helperText="The action of the experiment. Automatic filling."
-                disabled
+      {(props) => {
+        const scheduled = Boolean(props.values.scheduled)
+
+        return (
+          <Form>
+            <Stack spacing={1.5}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 'bold',
+                }}
               >
-                <MenuItem value={action}>{action}</MenuItem>
-              </SelectField>
-            )}
-            {renderForm(form, props)}
-            {kind === 'NetworkChaos' && (
-              <>
-                <Typography
-                  sx={{
-                    fontWeight: 500,
-                    mb: 3,
-                  }}
+                {kindAction}
+              </Typography>
+              {action && (
+                <SelectField
+                  name="action"
+                  label="action"
+                  helperText="The action of the experiment. Automatic filling."
+                  disabled
                 >
-                  target
-                </Typography>
-                <Space direction="row">
-                  <Divider orientation="vertical" flexItem />
-                  <Scope
-                    env="k8s"
-                    kind={kind}
-                    namespaces={namespaces!}
-                    scope="target.selector"
-                    modeScope="target"
-                    previewTitle={<T id="newE.target.network.target.podsPreview" />}
-                  />
-                </Space>
-              </>
-            )}
-            {kind !== SpecialTemplateType.Suspend &&
-              kind !== SpecialTemplateType.Serial &&
-              kind !== SpecialTemplateType.Parallel && (
+                  <MenuItem value={action}>{action}</MenuItem>
+                </SelectField>
+              )}
+              {renderForm(form, props)}
+              {kind === 'NetworkChaos' && (
                 <>
-                  <Divider />
-                  <Typography variant="h6">
-                    <T id="newE.sections.targetScope" />
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      mb: 3,
+                    }}
+                  >
+                    target
                   </Typography>
-                  {hasSelector ? (
+                  <Stack direction="row" spacing={1.5}>
+                    <Divider orientation="vertical" flexItem />
                     <Scope
-                      env={kind === 'PhysicalMachineChaos' ? 'physic' : 'k8s'}
+                      env="k8s"
                       kind={kind}
                       namespaces={namespaces!}
+                      scope="target.selector"
+                      modeScope="target"
+                      previewTitle={<T id="newE.target.network.target.podsPreview" />}
                     />
-                  ) : (
-                    <Mode scope="selector" modeScope="" />
-                  )}
-                  <Divider />
-                  <Box>
-                    <Typography variant="h6">Schedule</Typography>
-                    <Checkbox
-                      label="Scheduled"
-                      helperText={`Check the box to convert ${kindAction} into a Schedule.`}
-                      checked={scheduled}
-                      onChange={switchToSchedule}
-                    />
-                  </Box>
-                  {scheduled && <Schedule />}
-                  <Divider />
+                  </Stack>
                 </>
               )}
-            <Typography variant="h6">Info</Typography>
-            <Info belong={belong} kind={kind} action={action} />
-            <Submit />
-          </Space>
-        </Form>
-      )}
+              {kind !== SpecialTemplateType.Suspend &&
+                kind !== SpecialTemplateType.Serial &&
+                kind !== SpecialTemplateType.Parallel && (
+                  <>
+                    <Divider />
+                    <Typography variant="h6">
+                      <T id="newE.sections.targetScope" />
+                    </Typography>
+                    {hasSelector ? (
+                      <Scope
+                        env={kind === 'PhysicalMachineChaos' ? 'physic' : 'k8s'}
+                        kind={kind}
+                        namespaces={namespaces!}
+                      />
+                    ) : (
+                      <Mode scope="selector" modeScope="" />
+                    )}
+                    <Divider />
+                    <Box>
+                      <Typography variant="h6">Schedule</Typography>
+                      <FormControl>
+                        <Checkbox
+                          label="Scheduled"
+                          checked={scheduled}
+                          onChange={(event) => {
+                            props.setValues(
+                              event.target.checked
+                                ? {
+                                    ...scheduleInitialValues,
+                                    ...props.values,
+                                    scheduled: true,
+                                  }
+                                : removeScheduleValues(props.values),
+                            )
+                          }}
+                        />
+                        <JoyFormHelperText>{`Check the box to convert ${kindAction} into a Schedule.`}</JoyFormHelperText>
+                      </FormControl>
+                    </Box>
+                    {scheduled && <Schedule />}
+                    <Divider />
+                  </>
+                )}
+              <Typography variant="h6">Info</Typography>
+              <Info belong={belong} kind={kind} action={action} />
+              <Submit />
+            </Stack>
+          </Form>
+        )
+      }}
     </Formik>
   )
 }

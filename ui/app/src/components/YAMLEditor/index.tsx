@@ -14,12 +14,11 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import { useComponentActions } from '@/zustand/component'
 import { useResolvedTheme } from '@/zustand/system'
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import PublishIcon from '@mui/icons-material/Publish'
-import { Box, Button } from '@mui/joy'
+import { Box, Button, Stack } from '@mui/joy'
 import { type Editor } from 'ace-builds'
 import ace from 'ace-builds/src-noconflict/ace'
 import 'ace-builds/src-noconflict/mode-yaml'
@@ -104,7 +103,7 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
         {...aceProps}
       />
       {(typeof onUpdate === 'function' || download) && (
-        <Space direction="row" sx={{ position: 'absolute', top: 1.5, right: 3 }}>
+        <Stack direction="row" spacing={1.5} sx={{ position: 'absolute', top: 1.5, right: 3 }}>
           {download && (
             <Button
               size="sm"
@@ -126,7 +125,7 @@ const YAMLEditor: ReactFCWithChildren<YAMLEditorProps> = ({
               {i18n('common.update')}
             </Button>
           )}
-        </Space>
+        </Stack>
       )}
     </Box>
   )

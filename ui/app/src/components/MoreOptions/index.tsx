@@ -14,10 +14,9 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import { Box, Button } from '@mui/joy'
+import { Box, Button, Stack } from '@mui/joy'
 import { useState } from 'react'
 
 import { T } from '@/components/T'
@@ -49,7 +48,7 @@ const MoreOptions: ReactFCWithChildren<MoreOptionsProps> = ({
   }
 
   return (
-    <Space>
+    <Stack spacing={1.5}>
       <Box
         sx={{
           textAlign: 'right',
@@ -64,8 +63,10 @@ const MoreOptions: ReactFCWithChildren<MoreOptionsProps> = ({
           {title ? title : <T id="common.moreOptions" />}
         </Button>
       </Box>
-      <Space sx={{ display: open ? 'flex' : 'none' }}>{children}</Space>
-    </Space>
+      <Stack spacing={1.5} sx={{ display: open ? 'flex' : 'none' }}>
+        {children}
+      </Stack>
+    </Stack>
   )
 }
 

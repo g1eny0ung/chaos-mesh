@@ -14,19 +14,19 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import Space from '@/mui-extends/Space'
 import { useWorkflowStore } from '@/zustand/workflow'
 import { Tab as BaseTab } from '@mui/base/Tab'
 import { TabPanel as BaseTabPanel } from '@mui/base/TabPanel'
 import { Tabs as BaseTabs } from '@mui/base/Tabs'
 import { TabsList as BaseTabsList } from '@mui/base/TabsList'
+import { Stack } from '@mui/joy'
 import { Box, Button, Grow, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import type { ReactFlowInstance } from '@xyflow/react'
 import _ from 'lodash'
 import { useRef, useState } from 'react'
 
+import PanelCard from '@/components/PanelCard'
 import YAML from '@/components/YAML'
 
 import FunctionalNodesElements from './Elements/FunctionalNodes'
@@ -112,7 +112,7 @@ export default function NewWorkflow() {
   return (
     <Grow in={true} style={{ transformOrigin: '0 0 0' }}>
       <div style={{ height: '100%' }}>
-        <Space sx={{ height: '100%' }}>
+        <Stack spacing={1.5} sx={{ height: '100%' }}>
           <Box
             sx={{
               display: 'flex',
@@ -132,17 +132,17 @@ export default function NewWorkflow() {
               </Typography>
               <Typography variant="body2">Use flowchart to create a new workflow.</Typography>
             </Box>
-            <Space direction="row">
+            <Stack direction="row" spacing={1.5}>
               <YAML callback={handleImportWorkflow}>Import Workflow</YAML>
               {!_.isEmpty(nodes) && (
                 <Button variant="contained" size="small" onClick={onFinishWorkflow}>
                   Submit Workflow
                 </Button>
               )}
-            </Space>
+            </Stack>
           </Box>
-          <Paper sx={{ display: 'flex', flex: 1 }}>
-            <Space sx={{ width: 300, pr: 4, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}>
+          <PanelCard sx={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 0, gap: 0 }}>
+            <Stack spacing={1.5} sx={{ width: 300, pr: 2, borderRight: '1px solid', borderColor: 'divider' }}>
               <Typography
                 variant="h6"
                 component="div"
@@ -202,8 +202,8 @@ export default function NewWorkflow() {
                   <PhysicalNodesElements onElementClick={handleClickElement} />
                 </TabPanel>
               </Tabs>
-            </Space>
-            <Space sx={{ flex: 1, px: 4 }}>
+            </Stack>
+            <Stack spacing={1.5} sx={{ flex: 1, minWidth: 0, px: 2 }}>
               <Typography
                 variant="h6"
                 component="div"
@@ -220,9 +220,9 @@ export default function NewWorkflow() {
               >
                 <Whiteboard flowRef={flowRef} />
               </Box>
-            </Space>
-          </Paper>
-        </Space>
+            </Stack>
+          </PanelCard>
+        </Stack>
         {workflow && <SubmitWorkflow open={openSubmitDialog} setOpen={setOpenSubmitDialog} workflow={workflow} />}
       </div>
     </Grow>

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
 import {
   useDeleteExperiments,
   useDeleteExperimentsUid,
@@ -36,6 +35,7 @@ import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 
+import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
 import PanelCard from '@/components/PanelCard'
 import StatusLabel from '@/components/StatusLabel'
@@ -214,7 +214,7 @@ export default function Experiments() {
       <PanelCard sx={{ p: 0, gap: 0, minHeight: 360, overflow: 'hidden' }}>
         {loading ? (
           <Box sx={{ position: 'relative', minHeight: 360 }}>
-            <Loading />
+            <LoadingOverlay contained />
           </Box>
         ) : experiments.length > 0 ? (
           <Box sx={{ display: 'flex', flex: 1, minHeight: 0, flexDirection: 'column' }}>

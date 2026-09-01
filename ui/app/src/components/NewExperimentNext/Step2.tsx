@@ -15,13 +15,11 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import SkeletonN from '@/mui-extends/SkeletonN'
-import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces } from '@/openapi'
 import { useExperimentActions, useExperimentStore } from '@/zustand/experiment'
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import { Box, Button, Divider, Grid, Option, Typography } from '@mui/joy'
+import { Box, Button, Divider, Grid, Option, Skeleton, Stack, Typography } from '@mui/joy'
 import { Form, Formik } from 'formik'
 import _ from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
@@ -155,7 +153,7 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
             <Form>
               <Grid container spacing={3}>
                 <Grid xs={12} md={6}>
-                  <Space>
+                  <Stack spacing={1.5}>
                     <Typography
                       sx={{
                         fontWeight: 500,
@@ -166,12 +164,12 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                     {namespaces ? (
                       <Scope env={env} kind={kind} namespaces={namespaces} scope="spec.selector" modeScope="spec" />
                     ) : (
-                      <SkeletonN n={6} />
+                      Array.from({ length: 6 }, (_, index) => <Skeleton key={index} variant="text" level="body-sm" />)
                     )}
-                  </Space>
+                  </Stack>
                 </Grid>
                 <Grid xs={12} md={6}>
-                  <Space>
+                  <Stack spacing={1.5}>
                     <Typography
                       sx={{
                         fontWeight: 500,
@@ -235,7 +233,7 @@ const Step2: ReactFCWithChildren<Step2Props> = ({ inWorkflow = false, inSchedule
                         <Scheduler errors={errors} touched={touched} inSchedule={inSchedule} />
                       </>
                     )}
-                  </Space>
+                  </Stack>
                   <Box
                     sx={{
                       mt: 6,

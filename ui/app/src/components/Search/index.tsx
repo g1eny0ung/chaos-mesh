@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-import Tooltip from '@/mui-extends/Tooltip'
 import {
   getArchives,
   getArchivesSchedules,
@@ -28,6 +27,12 @@ import FingerprintIcon from '@mui/icons-material/Fingerprint'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import SearchIcon from '@mui/icons-material/Search'
+import {
+  Box as JoyBox,
+  IconButton as JoyIconButton,
+  Tooltip as JoyTooltip,
+  Typography as JoyTypography,
+} from '@mui/joy'
 import {
   Autocomplete,
   Box,
@@ -53,19 +58,10 @@ import search from '@/lib/search'
 const PREFIX = 'Search'
 
 const classes = {
-  tooltip: `${PREFIX}-tooltip`,
   chipContainer: `${PREFIX}-chipContainer`,
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  [`& .${classes.tooltip}`]: {
-    marginBottom: 0,
-    paddingLeft: theme.spacing(3),
-    '& > li': {
-      marginTop: theme.spacing(1.5),
-    },
-  },
-
   [`& .${classes.chipContainer}`]: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -225,19 +221,30 @@ const Search: ReactFCWithChildren = () => {
                 <>
                   {loading && !noResult ? <CircularProgress color="inherit" size={15} /> : null}
                   <InputAdornment position="end">
-                    <Tooltip
+                    <JoyTooltip
                       title={
-                        <Typography variant="body2" component="div">
+                        <JoyTypography level="body-sm" component="div" textColor="inherit">
                           {i18n('search.tip.title')}
-                          <ul className={classes.tooltip}>
+                          <JoyBox
+                            component="ul"
+                            sx={{
+                              mb: 0,
+                              pl: 1.5,
+                              '& > li': {
+                                mt: 0.75,
+                              },
+                            }}
+                          >
                             <li>{i18n('search.tip.namespace')}</li>
                             <li>{i18n('search.tip.kind')}</li>
-                          </ul>
-                        </Typography>
+                          </JoyBox>
+                        </JoyTypography>
                       }
                     >
-                      <HelpOutlineIcon />
-                    </Tooltip>
+                      <JoyIconButton size="sm" variant="plain" aria-label={i18n('search.tip.title', intl)}>
+                        <HelpOutlineIcon sx={{ fontSize: 16 }} />
+                      </JoyIconButton>
+                    </JoyTooltip>
                   </InputAdornment>
                 </>
               ),

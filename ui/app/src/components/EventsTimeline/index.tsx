@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-import PaperTop from '@/mui-extends/PaperTop'
 import { type CoreEvent } from '@/openapi/index.schemas'
 import { useSettingStore } from '@/zustand/setting'
 import { useSystemStore } from '@/zustand/system'
 import { Box, Chip, List, ListItem, ListItemContent, ListItemDecorator, Typography } from '@mui/joy'
 
 import PanelCard from '@/components/PanelCard'
+import PanelHeader from '@/components/PanelHeader'
 import i18n from '@/components/T'
 
 import { iconByKind } from '@/lib/byKind'
@@ -89,7 +89,7 @@ const EventsTimeline: React.FC<EventsTimelineProps> = ({ events, height, paperPr
   if (paperProps) {
     return (
       <PanelCard {...paperProps}>
-        <PaperTop title={paperProps.title || i18n('events.title')} />
+        <PanelHeader title={paperProps.title || i18n('events.title')} />
         {eventList}
       </PanelCard>
     )

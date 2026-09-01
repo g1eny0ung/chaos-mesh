@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
-import Space from '@/mui-extends/Space'
 import {
   useDeleteSchedules,
   useDeleteSchedulesUid,
@@ -30,6 +28,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
+import { Stack } from '@mui/joy'
 import { Box, Button, Checkbox, styled } from '@mui/material'
 import { Typography } from '@mui/material'
 import _ from 'lodash'
@@ -38,6 +37,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 import { List as RWList, type RowComponentProps as RWListRowComponentProps } from 'react-window'
 
+import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
 import ObjectListItem from '@/components/ObjectListItem'
 import type { ObjectListItemAction } from '@/components/ObjectListItem'
@@ -182,7 +182,7 @@ const Schedules = () => {
 
   return (
     <>
-      <Space direction="row" sx={{ mb: 6 }}>
+      <Stack direction="row" spacing={1.5} sx={{ mb: 3 }}>
         <Button variant="outlined" startIcon={<AddIcon />} onClick={() => navigate('/schedules/new')}>
           {i18n('newS.title')}
         </Button>
@@ -204,7 +204,7 @@ const Schedules = () => {
             </Button>
           </>
         )}
-      </Space>
+      </Stack>
 
       {schedules.length > 0 &&
         Object.entries(_.groupBy(schedules, 'kind')).map(([type, schedulesByType]) => (
@@ -231,7 +231,7 @@ const Schedules = () => {
         </NotFound>
       )}
 
-      {loading && <Loading />}
+      {loading && <LoadingOverlay />}
     </>
   )
 }

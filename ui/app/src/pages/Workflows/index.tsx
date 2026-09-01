@@ -14,15 +14,13 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
-import PaperTop from '@/mui-extends/PaperTop'
-import Space from '@/mui-extends/Space'
 import { getWorkflowsUid, useDeleteWorkflowsUid, useGetWorkflows, usePostWorkflows } from '@/openapi'
 import type { CoreWorkflowMeta } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
 import ReplayIcon from '@mui/icons-material/Replay'
+import { Stack } from '@mui/joy'
 import { Button, Grow, Typography } from '@mui/material'
 import type { ButtonProps } from '@mui/material'
 import type { GridColDef, GridRenderCellParams, GridRowParams } from '@mui/x-data-grid'
@@ -34,7 +32,9 @@ import { useNavigate } from 'react-router'
 import { v4 as uuidv4 } from 'uuid'
 
 import DataTable from '@/components/DataTable'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
+import PanelHeader from '@/components/PanelHeader'
 import StatusLabel from '@/components/StatusLabel'
 import i18n, { T } from '@/components/T'
 
@@ -185,17 +185,17 @@ const Workflows = () => {
       <Grow in={!isLoading} style={{ transformOrigin: '0 0 0' }}>
         <div style={{ height: '100%' }}>
           {workflows && workflows.length > 0 ? (
-            <Space>
-              <PaperTop title="All Workflows" subtitle="Manage your workflows." h1 divider>
+            <Stack spacing={1.5}>
+              <PanelHeader title="All Workflows" subtitle="Manage your workflows." h1>
                 <NewWorkflow />
-              </PaperTop>
+              </PanelHeader>
               <DataTable
                 columns={columns}
                 rows={workflows}
                 getRowId={(row) => row.uid ?? row.id!}
                 onRowClick={jumpToSingleWorkflow}
               />
-            </Space>
+            </Stack>
           ) : (
             <NotFound illustrated>
               <Typography
@@ -211,7 +211,7 @@ const Workflows = () => {
         </div>
       </Grow>
 
-      {isLoading && <Loading />}
+      {isLoading && <LoadingOverlay />}
     </>
   )
 }

@@ -14,10 +14,9 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import AddCircleTwoToneIcon from '@mui/icons-material/AddCircleTwoTone'
 import RemoveCircleTwoToneIcon from '@mui/icons-material/RemoveCircleTwoTone'
-import { Box, Button, FormHelperText, IconButton, Typography } from '@mui/joy'
+import { Box, Button, FormHelperText, IconButton, Stack, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import _ from 'lodash'
 
@@ -63,7 +62,7 @@ export default function TextTextField({ name, label, helperText, valueLabeled }:
       </Box>
       {entries.length > 0 ? (
         entries.map(([key], i) => (
-          <Space key={key} direction="row">
+          <Stack key={key} direction="row" spacing={1.5}>
             <TextField fast name={`${name}.${key}.key`} />
             {valueLabeled ? (
               <LabelField name={`${name}.${key}.value`} sx={{ width: 300 }} />
@@ -78,7 +77,7 @@ export default function TextTextField({ name, label, helperText, valueLabeled }:
                 <AddCircleTwoToneIcon />
               </IconButton>
             )}
-          </Space>
+          </Stack>
         ))
       ) : (
         <Box>

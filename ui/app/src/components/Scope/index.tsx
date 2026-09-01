@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import {
   useGetCommonAnnotations,
   useGetCommonLabels,
@@ -23,7 +22,7 @@ import {
 } from '@/openapi'
 import type { Env } from '@/zustand/experiment'
 import { useSettingStore } from '@/zustand/setting'
-import { Option, Typography } from '@mui/joy'
+import { Option, Stack, Typography } from '@mui/joy'
 import { getIn, useFormikContext } from 'formik'
 import { useEffect, useMemo } from 'react'
 
@@ -127,7 +126,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
   }, [currentNamespaces, currentLabels, currentAnnotations, currentPodPhases, env, postPods, postPhysicalMachines])
 
   return (
-    <Space>
+    <Stack spacing={1.5}>
       <AutocompleteField
         freeSolo
         multiple
@@ -205,7 +204,7 @@ const Scope = ({ env, namespaces, scope = 'selector', modeScope = '', previewTit
           <T id={`newE.scope.no${env === 'k8s' ? 'Pods' : 'PhysicalMachines'}Found`} />
         </Typography>
       )}
-    </Space>
+    </Stack>
   )
 }
 

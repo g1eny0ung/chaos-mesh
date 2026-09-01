@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import SkeletonN from '@/mui-extends/SkeletonN'
-import Space from '@/mui-extends/Space'
 import {
   useGetArchives,
   useGetArchivesSchedules,
@@ -29,10 +26,11 @@ import {
 } from '@/openapi'
 import type { TypesArchiveDetail, TypesExperimentDetail, TypesScheduleDetail } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
-import { Box, Divider, Radio, RadioGroup, Typography } from '@mui/joy'
+import { Box, Divider, Radio, RadioGroup, Skeleton, Stack, Typography } from '@mui/joy'
 import { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 
+import PanelCard from '@/components/PanelCard'
 import i18n from '@/components/T'
 
 import RadioLabel from './RadioLabel'
@@ -157,15 +155,15 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
   }
 
   return (
-    <Paper>
+    <PanelCard>
       <RadioGroup value={radio} onChange={onRadioChange}>
-        <Space>
+        <Stack spacing={1.5}>
           {inSchedule && (
             <>
               <Typography>{i18n('schedules.title')}</Typography>
 
               {loading ? (
-                <SkeletonN n={3} />
+                Array.from({ length: 3 }, (_, index) => <Skeleton key={index} variant="text" level="body-sm" />)
               ) : schedules && schedules.length > 0 ? (
                 <Box
                   sx={{
@@ -198,7 +196,7 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
               <Typography>{i18n('experiments.title')}</Typography>
 
               {loading ? (
-                <SkeletonN n={3} />
+                Array.from({ length: 3 }, (_, index) => <Skeleton key={index} variant="text" level="body-sm" />)
               ) : experiments && experiments.length > 0 ? (
                 <Box
                   sx={{
@@ -229,7 +227,7 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
           <Typography>{i18n('archives.title')}</Typography>
 
           {loading ? (
-            <SkeletonN n={3} />
+            Array.from({ length: 3 }, (_, index) => <Skeleton key={index} variant="text" level="body-sm" />)
           ) : archives && archives.length > 0 ? (
             <Box
               sx={{
@@ -252,9 +250,9 @@ const LoadFrom: ReactFCWithChildren<LoadFromProps> = ({ callback, inSchedule }) 
               {i18n('archives.notFound')}
             </Typography>
           )}
-        </Space>
+        </Stack>
       </RadioGroup>
-    </Paper>
+    </PanelCard>
   )
 }
 

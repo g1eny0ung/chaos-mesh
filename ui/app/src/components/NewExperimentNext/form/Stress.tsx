@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-import Space from '@/mui-extends/Space'
 import { useExperimentStore } from '@/zustand/experiment'
-import { Typography } from '@mui/joy'
+import { Stack, Typography } from '@mui/joy'
 import { Form, Formik, getIn } from 'formik'
 import { useEffect, useState } from 'react'
 
@@ -71,7 +70,7 @@ const Stress: ReactFCWithChildren<StressProps> = ({ onSubmit }) => {
     <Formik enableReinitialize initialValues={init} onSubmit={onSubmit} validate={validate}>
       {({ errors }) => (
         <Form>
-          <Space>
+          <Stack spacing={1.5}>
             <Typography level="title-sm">CPU</Typography>
             <TextField
               type="number"
@@ -111,7 +110,7 @@ const Stress: ReactFCWithChildren<StressProps> = ({ onSubmit }) => {
               label="Options of Memory stressors"
               helperText="Type and end with Enter to generate the memStress options"
             />
-          </Space>
+          </Stack>
 
           <MoreOptions>
             <TextField

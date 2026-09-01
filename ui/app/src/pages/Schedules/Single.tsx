@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
-import Paper from '@/mui-extends/Paper'
-import PaperTop from '@/mui-extends/PaperTop'
-import Space from '@/mui-extends/Space'
 import {
   useDeleteSchedulesUid,
   useGetEvents,
@@ -28,6 +24,7 @@ import {
 import { useComponentActions } from '@/zustand/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
+import { Stack } from '@mui/joy'
 import { Box, Button, Grid, Grow } from '@mui/material'
 import * as yaml from 'js-yaml'
 import { lazy } from 'react'
@@ -36,7 +33,10 @@ import { useNavigate, useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
 import HeadTitle from '@/components/HeadTitle'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
+import PanelCard from '@/components/PanelCard'
+import PanelHeader from '@/components/PanelHeader'
 import i18n from '@/components/T'
 
 const YAMLEditor = lazy(() => import('@/components/YAMLEditor'))
@@ -130,8 +130,8 @@ const Single = () => {
       <HeadTitle title={`${i18n('schedules.single', intl)}${schedule?.name ? ` ${schedule.name}` : ''}`} />
       <Grow in={!loading} style={{ transformOrigin: '0 0 0' }}>
         <div>
-          <Space spacing={6}>
-            <Space direction="row">
+          <Stack spacing={3}>
+            <Stack direction="row" spacing={1.5}>
               <Button
                 variant="outlined"
                 size="small"
@@ -150,9 +150,9 @@ const Single = () => {
                   {i18n('common.start')}
                 </Button>
               ) : null}
-            </Space>
+            </Stack>
 
-            <Paper>{schedule && <ObjectConfiguration config={schedule} inSchedule />}</Paper>
+            <PanelCard>{schedule && <ObjectConfiguration config={schedule} inSchedule />}</PanelCard>
 
             <Grid container>
               <Grid
@@ -171,10 +171,10 @@ const Single = () => {
                   lg: 6,
                 }}
               >
-                <Paper sx={{ height: 600, p: 0 }}>
+                <PanelCard sx={{ height: 600, p: 0, overflow: 'hidden' }}>
                   {schedule && (
-                    <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                      <PaperTop title={i18n('common.definition')} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+                    <Stack spacing={0} sx={{ height: '100%' }}>
+                      <PanelHeader title={i18n('common.definition')} boxProps={{ sx: { p: 2.25, pb: 0 } }} />
                       <Box
                         sx={{
                           flex: 1,
@@ -182,16 +182,16 @@ const Single = () => {
                       >
                         <YAMLEditor name={schedule.name} data={yaml.dump(schedule.kube_object)} download />
                       </Box>
-                    </Space>
+                    </Stack>
                   )}
-                </Paper>
+                </PanelCard>
               </Grid>
             </Grid>
-          </Space>
+          </Stack>
         </div>
       </Grow>
 
-      {loading && <Loading />}
+      {loading && <LoadingOverlay />}
     </>
   )
 }

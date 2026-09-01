@@ -15,14 +15,14 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import ConfirmDialog from '@/mui-extends/ConfirmDialog'
-import Space from '@/mui-extends/Space'
 import { useGetCommonConfig } from '@/openapi'
 import GoogleIcon from '@mui/icons-material/Google'
+import { Stack } from '@mui/joy'
 import { Box, Button, Divider, IconButton, Link, Typography, createSvgIcon } from '@mui/material'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import AppDialog from '@/components/AppDialog'
 import RBACGenerator from '@/components/RBACGenerator'
 import i18n from '@/components/T'
 import Token from '@/components/Token'
@@ -59,18 +59,8 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
   const handleAuthOIDC = () => (window.location.href = '/api/auth/oidc/redirect')
 
   return (
-    <ConfirmDialog
-      open={open}
-      title={i18n('settings.addToken.prompt')}
-      dialogProps={{
-        slotProps: {
-          paper: {
-            style: { width: 512 },
-          },
-        },
-      }}
-    >
-      <Space>
+    <AppDialog open={open} title={i18n('settings.addToken.prompt')} modalDialogProps={{ sx: { width: 512 } }}>
+      <Stack spacing={1.5}>
         <Typography variant="body2" color="textSecondary">
           {i18n('settings.addToken.prompt2')}
           <Link sx={{ cursor: 'pointer' }} onClick={() => setTokenGenOpen(true)}>
@@ -78,7 +68,7 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
           </Link>
         </Typography>
         <Token onSubmitCallback={handleSubmitCallback} />
-      </Space>
+      </Stack>
       {config?.gcp_security_mode && (
         <>
           <Divider sx={{ mt: 6, mb: 3, color: 'text.secondary', typography: 'body2' }}>
@@ -112,16 +102,11 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
         </>
       )}
 
-      <ConfirmDialog
+      <AppDialog
         open={tokenGenOpen}
+        onClose={() => setTokenGenOpen(false)}
         title={i18n('settings.addToken.generator')}
-        dialogProps={{
-          slotProps: {
-            paper: {
-              style: { width: 750, maxWidth: 'unset' }, // max-width: 600
-            },
-          },
-        }}
+        modalDialogProps={{ sx: { width: 750 } }}
       >
         <RBACGenerator />
         <Box
@@ -132,8 +117,8 @@ const Auth: ReactFCWithChildren<AuthProps> = ({ open }) => {
         >
           <Button onClick={() => setTokenGenOpen(false)}>{i18n('common.close')}</Button>
         </Box>
-      </ConfirmDialog>
-    </ConfirmDialog>
+      </AppDialog>
+    </AppDialog>
   )
 }
 

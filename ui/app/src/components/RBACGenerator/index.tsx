@@ -15,9 +15,9 @@
  *
  */
 import { Stale } from '@/api/queryUtils'
-import Space from '@/mui-extends/Space'
 import { useGetCommonChaosAvailableNamespaces, useGetCommonRbacConfig } from '@/openapi'
 import { useComponentActions } from '@/zustand/component'
+import { Stack } from '@mui/joy'
 import { Box, Checkbox, FormControl, FormControlLabel, MenuItem, Typography } from '@mui/material'
 import copy from 'copy-text-to-clipboard'
 import { Field, Form, Formik } from 'formik'
@@ -89,14 +89,14 @@ const RBACGenerator = () => {
 
   return (
     <div ref={containerRef}>
-      <Space>
+      <Stack spacing={1.5}>
         <Typography variant="body2" color="textSecondary">
           {i18n('settings.addToken.generatorHelper')}
         </Typography>
         <Formik initialValues={initialValues} onSubmit={() => {}} validate={onValidate} validateOnBlur={false}>
           {({ values: { clustered } }) => (
             <Form>
-              <Space>
+              <Stack spacing={1.5}>
                 <FormControl>
                   <FormControlLabel
                     control={<Field as={Checkbox} name="clustered" color="primary" />}
@@ -126,7 +126,7 @@ const RBACGenerator = () => {
                     </MenuItem>
                   ))}
                 </SelectField>
-              </Space>
+              </Stack>
             </Form>
           )}
         </Formik>
@@ -169,7 +169,7 @@ const RBACGenerator = () => {
           </Typography>
           <CopyableCodeBlock text={rbac.getSecret} copyLabel={i18n('common.copy')} onCopy={copyCommand} singleLine />
         </Box>
-      </Space>
+      </Stack>
     </div>
   )
 }

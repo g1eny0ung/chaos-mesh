@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-import Loading from '@/mui-extends/Loading'
-import PaperTop from '@/mui-extends/PaperTop'
-import Space from '@/mui-extends/Space'
 import {
   useDeleteExperimentsUid,
   useGetEvents,
@@ -28,7 +25,7 @@ import { useComponentActions } from '@/zustand/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutlineOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
-import { Alert, Box, Button, Grid, Typography } from '@mui/joy'
+import { Alert, Box, Button, Grid, Stack, Typography } from '@mui/joy'
 import * as yaml from 'js-yaml'
 import { lazy } from 'react'
 import { useIntl } from 'react-intl'
@@ -36,9 +33,11 @@ import { useNavigate, useParams } from 'react-router'
 
 import EventsTimeline from '@/components/EventsTimeline'
 import HeadTitle from '@/components/HeadTitle'
+import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
 import ObjectConfiguration from '@/components/ObjectConfiguration'
 import PanelCard from '@/components/PanelCard'
+import PanelHeader from '@/components/PanelHeader'
 import StatusLabel from '@/components/StatusLabel'
 import i18n from '@/components/T'
 
@@ -145,7 +144,7 @@ export default function Single() {
             },
           }}
         >
-          <Space spacing={2}>
+          <Stack spacing={2}>
             <Box
               component="header"
               sx={{
@@ -230,8 +229,8 @@ export default function Single() {
               <Grid xs={12} lg={6}>
                 <PanelCard sx={{ height: 600, p: 0, overflow: 'hidden' }}>
                   {experiment && (
-                    <Space spacing={0} sx={{ height: '100%' }}>
-                      <PaperTop title={i18n('common.definition')} boxProps={{ sx: { px: 3, pt: 3, pb: 2 } }} />
+                    <Stack spacing={0} sx={{ height: '100%' }}>
+                      <PanelHeader title={i18n('common.definition')} boxProps={{ sx: { px: 3, pt: 3, pb: 2 } }} />
                       <Box
                         sx={{
                           flex: 1,
@@ -239,12 +238,12 @@ export default function Single() {
                       >
                         <YAMLEditor name={experiment.name} data={yaml.dump(experiment.kube_object)} download />
                       </Box>
-                    </Space>
+                    </Stack>
                   )}
                 </PanelCard>
               </Grid>
             </Grid>
-          </Space>
+          </Stack>
         </Box>
       )}
 
@@ -254,7 +253,7 @@ export default function Single() {
         </NotFound>
       )}
 
-      {loading && <Loading />}
+      {loading && <LoadingOverlay />}
     </>
   )
 }

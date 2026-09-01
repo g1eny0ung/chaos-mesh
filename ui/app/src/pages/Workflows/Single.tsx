@@ -14,13 +14,11 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import PaperTop from '@/mui-extends/PaperTop'
-import Space from '@/mui-extends/Space'
 import { useDeleteWorkflowsUid, useGetEventsWorkflowUid, useGetWorkflowsUid } from '@/openapi'
 import type { CoreWorkflowDetail } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
+import { Stack } from '@mui/joy'
 import { Box, Button, Grid, Grow, Modal, useTheme } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { EventHandler } from 'cytoscape'
@@ -32,6 +30,8 @@ import { useNavigate, useParams } from 'react-router'
 import EventsTimeline from '@/components/EventsTimeline'
 import HeadTitle from '@/components/HeadTitle'
 import NodeConfiguration from '@/components/ObjectConfiguration/Node'
+import PanelCard from '@/components/PanelCard'
+import PanelHeader from '@/components/PanelHeader'
 import i18n from '@/components/T'
 
 import { constructWorkflowTopology } from '@/lib/cytoscape'
@@ -163,8 +163,8 @@ const Single = () => {
       <HeadTitle title={`${i18n('workflows.single', intl)}${workflow?.name ? ` ${workflow.name}` : ''}`} />
       <Grow in={true} style={{ transformOrigin: '0 0 0' }}>
         <div style={{ height: '100%' }}>
-          <Space spacing={6} className={classes.root}>
-            <Space direction="row">
+          <Stack spacing={3} className={classes.root}>
+            <Stack direction="row" spacing={1.5}>
               <Button
                 variant="outlined"
                 size="small"
@@ -179,11 +179,11 @@ const Single = () => {
               >
                 {i18n('archives.single')}
               </Button>
-            </Space>
-            <Paper sx={{ display: 'flex', flexDirection: 'column', height: 450 }}>
-              <PaperTop title={i18n('workflow.topology')} />
+            </Stack>
+            <PanelCard sx={{ display: 'flex', flexDirection: 'column', height: 450 }}>
+              <PanelHeader title={i18n('workflow.topology')} />
               <div ref={topologyRef} style={{ flex: 1 }} />
-            </Paper>
+            </PanelCard>
 
             <Grid container>
               <Grid
@@ -202,10 +202,10 @@ const Single = () => {
                   lg: 6,
                 }}
               >
-                <Paper sx={{ height: 600, p: 0 }}>
+                <PanelCard sx={{ height: 600, p: 0, overflow: 'hidden' }}>
                   {workflow && (
-                    <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                      <PaperTop title={i18n('common.definition')} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+                    <Stack spacing={0} sx={{ height: '100%' }}>
+                      <PanelHeader title={i18n('common.definition')} boxProps={{ sx: { p: 2.25, pb: 0 } }} />
                       <Box
                         sx={{
                           flex: 1,
@@ -221,23 +221,23 @@ const Single = () => {
                           download
                         />
                       </Box>
-                    </Space>
+                    </Stack>
                   )}
-                </Paper>
+                </PanelCard>
               </Grid>
             </Grid>
-          </Space>
+          </Stack>
         </div>
       </Grow>
       <Modal open={configOpen} onClose={onModalClose}>
         <div>
-          <Paper
+          <PanelCard
             className={classes.configPaper}
-            sx={{ width: selected === 'workflow' ? '50vw' : selected === 'node' ? '70vw' : '50vw' }}
+            sx={{ width: selected === 'workflow' ? '50vw' : selected === 'node' ? '70vw' : '50vw', p: 0 }}
           >
             {workflow && configOpen && (
-              <Space sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <PaperTop title={modalTitle} boxProps={{ sx: { p: 4.5, pb: 0 } }} />
+              <Stack spacing={0} sx={{ height: '100%' }}>
+                <PanelHeader title={modalTitle} boxProps={{ sx: { p: 2.25, pb: 0 } }} />
                 <Box
                   sx={{
                     display: 'flex',
@@ -255,9 +255,9 @@ const Single = () => {
                   )}
                   <YAMLEditor name={modalTitle} data={yaml.dump(data)} />
                 </Box>
-              </Space>
+              </Stack>
             )}
-          </Paper>
+          </PanelCard>
         </div>
       </Modal>
     </Root>

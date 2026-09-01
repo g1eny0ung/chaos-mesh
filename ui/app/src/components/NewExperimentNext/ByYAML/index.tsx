@@ -14,15 +14,14 @@
  * limitations under the License.
  *
  */
-import Paper from '@/mui-extends/Paper'
-import Space from '@/mui-extends/Space'
 import { useComponentActions } from '@/zustand/component'
 import PublishIcon from '@mui/icons-material/Publish'
-import { Button, Typography } from '@mui/joy'
+import { Button, Stack, Typography } from '@mui/joy'
 import { type Editor } from 'ace-builds'
 import { lazy, useState } from 'react'
 import { useIntl } from 'react-intl'
 
+import PanelCard from '@/components/PanelCard'
 import i18n from '@/components/T'
 import YAML from '@/components/YAML'
 
@@ -60,14 +59,14 @@ const ByYAML: ReactFCWithChildren<ByYAMLProps> = ({ callback }) => {
   }
 
   return (
-    <Space spacing={3}>
+    <Stack spacing={3}>
       <Typography level="body-sm" color="neutral">
         {i18n('newE.createFromYAMLDescription')}
       </Typography>
-      <Paper sx={{ height: { xs: 320, md: 400 }, p: 0 }}>
+      <PanelCard sx={{ height: { xs: 320, md: 400 }, p: 0, overflow: 'hidden' }}>
         <YAMLEditor mountEditor={setYAMLEditor} aceProps={{ onChange }} />
-      </Paper>
-      <Space direction="row" sx={{ justifyContent: 'flex-end' }}>
+      </PanelCard>
+      <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'flex-end' }}>
         <YAML callback={handleUploadYAMLCallback} />
         <Button
           variant="solid"
@@ -79,8 +78,8 @@ const ByYAML: ReactFCWithChildren<ByYAMLProps> = ({ callback }) => {
         >
           {i18n('common.submit')}
         </Button>
-      </Space>
-    </Space>
+      </Stack>
+    </Stack>
   )
 }
 
