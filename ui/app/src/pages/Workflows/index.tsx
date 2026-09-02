@@ -17,46 +17,39 @@
 import { getWorkflowsUid, useDeleteWorkflowsUid, useGetWorkflows, usePostWorkflows } from '@/openapi'
 import type { CoreWorkflowMeta } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
+import { useSystemStore } from '@/zustand/system'
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import AddIcon from '@mui/icons-material/Add'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
 import ReplayIcon from '@mui/icons-material/Replay'
-import { Stack } from '@mui/joy'
-import { Button, Grow, Typography } from '@mui/material'
-import type { ButtonProps } from '@mui/material'
-import type { GridColDef, GridRenderCellParams, GridRowParams } from '@mui/x-data-grid'
-import { GridActionsCellItem } from '@mui/x-data-grid'
-import _ from 'lodash'
-import { type SyntheticEvent } from 'react'
+import { Box, Button, IconButton, Link, Table, Typography } from '@mui/joy'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 import { v4 as uuidv4 } from 'uuid'
 
-import DataTable from '@/components/DataTable'
 import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
-import PanelHeader from '@/components/PanelHeader'
+import PanelCard from '@/components/PanelCard'
 import StatusLabel from '@/components/StatusLabel'
 import i18n, { T } from '@/components/T'
 
 import { comparator, format, toRelative } from '@/lib/luxon'
 
+const compactIconSx = { fontSize: 16 }
+
 function transformWorkflows(data: CoreWorkflowMeta[]) {
-  return data
-    .map((d) => ({
-      ...d,
-      time: d.status === 'finished' ? 'Ended at: ' + format(d.end_time!) : 'Created at: ' + toRelative(d.created_at!),
-    }))
-    .sort((a, b) => comparator(b.created_at!, a.created_at!))
+  return [...data].sort((a, b) => comparator(b.created_at!, a.created_at!))
 }
 
-const Workflows = () => {
+export default function Workflows() {
   const navigate = useNavigate()
   const intl = useIntl()
+  const lang = useSystemStore((state) => state.lang)
 
   const { setAlert, setConfirm } = useComponentActions()
 
   const {
-    data: workflows,
+    data: workflows = [],
     isLoading,
     refetch,
   } = useGetWorkflows(undefined, {
@@ -67,64 +60,30 @@ const Workflows = () => {
   const { mutateAsync: deleteWorkflows } = useDeleteWorkflowsUid()
   const { mutateAsync: createWorkflows } = usePostWorkflows()
 
-  const NewWorkflow = (props: ButtonProps) => (
-    <Button
-      variant="contained"
-      size="small"
-      startIcon={<AddIcon />}
-      onClick={() => navigate('/workflows/new')}
-      {...props}
-    >
-      <T id="newW.title" />
-    </Button>
-  )
+  const handleArchive = (workflow: CoreWorkflowMeta) =>
+    setConfirm({
+      title: `${i18n('archives.single', intl)} ${workflow.name}`,
+      description: i18n('workflows.deleteDesc', intl),
+      handle: () => {
+        deleteWorkflows({ uid: workflow.uid! })
+          .then(() => {
+            setAlert({
+              type: 'success',
+              message: i18n('confirm.success.archive', intl),
+            })
 
-  const handleAction = (action: string, uuid: uuid) => () => {
-    let actionFunc
-
-    switch (action) {
-      case 'archive':
-        actionFunc = deleteWorkflows
-
-        break
-      default:
-        break
-    }
-
-    if (actionFunc) {
-      actionFunc({ uid: uuid })
-        .then(() => {
-          setAlert({
-            type: 'success',
-            message: <T id={`confirm.success.${action}`} />,
+            refetch()
           })
+          .catch(console.error)
+      },
+    })
 
-          refetch()
-        })
-        .catch(console.error)
-    }
-  }
-
-  const handleDelete =
-    ({ uid, name }: CoreWorkflowMeta) =>
-    (e: SyntheticEvent) => {
-      e.stopPropagation()
-
-      setConfirm({
-        title: `${i18n('archives.single', intl)} ${name}`,
-        description: <T id="workflows.deleteDesc" />,
-        handle: handleAction('archive', uid!),
-      })
-    }
-
-  const handleReRun = (uid: uuid) => async (e: SyntheticEvent) => {
-    e.stopPropagation()
-
+  const handleReRun = async (uid: uuid) => {
     const { name, kube_object } = await getWorkflowsUid(uid)
 
     setConfirm({
-      title: `Re-run ${name}`,
-      description: 'This will re-create a new workflow with the same configuration.',
+      title: intl.formatMessage({ id: 'workflows.rerunTitle' }, { name }),
+      description: i18n('workflows.rerunDesc', intl),
       handle: () => {
         createWorkflows({
           data: {
@@ -140,7 +99,7 @@ const Workflows = () => {
           .then(() => {
             setAlert({
               type: 'success',
-              message: <T id="confirm.success.create" />,
+              message: i18n('confirm.success.create', intl),
             })
 
             refetch()
@@ -150,70 +109,135 @@ const Workflows = () => {
     })
   }
 
-  const jumpToSingleWorkflow = ({ row }: GridRowParams) => navigate(`/workflows/${row.uid}`)
+  const workflowTime = (workflow: CoreWorkflowMeta) => {
+    if (workflow.status === 'finished' && workflow.end_time) {
+      return intl.formatMessage({ id: 'workflows.endedAt' }, { time: format(workflow.end_time, lang) })
+    }
 
-  const columns: GridColDef[] = [
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 150,
-      renderCell: ({ value }: GridRenderCellParams) => <StatusLabel status={value} />,
-    },
-    {
-      field: 'name',
-      headerName: 'Name',
-      renderCell: ({ value }: GridRenderCellParams) => <Typography variant="body2">{_.truncate(value)}</Typography>,
-    },
-    { field: 'time', headerName: 'Time' },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Operations',
-      align: 'left',
-      width: 150,
-      getActions: ({ row }: GridRowParams) => [
-        <GridActionsCellItem icon={<RemoveCircleOutlineIcon />} label="Archive" onClick={handleDelete(row)} />,
-        ...(row.status === 'finished'
-          ? [<GridActionsCellItem icon={<ReplayIcon />} label="Re-run" onClick={handleReRun(row.uid)} />]
-          : []),
-      ],
-    },
-  ]
+    return workflow.created_at
+      ? intl.formatMessage({ id: 'workflows.createdAt' }, { time: toRelative(workflow.created_at, lang) ?? '-' })
+      : '-'
+  }
 
   return (
     <>
-      <Grow in={!isLoading} style={{ transformOrigin: '0 0 0' }}>
-        <div style={{ height: '100%' }}>
-          {workflows && workflows.length > 0 ? (
-            <Stack spacing={1.5}>
-              <PanelHeader title="All Workflows" subtitle="Manage your workflows." h1>
-                <NewWorkflow />
-              </PanelHeader>
-              <DataTable
-                columns={columns}
-                rows={workflows}
-                getRowId={(row) => row.uid ?? row.id!}
-                onRowClick={jumpToSingleWorkflow}
-              />
-            </Stack>
-          ) : (
-            <NotFound illustrated>
-              <Typography
-                sx={{
-                  fontWeight: 'medium',
-                }}
-              >
-                <T id="workflows.notFound" />
-              </Typography>
-              <NewWorkflow sx={{ mt: 3 }} />
-            </NotFound>
-          )}
-        </div>
-      </Grow>
+      <Box
+        component="header"
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, mb: 3 }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 'md',
+              bgcolor: 'primary.softBg',
+              color: 'primary.softColor',
+            }}
+          >
+            <AccountTreeOutlinedIcon sx={{ fontSize: 20 }} />
+          </Box>
+          <Typography component="h1" level="h2" sx={{ fontSize: 'xl' }}>
+            {i18n('workflows.title', intl)}
+          </Typography>
+        </Box>
 
-      {isLoading && <LoadingOverlay />}
+        <Button
+          size="sm"
+          color="primary"
+          startDecorator={<AddIcon sx={compactIconSx} />}
+          onClick={() => navigate('/workflows/new')}
+        >
+          <T id="newW.title" />
+        </Button>
+      </Box>
+
+      <PanelCard sx={{ p: 0, gap: 0, minHeight: 360, overflow: 'hidden' }}>
+        {isLoading ? (
+          <Box sx={{ position: 'relative', minHeight: 360 }}>
+            <LoadingOverlay contained />
+          </Box>
+        ) : workflows.length > 0 ? (
+          <Box sx={{ maxHeight: 'calc(100dvh - 162px)', overflow: 'auto' }}>
+            <Table
+              size="sm"
+              sx={{
+                minWidth: 800,
+                '--TableCell-paddingX': '0.875rem',
+                '--Table-headerUnderlineThickness': '1px',
+                '& tbody td': { paddingBlock: '0.75rem', verticalAlign: 'middle' },
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={{ width: 150 }}>{i18n('common.status', intl)}</th>
+                  <th>{i18n('common.name', intl)}</th>
+                  <th>{i18n('k8s.namespace', intl)}</th>
+                  <th>{i18n('workflow.time', intl)}</th>
+                  <th style={{ width: 120, paddingLeft: 20 }}>{i18n('common.operation', intl)}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {workflows.map((workflow) => (
+                  <tr key={workflow.uid ?? workflow.id}>
+                    <td>
+                      <StatusLabel status={workflow.status ?? 'unknown'} />
+                    </td>
+                    <td>
+                      <Link
+                        component="button"
+                        level="title-sm"
+                        underline="hover"
+                        onClick={() => navigate(`/workflows/${workflow.uid}`)}
+                      >
+                        {workflow.name}
+                      </Link>
+                      <Typography level="body-xs" color="neutral" noWrap title={workflow.uid}>
+                        {workflow.uid}
+                      </Typography>
+                    </td>
+                    <td>{workflow.namespace}</td>
+                    <td>
+                      <Typography level="body-sm">{workflowTime(workflow)}</Typography>
+                    </td>
+                    <td>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {workflow.status === 'finished' && (
+                          <IconButton
+                            size="sm"
+                            variant="plain"
+                            color="primary"
+                            title={i18n('workflows.rerun', intl)}
+                            onClick={() => handleReRun(workflow.uid!)}
+                          >
+                            <ReplayIcon sx={compactIconSx} />
+                          </IconButton>
+                        )}
+                        <IconButton
+                          size="sm"
+                          variant="plain"
+                          color="neutral"
+                          title={i18n('archives.single', intl)}
+                          onClick={() => handleArchive(workflow)}
+                        >
+                          <ArchiveOutlinedIcon sx={compactIconSx} />
+                        </IconButton>
+                      </Box>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Box>
+        ) : (
+          <NotFound illustrated sx={{ minHeight: 360, textAlign: 'center' }}>
+            <Typography>{i18n('workflows.notFound', intl)}</Typography>
+          </NotFound>
+        )}
+      </PanelCard>
     </>
   )
 }
-
-export default Workflows

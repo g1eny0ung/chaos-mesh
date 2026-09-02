@@ -223,6 +223,11 @@
     "title": "Schedules",
     "single": "Schedule",
     "notFound": "No schedules found",
+    "totalCount": "{count} schedules",
+    "selectedCount": "{count} selected",
+    "type": "Type",
+    "typeFilter": "Filter by schedule type",
+    "allTypes": "All types",
     "deleteMulti": "Archive selected schedules",
     "deleteDesc": "You can still find this schedule in the archives"
   },
@@ -230,6 +235,11 @@
     "title": "Workflows",
     "single": "Workflow",
     "notFound": "No workflows found",
+    "createdAt": "Created at: {time}",
+    "endedAt": "Ended at: {time}",
+    "rerun": "Re-run",
+    "rerunTitle": "Re-run {name}",
+    "rerunDesc": "This will re-create a new workflow with the same configuration.",
     "deleteDesc": "You can still find this workflow in the archives."
   },
   "workflow": {

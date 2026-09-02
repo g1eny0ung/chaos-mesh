@@ -17,7 +17,7 @@
 import { usePostSchedules } from '@/openapi'
 import { useComponentActions } from '@/zustand/component'
 import { useExperimentActions } from '@/zustand/experiment'
-import { Grid } from '@mui/material'
+import { Grid } from '@mui/joy'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 
@@ -49,13 +49,8 @@ const New = () => {
   }
 
   return (
-    <Grid container>
-      <Grid
-        size={{
-          xs: 12,
-          lg: 8,
-        }}
-      >
+    <Grid container spacing={3}>
+      <Grid xs={12} xl={9}>
         <NewExperiment inSchedule={true} onSubmit={onSubmit} />
       </Grid>
     </Grid>

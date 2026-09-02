@@ -165,6 +165,11 @@
     "title": "计划",
     "single": "计划",
     "notFound": "未发现计划",
+    "totalCount": "共 {count} 个计划",
+    "selectedCount": "已选择 {count} 个",
+    "type": "类型",
+    "typeFilter": "按计划类型筛选",
+    "allTypes": "全部类型",
     "deleteMulti": "归档所选计划",
     "deleteDesc": "你仍然可以在归档中找到此计划"
   },
@@ -234,6 +239,11 @@
     "title": "工作流",
     "single": "工作流",
     "notFound": "未发现工作流",
+    "createdAt": "创建于：{time}",
+    "endedAt": "结束于：{time}",
+    "rerun": "重新运行",
+    "rerunTitle": "重新运行 {name}",
+    "rerunDesc": "这将使用相同的配置重新创建一个工作流。",
     "deleteDesc": "你仍然可以在归档中找到此工作流"
   },
   "workflow": {

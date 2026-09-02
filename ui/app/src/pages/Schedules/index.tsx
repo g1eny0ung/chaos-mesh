@@ -21,65 +21,62 @@ import {
   usePutSchedulesPauseUid,
   usePutSchedulesStartUid,
 } from '@/openapi'
-import type { DeleteSchedulesParams } from '@/openapi/index.schemas'
+import type { DeleteSchedulesParams, TypesSchedule } from '@/openapi/index.schemas'
 import { useComponentActions } from '@/zustand/component'
+import { useSystemStore } from '@/zustand/system'
 import AddIcon from '@mui/icons-material/Add'
-import CloseIcon from '@mui/icons-material/Close'
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
-import FilterListIcon from '@mui/icons-material/FilterList'
-import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
-import { Stack } from '@mui/joy'
-import { Box, Button, Checkbox, styled } from '@mui/material'
-import { Typography } from '@mui/material'
-import _ from 'lodash'
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined'
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined'
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined'
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutlineOutlined'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
+import { Box, Button, Checkbox, IconButton, Link, Option, Select, Table, Typography } from '@mui/joy'
 import { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
-import { List as RWList, type RowComponentProps as RWListRowComponentProps } from 'react-window'
 
 import LoadingOverlay from '@/components/LoadingOverlay'
 import NotFound from '@/components/NotFound'
-import ObjectListItem from '@/components/ObjectListItem'
-import type { ObjectListItemAction } from '@/components/ObjectListItem'
-import i18n from '@/components/T'
+import PanelCard from '@/components/PanelCard'
+import StatusLabel from '@/components/StatusLabel'
+import i18n, { T } from '@/components/T'
 
 import { transByKind } from '@/lib/byKind'
+import DateTime, { format } from '@/lib/luxon'
 
-const StyledCheckBox = styled(Checkbox)({
-  position: 'relative',
-  left: -11,
-  paddingRight: 0,
-  '&:hover': {
-    background: 'none !important',
-  },
-})
+type ScheduleAction = 'archive' | 'pause' | 'start'
+const compactIconSx = { fontSize: 16 }
 
-const Schedules = () => {
-  const navigate = useNavigate()
+export default function Schedules() {
   const intl = useIntl()
+  const navigate = useNavigate()
+  const lang = useSystemStore((state) => state.lang)
 
   const { setAlert, setConfirm } = useComponentActions()
 
   const [batch, setBatch] = useState<Record<uuid, boolean>>({})
-  const batchLength = Object.keys(batch).length
-  const isBatchEmpty = batchLength === 0
+  const [kindFilter, setKindFilter] = useState('all')
 
   const { data: schedules = [], isLoading: loading, refetch } = useGetSchedules()
+  const scheduleKinds = Array.from(new Set(schedules.map((schedule) => schedule.kind).filter(Boolean)))
+  const activeKindFilter = kindFilter === 'all' || scheduleKinds.includes(kindFilter) ? kindFilter : 'all'
+  const filteredSchedules =
+    activeKindFilter === 'all' ? schedules : schedules.filter((schedule) => schedule.kind === activeKindFilter)
+  const visibleUids = filteredSchedules.flatMap((schedule) => (schedule.uid ? [schedule.uid] : []))
+  const selectedUids = filteredSchedules.flatMap((schedule) =>
+    schedule.uid && batch[schedule.uid] ? [schedule.uid] : [],
+  )
+  const selectedCount = selectedUids.length
+  const visibleSelectedCount = visibleUids.filter((uid) => batch[uid]).length
   const { mutateAsync: deleteSchedulesByUUID } = useDeleteSchedulesUid()
   const { mutateAsync: deleteSchedules } = useDeleteSchedules()
   const { mutateAsync: pauseSchedules } = usePutSchedulesPauseUid()
   const { mutateAsync: startSchedules } = usePutSchedulesStartUid()
 
-  const onSelect = (selected: ObjectListItemAction) =>
-    setConfirm({
-      title: selected.title,
-      description: selected.description,
-      handle: handleAction(selected.action, selected.uuid),
-    })
-
   const handleAction = (action: string, uuid?: uuid) => () => {
     let actionFunc
     let arg: { uid: string } | { params: DeleteSchedulesParams } | undefined
+    const successAction = action === 'archiveMulti' ? 'archive' : action
 
     switch (action) {
       case 'archive':
@@ -88,10 +85,8 @@ const Schedules = () => {
 
         break
       case 'archiveMulti':
-        action = 'archive'
         actionFunc = deleteSchedules
-        arg = { params: { uids: Object.keys(batch).join(',') } }
-        setBatch({})
+        arg = { params: { uids: selectedUids.join(',') } }
 
         break
       case 'pause':
@@ -104,16 +99,18 @@ const Schedules = () => {
         arg = { uid: uuid! }
 
         break
-      default:
-        break
     }
 
     if (actionFunc) {
       actionFunc(arg as any)
         .then(() => {
+          if (action === 'archiveMulti') {
+            setBatch({})
+          }
+
           setAlert({
             type: 'success',
-            message: i18n(`confirm.success.${action}`, intl),
+            message: i18n(`confirm.success.${successAction}`, intl),
           })
 
           refetch()
@@ -122,22 +119,33 @@ const Schedules = () => {
     }
   }
 
-  const handleBatchSelect = () => {
-    if (schedules.length > 0) {
-      setBatch(isBatchEmpty ? { [schedules[0].uid!]: true } : {})
-    }
+  const confirmScheduleAction = (action: ScheduleAction, schedule: TypesSchedule) => {
+    const titleKey = action === 'archive' ? 'archives.single' : `common.${action}`
+    const descriptionKey = action === 'archive' ? 'schedules.deleteDesc' : `experiments.${action}Desc`
+
+    setConfirm({
+      title: `${i18n(titleKey, intl)} ${schedule.name}`,
+      description: i18n(descriptionKey, intl),
+      handle: handleAction(action, schedule.uid),
+    })
   }
 
-  const handleBatchSelectAll = () =>
-    setBatch(
-      batchLength <= schedules.length
-        ? schedules.reduce<Record<uuid, boolean>>((acc, d) => {
-            acc[d.uid!] = true
+  const handleBatchSelectAll = () => {
+    setBatch((current) => {
+      const next = { ...current }
+      const selectVisible = !visibleUids.every((uid) => current[uid])
 
-            return acc
-          }, {})
-        : {},
-    )
+      visibleUids.forEach((uid) => {
+        if (selectVisible) {
+          next[uid] = true
+        } else {
+          delete next[uid]
+        }
+      })
+
+      return next
+    })
+  }
 
   const handleBatchDelete = () =>
     setConfirm({
@@ -147,93 +155,229 @@ const Schedules = () => {
     })
 
   const onCheckboxChange = (uuid: uuid) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBatch({
-      ...batch,
-      [uuid]: e.target.checked,
+    const checked = e.target.checked
+
+    setBatch((current) => {
+      if (checked) {
+        return { ...current, [uuid]: true }
+      }
+
+      const next = { ...current }
+      delete next[uuid]
+
+      return next
     })
   }
 
-  const Row = ({ data, index, style }: RWListRowComponentProps<{ data: any[] }>) => (
-    <Box
-      style={style}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mb: 3,
-      }}
-    >
-      {!isBatchEmpty && (
-        <StyledCheckBox
-          color="primary"
-          checked={batch[data[index].uid] === true}
-          onChange={onCheckboxChange(data[index].uid)}
-          disableRipple
-        />
-      )}
-      <Box
-        sx={{
-          flex: 1,
-        }}
-      >
-        <ObjectListItem type="schedule" data={data[index]} onSelect={onSelect} />
-      </Box>
-    </Box>
-  )
+  const handleKindFilterChange = (value: string | null) => {
+    setKindFilter(value ?? 'all')
+    setBatch({})
+  }
 
   return (
     <>
-      <Stack direction="row" spacing={1.5} sx={{ mb: 3 }}>
-        <Button variant="outlined" startIcon={<AddIcon />} onClick={() => navigate('/schedules/new')}>
-          {i18n('newS.title')}
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={isBatchEmpty ? <FilterListIcon /> : <CloseIcon />}
-          onClick={handleBatchSelect}
-          disabled={schedules.length === 0}
-        >
-          {i18n(`common.${isBatchEmpty ? 'batchOperation' : 'cancel'}`)}
-        </Button>
-        {!isBatchEmpty && (
-          <>
-            <Button variant="outlined" startIcon={<PlaylistAddCheckIcon />} onClick={handleBatchSelectAll}>
-              {i18n('common.selectAll')}
-            </Button>
-            <Button variant="outlined" color="secondary" startIcon={<DeleteOutlinedIcon />} onClick={handleBatchDelete}>
-              {i18n('archives.single')}
-            </Button>
-          </>
-        )}
-      </Stack>
-
-      {schedules.length > 0 &&
-        Object.entries(_.groupBy(schedules, 'kind')).map(([type, schedulesByType]) => (
+      <Box
+        component="header"
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, mb: 3 }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Box
-            key={type}
             sx={{
-              mb: 6,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 'md',
+              bgcolor: 'primary.softBg',
+              color: 'primary.softColor',
             }}
           >
-            <Typography variant="overline">{transByKind(type as any)}</Typography>
-            <RWList
-              style={{ width: '100%', height: schedulesByType.length > 3 ? 300 : schedulesByType.length * 70 }}
-              rowCount={schedulesByType.length}
-              rowHeight={70}
-              rowComponent={Row}
-              rowProps={{ data: schedulesByType }}
-            />
+            <CalendarMonthOutlinedIcon sx={{ fontSize: 20 }} />
           </Box>
-        ))}
+          <Typography component="h1" level="h2" sx={{ fontSize: 'xl' }}>
+            {i18n('schedules.title')}
+          </Typography>
+        </Box>
 
-      {!loading && schedules.length === 0 && (
-        <NotFound illustrated sx={{ textAlign: 'center' }}>
-          <Typography>{i18n('schedules.notFound')}</Typography>
-        </NotFound>
-      )}
+        <Button
+          size="sm"
+          color="primary"
+          startDecorator={<AddIcon sx={compactIconSx} />}
+          onClick={() => navigate('/schedules/new')}
+        >
+          {i18n('newS.title')}
+        </Button>
+      </Box>
 
-      {loading && <LoadingOverlay />}
+      <PanelCard sx={{ p: 0, gap: 0, minHeight: 360, overflow: 'hidden' }}>
+        {loading ? (
+          <Box sx={{ position: 'relative', minHeight: 360 }}>
+            <LoadingOverlay contained />
+          </Box>
+        ) : schedules.length > 0 ? (
+          <Box sx={{ display: 'flex', flex: 1, minHeight: 0, flexDirection: 'column' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                minHeight: 48,
+                px: 2,
+                py: 1,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Checkbox
+                  size="sm"
+                  slotProps={{ input: { 'aria-label': i18n('common.selectAll', intl) } }}
+                  checked={visibleUids.length > 0 && visibleSelectedCount === visibleUids.length}
+                  indeterminate={visibleSelectedCount > 0 && visibleSelectedCount < visibleUids.length}
+                  onChange={handleBatchSelectAll}
+                />
+                <Typography level="body-sm" color="neutral">
+                  <T
+                    id={selectedCount > 0 ? 'schedules.selectedCount' : 'schedules.totalCount'}
+                    values={{ count: selectedCount > 0 ? selectedCount : filteredSchedules.length }}
+                  />
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {selectedCount > 0 && (
+                  <Button
+                    size="sm"
+                    variant="plain"
+                    color="neutral"
+                    startDecorator={<ArchiveOutlinedIcon sx={compactIconSx} />}
+                    onClick={handleBatchDelete}
+                  >
+                    {i18n('archives.single')}
+                  </Button>
+                )}
+                <Select
+                  size="sm"
+                  variant="soft"
+                  color="neutral"
+                  value={activeKindFilter}
+                  aria-label={i18n('schedules.typeFilter', intl)}
+                  startDecorator={<FilterAltOutlinedIcon sx={compactIconSx} />}
+                  onChange={(_, value) => handleKindFilterChange(value)}
+                  sx={{ minWidth: 160 }}
+                >
+                  <Option value="all">{i18n('schedules.allTypes', intl)}</Option>
+                  {scheduleKinds.map((kind) => (
+                    <Option key={kind} value={kind}>
+                      {transByKind(kind as any)}
+                    </Option>
+                  ))}
+                </Select>
+              </Box>
+            </Box>
+
+            <Box sx={{ maxHeight: 'calc(100dvh - 210px)', overflow: 'auto' }}>
+              <Table
+                size="sm"
+                sx={{
+                  minWidth: 880,
+                  '--TableCell-paddingX': '0.875rem',
+                  '--Table-headerUnderlineThickness': '1px',
+                  '& tbody td': { paddingBlock: '0.75rem', verticalAlign: 'middle' },
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ width: 24 }} />
+                    <th>{i18n('common.name')}</th>
+                    <th>{i18n('schedules.type')}</th>
+                    <th>{i18n('k8s.namespace')}</th>
+                    <th>{i18n('common.status')}</th>
+                    <th>{i18n('table.created')}</th>
+                    <th style={{ width: 160, paddingLeft: 20 }}>{i18n('common.operation')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSchedules.map((schedule) => (
+                    <tr key={schedule.uid}>
+                      <td>
+                        <Checkbox
+                          size="sm"
+                          slotProps={{ input: { 'aria-label': schedule.name } }}
+                          checked={batch[schedule.uid!] === true}
+                          onChange={onCheckboxChange(schedule.uid!)}
+                        />
+                      </td>
+                      <td>
+                        <Link
+                          component="button"
+                          level="title-sm"
+                          underline="hover"
+                          onClick={() => navigate(`/schedules/${schedule.uid}`)}
+                        >
+                          {schedule.name}
+                        </Link>
+                        <Typography level="body-xs" color="neutral" noWrap title={schedule.uid}>
+                          {schedule.uid}
+                        </Typography>
+                      </td>
+                      <td>{transByKind(schedule.kind as any)}</td>
+                      <td>{schedule.namespace}</td>
+                      <td>
+                        <StatusLabel status={schedule.status ?? 'unknown'} />
+                      </td>
+                      <td>
+                        <Typography level="body-sm" title={format(schedule.created_at!)}>
+                          {DateTime.fromISO(schedule.created_at!, { locale: lang }).toRelative()}
+                        </Typography>
+                      </td>
+                      <td>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {schedule.status === 'paused' ? (
+                            <IconButton
+                              size="sm"
+                              variant="plain"
+                              color="primary"
+                              title={i18n('common.start', intl)}
+                              onClick={() => confirmScheduleAction('start', schedule)}
+                            >
+                              <PlayCircleOutlineIcon sx={compactIconSx} />
+                            </IconButton>
+                          ) : schedule.status === 'running' ? (
+                            <IconButton
+                              size="sm"
+                              variant="plain"
+                              color="neutral"
+                              title={i18n('common.pause', intl)}
+                              onClick={() => confirmScheduleAction('pause', schedule)}
+                            >
+                              <PauseCircleOutlineIcon sx={compactIconSx} />
+                            </IconButton>
+                          ) : null}
+                          <IconButton
+                            size="sm"
+                            variant="plain"
+                            color="neutral"
+                            title={i18n('archives.single', intl)}
+                            onClick={() => confirmScheduleAction('archive', schedule)}
+                          >
+                            <ArchiveOutlinedIcon sx={compactIconSx} />
+                          </IconButton>
+                        </Box>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Box>
+          </Box>
+        ) : (
+          <NotFound illustrated sx={{ minHeight: 360, textAlign: 'center' }}>
+            <Typography>{i18n('schedules.notFound')}</Typography>
+          </NotFound>
+        )}
+      </PanelCard>
     </>
   )
 }
-
-export default Schedules
