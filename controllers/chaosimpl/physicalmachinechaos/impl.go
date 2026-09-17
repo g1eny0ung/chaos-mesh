@@ -88,8 +88,12 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	// Chaosd expects action configuration at the top level, while ExpInfo stores it
 	// beneath the action name. Flatten the action configuration for the request.
 	var expInfoMap map[string]any
-	expInfoBytes, _ := json.Marshal(physicalMachineChaos.Spec.ExpInfo)
-	err := json.Unmarshal(expInfoBytes, &expInfoMap)
+	expInfoBytes, err := json.Marshal(physicalMachineChaos.Spec.ExpInfo)
+	if err != nil {
+		impl.Log.Error(err, "fail to marshal experiment info")
+		return v1alpha1.NotInjected, err
+	}
+	err = json.Unmarshal(expInfoBytes, &expInfoMap)
 	if err != nil {
 		impl.Log.Error(err, "fail to unmarshal experiment info")
 		return v1alpha1.NotInjected, err
@@ -130,7 +134,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, errors.Wrap(err, "unmarshal chaosd response")
 	}
 	if response.UID == "" {
-		return v1alpha1.NotInjected, errors.New("chaosd response does not contain a uid")
+		return v1alpha1.NotInjected, errors.Errorf("chaosd response does not contain a uid for target %s", records[index].Id)
 	}
 	// Store the UID for this target because one experiment can apply to multiple chaosd instances.
 	if physicalMachineChaos.Status.ChaosdUIDs == nil {
