@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 
+// Package aws selects EC2 instances for AWS chaos experiments.
 package aws
 
 import (

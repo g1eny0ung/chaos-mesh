@@ -81,7 +81,7 @@ func (it *SerialNodeReconciler) Reconcile(ctx context.Context, request reconcile
 	}
 
 	// only resolve serial nodes
-	if node.Spec.Type != v1alpha1.TypeSerial {
+	if node.Spec.Type != v1alpha1.TypeSerial || !node.DeletionTimestamp.IsZero() {
 		return reconcile.Result{}, nil
 	}
 
@@ -148,7 +148,7 @@ func (it *SerialNodeReconciler) Reconcile(ctx context.Context, request reconcile
 	})
 
 	if updateError != nil {
-		it.logger.Error(err, "failed to update the status of node", "node", request)
+		it.logger.Error(updateError, "failed to update the status of node", "node", request)
 		return reconcile.Result{}, updateError
 	}
 

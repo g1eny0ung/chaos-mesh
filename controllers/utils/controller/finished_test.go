@@ -29,10 +29,8 @@ import (
 
 func makeTestPodKill(creationTime time.Time, duration *string, desiredPhase v1alpha1.DesiredPhase, records []*v1alpha1.Record) v1alpha1.InnerObject {
 	return &v1alpha1.PodChaos{
-		ObjectMeta: v1.ObjectMeta{
-			CreationTimestamp: v1.Time{
-				Time: creationTime,
-			},
+		CreationTimestamp: v1.Time{
+			Time: creationTime,
 		},
 		Spec: v1alpha1.PodChaosSpec{
 			Action:   v1alpha1.PodKillAction,
@@ -50,10 +48,8 @@ func makeTestPodKill(creationTime time.Time, duration *string, desiredPhase v1al
 }
 func makeTestNetworkChaos(creationTime time.Time, duration *string, desiredPhase v1alpha1.DesiredPhase, records []*v1alpha1.Record) v1alpha1.InnerObject {
 	return &v1alpha1.NetworkChaos{
-		ObjectMeta: v1.ObjectMeta{
-			CreationTimestamp: v1.Time{
-				Time: creationTime,
-			},
+		CreationTimestamp: v1.Time{
+			Time: creationTime,
 		},
 		Spec: v1alpha1.NetworkChaosSpec{
 			Duration: duration,
@@ -82,7 +78,7 @@ func TestIsChaosFinished(t *testing.T) {
 	beginTime := time.Now()
 	cases := []testCase{
 		{
-			chaos: makeTestNetworkChaos(beginTime, pointer.StringPtr("20s"), v1alpha1.RunningPhase, []*v1alpha1.Record{
+			chaos: makeTestNetworkChaos(beginTime, pointer.String("20s"), v1alpha1.RunningPhase, []*v1alpha1.Record{
 				{
 					Id:          "some",
 					SelectorKey: "some",
@@ -94,7 +90,7 @@ func TestIsChaosFinished(t *testing.T) {
 			expected: false,
 		},
 		{
-			chaos: makeTestNetworkChaos(beginTime, pointer.StringPtr("20s"), v1alpha1.RunningPhase, []*v1alpha1.Record{
+			chaos: makeTestNetworkChaos(beginTime, pointer.String("20s"), v1alpha1.RunningPhase, []*v1alpha1.Record{
 				{
 					Id:          "some",
 					SelectorKey: "some",
@@ -106,7 +102,7 @@ func TestIsChaosFinished(t *testing.T) {
 			expected: false,
 		},
 		{
-			chaos: makeTestNetworkChaos(beginTime, pointer.StringPtr("20s"), v1alpha1.RunningPhase, []*v1alpha1.Record{
+			chaos: makeTestNetworkChaos(beginTime, pointer.String("20s"), v1alpha1.RunningPhase, []*v1alpha1.Record{
 				{
 					Id:          "some",
 					SelectorKey: "some",
@@ -118,7 +114,7 @@ func TestIsChaosFinished(t *testing.T) {
 			expected: false,
 		},
 		{
-			chaos: makeTestNetworkChaos(beginTime, pointer.StringPtr("20s"), v1alpha1.StoppedPhase, []*v1alpha1.Record{
+			chaos: makeTestNetworkChaos(beginTime, pointer.String("20s"), v1alpha1.StoppedPhase, []*v1alpha1.Record{
 				{
 					Id:          "some",
 					SelectorKey: "some",
@@ -167,7 +163,7 @@ func TestIsChaosFinished(t *testing.T) {
 			expected: false,
 		},
 		{
-			chaos: makeTestPodKill(beginTime, pointer.StringPtr("20s"), v1alpha1.StoppedPhase, []*v1alpha1.Record{
+			chaos: makeTestPodKill(beginTime, pointer.String("20s"), v1alpha1.StoppedPhase, []*v1alpha1.Record{
 				{
 					Id:          "some",
 					SelectorKey: "some",
@@ -179,7 +175,7 @@ func TestIsChaosFinished(t *testing.T) {
 			expected: false,
 		},
 		{
-			chaos: makeTestPodKill(beginTime, pointer.StringPtr("20s"), v1alpha1.StoppedPhase, []*v1alpha1.Record{
+			chaos: makeTestPodKill(beginTime, pointer.String("20s"), v1alpha1.StoppedPhase, []*v1alpha1.Record{
 				{
 					Id:          "some",
 					SelectorKey: "some",

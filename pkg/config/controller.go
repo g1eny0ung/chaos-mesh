@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 
+// Package config loads controller manager and dashboard configuration from environment variables.
 package config
 
 import (
@@ -60,9 +61,6 @@ type ChaosControllerConfig struct {
 	MetricsPort int    `envconfig:"METRICS_PORT" default:"10080"`
 	// PprofAddr is the address the pprof endpoint binds to.
 	PprofAddr string `envconfig:"PPROF_ADDR" default:"0"`
-
-	// CtrlAddr os the address the ctrlserver bind to
-	CtrlAddr string `envconfig:"CTRL_ADDR"`
 
 	// EnableLeaderElection enables leader election for controller manager
 	// Enabling this will ensure there is only one active controller manager
@@ -114,6 +112,8 @@ type ChaosControllerConfig struct {
 	EnabledWebhooks    []string `envconfig:"ENABLED_WEBHOOKS" default:"*"`
 
 	LocalHelmChartPath string `envconfig:"LOCAL_HELM_CHART_PATH" default:""`
+
+	MaxEvents int `envconfig:"MAX_EVENTS" default:"100"`
 }
 
 // EnvironChaosController returns the settings from the environment.

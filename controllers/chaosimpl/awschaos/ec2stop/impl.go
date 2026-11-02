@@ -56,7 +56,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	}
 
 	if selected.Endpoint != nil {
-		opts = append(opts, awscfg.WithEndpointResolver(aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		opts = append(opts, awscfg.WithEndpointResolver(aws.EndpointResolverFunc(func(_, region string) (aws.Endpoint, error) {
 			return aws.Endpoint{URL: *selected.Endpoint, SigningRegion: region}, nil
 		})))
 	}
@@ -110,7 +110,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 
 	if selected.Endpoint != nil {
-		opts = append(opts, awscfg.WithEndpointResolver(aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		opts = append(opts, awscfg.WithEndpointResolver(aws.EndpointResolverFunc(func(_, region string) (aws.Endpoint, error) {
 			return aws.Endpoint{URL: *selected.Endpoint, SigningRegion: region}, nil
 		})))
 	}

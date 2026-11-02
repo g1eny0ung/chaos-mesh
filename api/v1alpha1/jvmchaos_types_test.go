@@ -17,10 +17,10 @@ package v1alpha1
 
 import (
 	"context"
+	"encoding/json"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -49,10 +49,8 @@ var _ = Describe("JVMChaos", func() {
 			}
 
 			created = &JVMChaos{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
-					Namespace: "default",
-				},
+				Name:      "foo",
+				Namespace: "default",
 				Spec: JVMChaosSpec{
 					Action: JVMLatencyAction,
 					JVMParameter: JVMParameter{
@@ -80,6 +78,71 @@ var _ = Describe("JVMChaos", func() {
 			By("deleting the created object")
 			Expect(k8sClient.Delete(context.TODO(), created)).To(Succeed())
 			Expect(k8sClient.Get(context.TODO(), key, created)).ToNot(Succeed())
+		})
+	})
+
+	Describe("JSON Marshal and Unmarshal", func() {
+		object := &JVMChaos{
+			Name:      "foo",
+			Namespace: "default",
+			Spec: JVMChaosSpec{
+				ContainerSelector: ContainerSelector{
+					PodSelector: PodSelector{
+						Mode:  FixedMode,
+						Value: "1337",
+					},
+				},
+				JVMParameter: JVMParameter{
+					Name:        "param-name",
+					ReturnValue: "param-return-value",
+				},
+			},
+		}
+		It("should marshal an object successfully", func() {
+			By("marshalling the object")
+			data, _ := json.MarshalIndent(object, "", "  ")
+			Expect(data).To(MatchJSON(`{
+  "metadata": {
+    "name": "foo",
+    "namespace": "default"
+  },
+  "spec": {
+    "selector": {},
+    "mode": "fixed",
+    "value": "1337",
+    "action": "",
+    "name": "param-name",
+    "returnValue": "param-return-value",
+    "exception": "",
+    "latency": 0,
+    "ruleData": ""
+  },
+  "status": {
+    "experiment": {}
+  }
+}`))
+		})
+		It("should unmarshal the object successfully", func() {
+			marshalledJSON := []byte(`{
+  "metadata": {
+    "name": "foo",
+    "namespace": "default"
+  },
+  "spec": {
+    "name": "param-name",
+    "returnValue": "param-return-value",
+    "mode": "fixed",
+    "value": "1337"
+  }
+}`)
+			By("unmarshalling the object")
+			var unmarshalledJVMChaos JVMChaos
+			Expect(json.Unmarshal(marshalledJSON, &unmarshalledJVMChaos)).To(Succeed())
+			Expect(&unmarshalledJVMChaos).To(HaveField("ObjectMeta.Name", "foo"))
+			Expect(&unmarshalledJVMChaos).To(HaveField("Spec.ContainerSelector.PodSelector.Mode", FixedMode))
+			Expect(&unmarshalledJVMChaos).To(HaveField("Spec.ContainerSelector.PodSelector.Value", "1337"))
+			Expect(&unmarshalledJVMChaos).To(HaveField("Spec.JVMParameter.Name", "param-name"))
+			Expect(&unmarshalledJVMChaos).To(HaveField("Spec.JVMParameter.ReturnValue", "param-return-value"))
 		})
 	})
 })

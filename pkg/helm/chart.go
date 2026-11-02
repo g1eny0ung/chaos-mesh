@@ -23,8 +23,8 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
+	chart "helm.sh/helm/v4/pkg/chart/v2"
+	"helm.sh/helm/v4/pkg/chart/v2/loader"
 )
 
 const ChaosMeshHelmRepo = "https://charts.chaos-mesh.org"
@@ -51,7 +51,7 @@ func FetchChaosMeshChart(ctx context.Context, version, local string) (*chart.Cha
 	return requestedChart, nil
 }
 
-func GetChaosMeshChartTgzPath(ctx context.Context, version, local string) (string, error) {
+func GetChaosMeshChartTgzPath(_ context.Context, version, local string) (string, error) {
 	fileName := fmt.Sprintf("chaos-mesh-%s.tgz", version)
 	tgzPath := fmt.Sprintf("%s/%s", os.TempDir(), fileName)
 	if local != "" {
@@ -65,9 +65,12 @@ func GetChaosMeshChartTgzPath(ctx context.Context, version, local string) (strin
 }
 
 func DownloadChaosMeshChartTgz(ctx context.Context, version string) (string, error) {
-	// TODO: use this context
 	url := fmt.Sprintf("%s/chaos-mesh-%s.tgz", ChaosMeshHelmRepo, version)
-	response, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to generate http request for url %s", url)
+	}
+	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", errors.Wrapf(err, "download helm chart from %s", url)
 	}

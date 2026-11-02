@@ -57,13 +57,16 @@ spec:
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
+      {{- if .Values.chaosDaemon.securityContext }}
+      securityContext: {{ toYaml .Values.chaosDaemon.securityContext | nindent 8 }}
+      {{- end }}
       containers:
         - name: chaos-daemon
           image: {{template "chaos-daemon.image" . }}
           imagePullPolicy: {{ .Values.chaosDaemon.imagePullPolicy | default "IfNotPresent" }}
-          {{- if .Values.chaosDaemon.resources }}
+          {{- if or .Values.chaosDaemon.resourceProfile .Values.chaosDaemon.resources }}
           resources:
-{{ toYaml .Values.chaosDaemon.resources | indent 12 }}
+{{ include "chaos-daemon.resources" . | indent 12 }}
           {{- end }}
           command:
             - /usr/local/bin/chaos-daemon
@@ -176,7 +179,7 @@ spec:
         {{- end }}
       volumes:
         - name: socket-path
-          hostPath: 
+          hostPath:
             path: {{template "chaos-daemon.socket-path" . }}
         - name: sys-path
           hostPath:

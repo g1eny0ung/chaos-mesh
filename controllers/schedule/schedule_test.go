@@ -50,10 +50,8 @@ var _ = Describe("Schedule", func() {
 			}
 			duration := "100m"
 			schedule := &v1alpha1.Schedule{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo0",
-					Namespace: "default",
-				},
+				Name:      "foo0",
+				Namespace: "default",
 				Spec: v1alpha1.ScheduleSpec{
 					Schedule: "@every 10s",
 					ScheduleItem: v1alpha1.ScheduleItem{
@@ -61,11 +59,7 @@ var _ = Describe("Schedule", func() {
 							TimeOffset: "100ms",
 							ClockIds:   []string{"CLOCK_REALTIME"},
 							Duration:   &duration,
-							ContainerSelector: v1alpha1.ContainerSelector{
-								PodSelector: v1alpha1.PodSelector{
-									Mode: v1alpha1.OneMode,
-								},
-							},
+							Mode:       v1alpha1.OneMode,
 						}},
 					},
 					ConcurrencyPolicy: v1alpha1.ForbidConcurrent,
@@ -98,10 +92,8 @@ var _ = Describe("Schedule", func() {
 			}
 			duration := "100s"
 			schedule := &v1alpha1.Schedule{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo1",
-					Namespace: "default",
-				},
+				Name:      "foo1",
+				Namespace: "default",
 				Spec: v1alpha1.ScheduleSpec{
 					Schedule: "@every 1s",
 					ScheduleItem: v1alpha1.ScheduleItem{
@@ -109,11 +101,7 @@ var _ = Describe("Schedule", func() {
 							TimeOffset: "100ms",
 							ClockIds:   []string{"CLOCK_REALTIME"},
 							Duration:   &duration,
-							ContainerSelector: v1alpha1.ContainerSelector{
-								PodSelector: v1alpha1.PodSelector{
-									Mode: v1alpha1.OneMode,
-								},
-							},
+							Mode:       v1alpha1.OneMode,
 						}},
 					},
 					ConcurrencyPolicy: v1alpha1.ForbidConcurrent,
@@ -132,13 +120,14 @@ var _ = Describe("Schedule", func() {
 
 			By("Reconciling the created schedule obj")
 			{
-				err := wait.Poll(time.Second*1, time.Minute*1, func() (ok bool, err error) {
-					err = k8sClient.Get(context.TODO(), key, schedule)
-					if err != nil {
-						return false, err
-					}
-					return len(schedule.Status.Active) > 0, nil
-				})
+				err := wait.PollUntilContextTimeout(context.TODO(), time.Second, time.Minute, true,
+					func(ctx context.Context) (ok bool, err error) {
+						err = k8sClient.Get(ctx, key, schedule)
+						if err != nil {
+							return false, err
+						}
+						return len(schedule.Status.Active) > 0, nil
+					})
 				Expect(err).ToNot(HaveOccurred())
 			}
 
@@ -163,10 +152,8 @@ var _ = Describe("Schedule", func() {
 			}
 			duration := "100s"
 			schedule := &v1alpha1.Schedule{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo2",
-					Namespace: "default",
-				},
+				Name:      "foo2",
+				Namespace: "default",
 				Spec: v1alpha1.ScheduleSpec{
 					Schedule: "@every 2s",
 					ScheduleItem: v1alpha1.ScheduleItem{
@@ -174,11 +161,7 @@ var _ = Describe("Schedule", func() {
 							TimeOffset: "100ms",
 							ClockIds:   []string{"CLOCK_REALTIME"},
 							Duration:   &duration,
-							ContainerSelector: v1alpha1.ContainerSelector{
-								PodSelector: v1alpha1.PodSelector{
-									Mode: v1alpha1.OneMode,
-								},
-							},
+							Mode:       v1alpha1.OneMode,
 						}},
 					},
 					ConcurrencyPolicy: v1alpha1.AllowConcurrent,
@@ -197,14 +180,15 @@ var _ = Describe("Schedule", func() {
 
 			By("Allowing concurrency and skip deleting running chaos")
 			{
-				err := wait.Poll(5*time.Second, 1*time.Minute, func() (done bool, err error) {
-					err = k8sClient.Get(context.TODO(), key, schedule)
-					if err != nil {
-						return false, err
-					}
-					ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
-					return len(schedule.Status.Active) >= 4, nil
-				})
+				err := wait.PollUntilContextTimeout(context.TODO(), 5*time.Second, 1*time.Minute, true,
+					func(ctx context.Context) (done bool, err error) {
+						err = k8sClient.Get(ctx, key, schedule)
+						if err != nil {
+							return false, err
+						}
+						ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
+						return len(schedule.Status.Active) >= 4, nil
+					})
 				Expect(err).ToNot(HaveOccurred())
 			}
 
@@ -221,10 +205,8 @@ var _ = Describe("Schedule", func() {
 			}
 			duration := "1s"
 			schedule := &v1alpha1.Schedule{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo3",
-					Namespace: "default",
-				},
+				Name:      "foo3",
+				Namespace: "default",
 				Spec: v1alpha1.ScheduleSpec{
 					Schedule: "@every 3s",
 					ScheduleItem: v1alpha1.ScheduleItem{
@@ -232,11 +214,7 @@ var _ = Describe("Schedule", func() {
 							TimeOffset: "100ms",
 							ClockIds:   []string{"CLOCK_REALTIME"},
 							Duration:   &duration,
-							ContainerSelector: v1alpha1.ContainerSelector{
-								PodSelector: v1alpha1.PodSelector{
-									Mode: v1alpha1.OneMode,
-								},
-							},
+							Mode:       v1alpha1.OneMode,
 						}},
 					},
 					ConcurrencyPolicy: v1alpha1.AllowConcurrent,
@@ -256,14 +234,15 @@ var _ = Describe("Schedule", func() {
 			By("deleting outdated chaos")
 			{
 				time.Sleep(time.Second * 10)
-				err := wait.Poll(5*time.Second, 1*time.Minute, func() (done bool, err error) {
-					err = k8sClient.Get(context.TODO(), key, schedule)
-					if err != nil {
-						return false, err
-					}
-					ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
-					return len(schedule.Status.Active) == 2, nil
-				})
+				err := wait.PollUntilContextTimeout(context.TODO(), 5*time.Second, 1*time.Minute, true,
+					func(ctx context.Context) (done bool, err error) {
+						err = k8sClient.Get(ctx, key, schedule)
+						if err != nil {
+							return false, err
+						}
+						ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
+						return len(schedule.Status.Active) == 2, nil
+					})
 				Expect(err).ToNot(HaveOccurred())
 			}
 
@@ -283,10 +262,8 @@ var _ = Describe("Schedule", func() {
 			}
 			duration := "10000s"
 			schedule := &v1alpha1.Schedule{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo10",
-					Namespace: "default",
-				},
+				Name:      "foo10",
+				Namespace: "default",
 				Spec: v1alpha1.ScheduleSpec{
 					Schedule: "@every 3s",
 					ScheduleItem: v1alpha1.ScheduleItem{
@@ -325,14 +302,15 @@ var _ = Describe("Schedule", func() {
 			By("disallowing concurrent")
 			{
 				time.Sleep(time.Second * 10)
-				err := wait.Poll(5*time.Second, 1*time.Minute, func() (done bool, err error) {
-					err = k8sClient.Get(context.TODO(), key, schedule)
-					if err != nil {
-						return false, err
-					}
-					ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
-					return len(schedule.Status.Active) == 1, nil
-				})
+				err := wait.PollUntilContextTimeout(context.TODO(), 5*time.Second, 1*time.Minute, true,
+					func(ctx context.Context) (done bool, err error) {
+						err = k8sClient.Get(ctx, key, schedule)
+						if err != nil {
+							return false, err
+						}
+						ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
+						return len(schedule.Status.Active) == 1, nil
+					})
 				Expect(err).ToNot(HaveOccurred())
 			}
 
@@ -350,10 +328,8 @@ var _ = Describe("Schedule", func() {
 			}
 			duration := "1s"
 			schedule := &v1alpha1.Schedule{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo11",
-					Namespace: "default",
-				},
+				Name:      "foo11",
+				Namespace: "default",
 				Spec: v1alpha1.ScheduleSpec{
 					Schedule: "@every 3s",
 					ScheduleItem: v1alpha1.ScheduleItem{
@@ -386,14 +362,15 @@ var _ = Describe("Schedule", func() {
 			By("deleting outdated workflow")
 			{
 				time.Sleep(time.Second * 10)
-				err := wait.Poll(5*time.Second, 1*time.Minute, func() (done bool, err error) {
-					err = k8sClient.Get(context.TODO(), key, schedule)
-					if err != nil {
-						return false, err
-					}
-					ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
-					return len(schedule.Status.Active) == 2, nil
-				})
+				err := wait.PollUntilContextTimeout(context.TODO(), 5*time.Second, 1*time.Minute, true,
+					func(ctx context.Context) (done bool, err error) {
+						err = k8sClient.Get(ctx, key, schedule)
+						if err != nil {
+							return false, err
+						}
+						ctrl.Log.Info("active chaos", "size", len(schedule.Status.Active))
+						return len(schedule.Status.Active) == 2, nil
+					})
 				Expect(err).ToNot(HaveOccurred())
 			}
 

@@ -30,11 +30,11 @@ import (
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	"github.com/chaos-mesh/chaos-mesh/cmd/chaos-controller-manager/provider"
-	. "github.com/chaos-mesh/chaos-mesh/controllers/test"
+	"github.com/chaos-mesh/chaos-mesh/controllers/test"
 	"github.com/chaos-mesh/chaos-mesh/controllers/utils/recorder"
 	"github.com/chaos-mesh/chaos-mesh/pkg/chaosdaemon/pb"
 	"github.com/chaos-mesh/chaos-mesh/pkg/mock"
-	. "github.com/chaos-mesh/chaos-mesh/pkg/testutils"
+	"github.com/chaos-mesh/chaos-mesh/pkg/testutils"
 )
 
 func setHostNetwork(objs []runtime.Object) {
@@ -45,8 +45,76 @@ func setHostNetwork(objs []runtime.Object) {
 	}
 }
 
+func TestBuildIptablesChain(t *testing.T) {
+	tests := []struct {
+		name           string
+		behavior       v1alpha1.NetworkChaosPartitionBehavior
+		target         string
+		protocol       string
+		fallbackTarget string
+	}{
+		{
+			name:   "defaults to drop",
+			target: "DROP",
+		},
+		{
+			name:     "explicitly drops",
+			behavior: v1alpha1.DropPartitionBehavior,
+			target:   "DROP",
+		},
+		{
+			name:           "rejects TCP with a reset",
+			behavior:       v1alpha1.RejectPartitionBehavior,
+			target:         "REJECT --reject-with tcp-reset",
+			protocol:       "tcp",
+			fallbackTarget: "REJECT",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			chain, err := buildIptablesChain(v1alpha1.RawIptables{
+				Name:              "OUTPUT/example",
+				Direction:         v1alpha1.Output,
+				PartitionBehavior: tt.behavior,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if chain.Target != tt.target || chain.Protocol != tt.protocol || chain.FallbackTarget != tt.fallbackTarget {
+				t.Fatalf(
+					"got target=%q protocol=%q fallback target=%q, want target=%q protocol=%q fallback target=%q",
+					chain.Target,
+					chain.Protocol,
+					chain.FallbackTarget,
+					tt.target,
+					tt.protocol,
+					tt.fallbackTarget,
+				)
+			}
+		})
+	}
+
+	t.Run("rejects an unknown direction", func(t *testing.T) {
+		_, err := buildIptablesChain(v1alpha1.RawIptables{Direction: "sideways"})
+		if err == nil {
+			t.Fatal("expected an error for an unknown direction")
+		}
+	})
+
+	t.Run("rejects an unknown partition behavior", func(t *testing.T) {
+		_, err := buildIptablesChain(v1alpha1.RawIptables{
+			Direction:         v1alpha1.Output,
+			PartitionBehavior: "unknown",
+		})
+		if err == nil {
+			t.Fatal("expected an error for an unknown partition behavior")
+		}
+	})
+}
+
 func TestHostNetworkOption(t *testing.T) {
-	defer mock.With("MockChaosDaemonClient", &MockChaosDaemonClient{})()
+	defer mock.With("MockChaosDaemonClient", &test.MockChaosDaemonClient{})()
 	RegisterTestingT(t)
 
 	testCases := []struct {
@@ -72,21 +140,17 @@ func TestHostNetworkOption(t *testing.T) {
 
 	for _, testCase := range testCases {
 
-		objs, _ := GenerateNPods("p", 1, PodArg{})
+		objs, _ := testutils.GenerateNPods("p", 1, testutils.PodArg{})
 
 		setHostNetwork(objs)
 
 		chaos := &v1alpha1.PodNetworkChaos{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "PodNetworkChaos",
-				APIVersion: "v1",
-			},
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:  metav1.NamespaceDefault,
-				Name:       "p0",
-				Generation: 1,
-			},
-			Spec: v1alpha1.PodNetworkChaosSpec{},
+			Kind:       "PodNetworkChaos",
+			APIVersion: "v1",
+			Namespace:  metav1.NamespaceDefault,
+			Name:       "p0",
+			Generation: 1,
+			Spec:       v1alpha1.PodNetworkChaosSpec{},
 		}
 		objs = append(objs, chaos)
 
@@ -107,10 +171,8 @@ func TestHostNetworkOption(t *testing.T) {
 		_, err := h.Reconcile(
 			context.TODO(),
 			ctrl.Request{
-				NamespacedName: types.NamespacedName{
-					Namespace: metav1.NamespaceDefault,
-					Name:      "p0",
-				},
+				Namespace: metav1.NamespaceDefault,
+				Name:      "p0",
 			})
 		Expect(err).To(BeNil())
 
@@ -140,9 +202,9 @@ func TestMergenetem(t *testing.T) {
 
 		spec := v1alpha1.TcParameter{
 			Delay: &v1alpha1.DelaySpec{
-				Latency:     "90ms",
+				Latency:     "1s",
 				Correlation: "25",
-				Jitter:      "90ms",
+				Jitter:      "100ms",
 			},
 			Loss: &v1alpha1.LossSpec{
 				Loss:        "25",
@@ -155,13 +217,32 @@ func TestMergenetem(t *testing.T) {
 		m, err := mergeNetem(spec)
 		g.Expect(err).ShouldNot(HaveOccurred())
 		em := &pb.Netem{
-			Time:      90000,
-			Jitter:    90000,
+			Time:      "1s",
+			Jitter:    "100ms",
 			DelayCorr: 25,
 			Loss:      25,
 			LossCorr:  25,
 			Rate:      "25mbps",
 		}
 		g.Expect(m).Should(Equal(em))
+
+		// Latency should have units in duration
+		spec = v1alpha1.TcParameter{
+			Delay: &v1alpha1.DelaySpec{
+				Latency: "1000",
+			},
+		}
+		_, err = mergeNetem(spec)
+		g.Expect(err).Should(HaveOccurred())
+
+		// Jitter should have units in duration
+		spec = v1alpha1.TcParameter{
+			Delay: &v1alpha1.DelaySpec{
+				Latency: "1s",
+				Jitter:  "100",
+			},
+		}
+		_, err = mergeNetem(spec)
+		g.Expect(err).Should(HaveOccurred())
 	})
 }

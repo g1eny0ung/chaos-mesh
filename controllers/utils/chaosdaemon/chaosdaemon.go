@@ -17,10 +17,12 @@ package chaosdaemon
 
 import (
 	"context"
+	"strings"
 
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 	v1 "k8s.io/api/core/v1"
+	discoveryv1 "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -33,11 +35,14 @@ import (
 
 var log = ctrl.Log.WithName("controller-chaos-daemon-client-utils")
 
-func findIPOnEndpoints(e *v1.Endpoints, nodeName string) string {
-	for _, subset := range e.Subsets {
-		for _, addr := range subset.Addresses {
-			if addr.NodeName != nil && *addr.NodeName == nodeName {
-				return addr.IP
+func findIPOnEndpointSlice(e *discoveryv1.EndpointSliceList, nodeName string) string {
+	for _, endpointSlice := range e.Items {
+		// Only get the endpoint slice of the current chaos-daemon pod.
+		if strings.HasPrefix(endpointSlice.ObjectMeta.Name, "chaos-daemon-") {
+			for _, ep := range endpointSlice.Endpoints {
+				if ep.NodeName != nil && *ep.NodeName == nodeName {
+					return ep.Addresses[0]
+				}
 			}
 		}
 	}
@@ -45,27 +50,24 @@ func findIPOnEndpoints(e *v1.Endpoints, nodeName string) string {
 	return ""
 }
 
-type ChaosDaemonClientBuilder struct {
+type ClientBuilder struct {
 	client.Reader
 }
 
-func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, pod *v1.Pod) (string, error) {
+func (b *ClientBuilder) FindDaemonIP(ctx context.Context, pod *v1.Pod) (string, error) {
 	nodeName := pod.Spec.NodeName
 	log.Info("Creating client to chaos-daemon", "node", nodeName)
 
 	ns := config.ControllerCfg.Namespace
-	var endpoints v1.Endpoints
-	err := b.Reader.Get(ctx, types.NamespacedName{
-		Namespace: ns,
-		Name:      "chaos-daemon",
-	}, &endpoints)
+	var endpointSliceList discoveryv1.EndpointSliceList
+	err := b.Reader.List(ctx, &endpointSliceList, client.InNamespace(ns))
 	if err != nil {
 		return "", err
 	}
 
-	daemonIP := findIPOnEndpoints(&endpoints, nodeName)
+	daemonIP := findIPOnEndpointSlice(&endpointSliceList, nodeName)
 	if len(daemonIP) == 0 {
-		return "", errors.Errorf("cannot find daemonIP on node %s in related Endpoints %v", nodeName, endpoints)
+		return "", errors.Errorf("cannot find daemonIP on node %s", nodeName)
 	}
 
 	return daemonIP, nil
@@ -74,7 +76,7 @@ func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, pod *v1.Pod
 // Build will construct a ChaosDaemonClient
 // The `id` parameter is the namespacedName of current handling resource,
 // which will be printed in the log of the chaos-daemon
-func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *types.NamespacedName) (chaosdaemonclient.ChaosDaemonClientInterface, error) {
+func (b *ClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *types.NamespacedName) (chaosdaemonclient.ChaosDaemonClientInterface, error) {
 	if cli := mock.On("MockChaosDaemonClient"); cli != nil {
 		return cli.(chaosdaemonclient.ChaosDaemonClientInterface), nil
 	}
@@ -104,21 +106,21 @@ func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *t
 	return chaosdaemonclient.New(cc), nil
 }
 
-type ChaosDaemonClientBuilderParams struct {
+type ClientBuilderParams struct {
 	fx.In
 
 	NoCacheReader           client.Reader `name:"no-cache"`
 	ControlPlaneCacheReader client.Reader `name:"control-plane-cache" optional:"true"`
 }
 
-func New(params ChaosDaemonClientBuilderParams) *ChaosDaemonClientBuilder {
+func New(params ClientBuilderParams) *ClientBuilder {
 	var reader client.Reader
 	if params.ControlPlaneCacheReader != nil {
 		reader = params.ControlPlaneCacheReader
 	} else {
 		reader = params.NoCacheReader
 	}
-	return &ChaosDaemonClientBuilder{
+	return &ClientBuilder{
 		Reader: reader,
 	}
 }

@@ -61,7 +61,7 @@ func TestSelect(t *testing.T) {
 	defer mock.With("MockCreateEc2Client", ec2client)()
 
 	s := selector.New(
-		selector.SelectorParams{
+		selector.Params{
 			AWSSelector: &aws.SelectImpl{},
 		})
 

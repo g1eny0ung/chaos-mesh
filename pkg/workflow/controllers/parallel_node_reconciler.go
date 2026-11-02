@@ -65,7 +65,7 @@ func (it *ParallelNodeReconciler) Reconcile(ctx context.Context, request reconci
 	}
 
 	// only resolve parallel nodes
-	if node.Spec.Type != v1alpha1.TypeParallel {
+	if node.Spec.Type != v1alpha1.TypeParallel || !node.DeletionTimestamp.IsZero() {
 		return reconcile.Result{}, nil
 	}
 
@@ -128,7 +128,7 @@ func (it *ParallelNodeReconciler) Reconcile(ctx context.Context, request reconci
 	})
 
 	if updateError != nil {
-		it.logger.Error(err, "failed to update the status of node", "node", request)
+		it.logger.Error(updateError, "failed to update the status of node", "node", request)
 		return reconcile.Result{}, updateError
 	}
 
