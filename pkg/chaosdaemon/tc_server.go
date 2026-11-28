@@ -215,10 +215,10 @@ func (s *DaemonServer) setGlobalTcs(log logr.Logger, cli tcClient, tcs []*pb.Tc,
 	for index, tc := range tcs {
 		parentArg := "root"
 		if index > 0 {
-			parentArg = fmt.Sprintf("parent %d:", index)
+			parentArg = fmt.Sprintf("parent %x:", index)
 		}
 
-		handleArg := fmt.Sprintf("handle %d:", index+1)
+		handleArg := fmt.Sprintf("handle %x:", index+1)
 
 		err := cli.addTc(device, parentArg, handleArg, tc)
 		if err != nil {
@@ -349,13 +349,13 @@ func (s *DaemonServer) setFilterTcs(
 	chains := []*pb.Chain{}
 	for index, group := range groups {
 		for i, tc := range group.tcs {
-			parentArg := fmt.Sprintf("parent %d:%d", parent, index+4)
+			parentArg := fmt.Sprintf("parent %x:%x", parent, index+4)
 			if i > 0 {
-				parentArg = fmt.Sprintf("parent %d:", currentHandler)
+				parentArg = fmt.Sprintf("parent %x:", currentHandler)
 			}
 
 			currentHandler++
-			handleArg := fmt.Sprintf("handle %d:", currentHandler)
+			handleArg := fmt.Sprintf("handle %x:", currentHandler)
 
 			err := tcCli.addTc(device, parentArg, handleArg, tc)
 			if err != nil {
@@ -365,7 +365,7 @@ func (s *DaemonServer) setFilterTcs(
 		}
 
 		tc := group.tcs[0]
-		target := fmt.Sprintf("CLASSIFY --set-class %d:%d", parent, index+4)
+		target := fmt.Sprintf("CLASSIFY --set-class %x:%x", parent, index+4)
 
 		if group.useV4 {
 			ch := &pb.Chain{
@@ -471,9 +471,9 @@ func (c *tcClient) addPrio(device string, parent int, band int) error {
 
 	parentArg := "root"
 	if parent > 0 {
-		parentArg = fmt.Sprintf("parent %d:", parent)
+		parentArg = fmt.Sprintf("parent %x:", parent)
 	}
-	args := fmt.Sprintf("qdisc add dev %s %s handle %d: prio bands %d priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1", device, parentArg, parent+1, band)
+	args := fmt.Sprintf("qdisc add dev %s %s handle %x: prio bands %d priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1", device, parentArg, parent+1, band)
 
 	processBuilder := bpm.DefaultProcessBuilder("tc", strings.Split(args, " ")...).SetContext(c.ctx)
 	if c.enterNS {
@@ -486,7 +486,7 @@ func (c *tcClient) addPrio(device string, parent int, band int) error {
 	}
 
 	for index := 1; index <= 3; index++ {
-		args := fmt.Sprintf("qdisc add dev %s parent %d:%d handle %d: sfq", device, parent+1, index, parent+1+index)
+		args := fmt.Sprintf("qdisc add dev %s parent %x:%x handle %x: sfq", device, parent+1, index, parent+1+index)
 
 		processBuilder := bpm.DefaultProcessBuilder("tc", strings.Split(args, " ")...).SetContext(c.ctx)
 		if c.enterNS {

@@ -141,6 +141,10 @@ var _ = Describe("Traffic control reconciliation", func() {
 		}
 		Expect(server.SetTcs(ctx, request)).NotTo(BeNil())
 		Expect(commands).To(ContainElement("tc qdisc add dev eth0 root handle 1: prio bands 10 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1"))
+		Expect(commands).To(ContainElement("tc qdisc add dev eth0 parent 1:a handle b: netem delay 5ms"))
+		Expect(commands).To(ContainElement(MatchRegexp(`^iptables -w -A TC-TABLES-6 -o eth0 -m set --match-set peers4-[a-g] dst,dst -j CLASSIFY --set-class 1:a -w 5$`)))
+		Expect(commands).To(ContainElement(MatchRegexp(`^ip6tables -w -A TC-TABLES-6/6 -o eth0 -m set --match-set peers6-[a-g] dst,dst -j CLASSIFY --set-class 1:a -w 5$`)))
+		Expect(commands).NotTo(ContainElement(ContainSubstring("1:10")))
 	})
 
 	It("skips an optional IPv6 filter on a shared band when ip6tables is unavailable and fails when both families are unavailable", func(ctx SpecContext) {
