@@ -14,7 +14,8 @@
  * limitations under the License.
  *
  */
-import { useGetEvents, useGetExperiments, useGetSchedules, useGetWorkflows } from '@/openapi'
+import { useEventList } from '@/api/events'
+import { useGetExperiments, useGetSchedules, useGetWorkflows } from '@/openapi'
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
@@ -125,7 +126,7 @@ export default function Dashboard() {
   const { data: experiments } = useGetExperiments()
   const { data: schedules } = useGetSchedules()
   const { data: workflows } = useGetWorkflows()
-  const { data: events } = useGetEvents({ limit: 50 })
+  const { data: events } = useEventList({ limit: 50 })
 
   const calculateStatus = (data?: { status?: string }[]): [string, number] | undefined => {
     if (!data) {

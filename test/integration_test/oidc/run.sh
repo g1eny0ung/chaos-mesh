@@ -55,7 +55,10 @@ SECRET_FILE="${WORKDIR}/client-secret.txt"
 
 PF_PID=""
 cleanup() {
-  [ -n "${PF_PID}" ] && kill "${PF_PID}" 2>/dev/null || true
+  if [ -n "${PF_PID}" ]; then
+    kill "${PF_PID}" 2>/dev/null || true
+    wait "${PF_PID}" 2>/dev/null || true
+  fi
   rm -rf "${WORKDIR}"
 }
 trap cleanup EXIT
@@ -91,7 +94,22 @@ kubectl create namespace "${NS_KEYCLOAK}" --dry-run=client -o yaml | kubectl app
 kubectl create secret tls keycloak-tls -n "${NS_KEYCLOAK}" \
   --cert="${CA_FILE}" --key="${KEY_FILE}" \
   --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-KC_HOST="${KC_HOST}" envsubst '${KC_HOST}' < manifests/keycloak.yaml | kubectl apply -f - >/dev/null
+envsubst '${KC_HOST}' < manifests/keycloak.yaml > "${WORKDIR}/keycloak.yaml"
+kubectl apply -f "${WORKDIR}/keycloak.yaml" >/dev/null
+envsubst '${KC_HOST}' < manifests/keycloak-ingress.yaml > "${WORKDIR}/keycloak-ingress.yaml"
+
+# The admission Service can lag behind the controller Pod's Ready condition.
+for attempt in {1..10}; do
+  if apply_output=$(kubectl apply -f "${WORKDIR}/keycloak-ingress.yaml" 2>&1); then
+    break
+  fi
+  if [[ "${apply_output}" != *'failed calling webhook "validate.nginx.ingress.kubernetes.io"'* ||
+        "${apply_output}" != *'connect: connection refused'* ]] || (( attempt == 10 )); then
+    printf '%s\n' "${apply_output}" >&2
+    exit 1
+  fi
+  sleep 2
+done
 kubectl wait -n "${NS_KEYCLOAK}" --for=condition=available --timeout=240s deployment/keycloak
 
 echo "    waiting for Keycloak discovery endpoint via ingress"
@@ -124,18 +142,22 @@ helm upgrade --install chaos-mesh "${repo_root}/helm/chaos-mesh" \
   --set dashboard.oidcSecurityMode.clientId="${CLIENT_ID}" \
   --set dashboard.oidcSecurityMode.clientSecret="${CLIENT_SECRET}" \
   --set dashboard.oidcSecurityMode.issuerUrl="${ISSUER}" \
-  --set-file dashboard.oidcSecurityMode.caBundlePEM="${CA_FILE}"
+  --set-file dashboard.oidcSecurityMode.caBundlePEM="${CA_FILE}" "$@"
 
-kubectl wait -n "${NS_CHAOS}" --for=condition=available --timeout=180s deployment/chaos-dashboard
+kubectl rollout status -n "${NS_CHAOS}" --timeout=180s deployment/chaos-dashboard
 
-kubectl -n "${NS_CHAOS}" port-forward svc/chaos-dashboard 2333:2333 >/dev/null 2>&1 &
+kubectl -n "${NS_CHAOS}" port-forward svc/chaos-dashboard 2333:2333 >"${WORKDIR}/port-forward.log" 2>&1 &
 PF_PID=$!
 # Wait until the dashboard can actually reach Keycloak: the /redirect handler
 # fetches the OIDC discovery document on each call, so a 302 here means the
 # dashboard -> Keycloak path (DNS, ingress, CA trust) is ready end to end.
 echo "    waiting for dashboard OIDC redirect to be ready"
 for i in $(seq 1 30); do
-  rc=$(curl -s -o /dev/null -w '%{http_code}' "${DASHBOARD_URL}/api/auth/oidc/redirect" || true)
+  rc=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' "${DASHBOARD_URL}/api/auth/oidc/redirect" || true)
+  if ! kill -0 "${PF_PID}" 2>/dev/null; then
+    cat "${WORKDIR}/port-forward.log" >&2
+    fail "dashboard port-forward exited before OIDC redirect was ready"
+  fi
   [ "${rc}" = "302" ] && break
   sleep 2
   [ "$i" = 30 ] && fail "dashboard OIDC redirect not ready (last http=${rc})"

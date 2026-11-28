@@ -98,7 +98,30 @@ var _ = Describe("Event", func() {
 	})
 
 	AfterEach(func() {
+		mock.ExpectClose()
+		Expect(db.Close()).Should(Succeed())
 		Expect(mock.ExpectationsWereMet()).ShouldNot(HaveOccurred())
+	})
+
+	Context("Query", func() {
+		It("binds typed bounds and repeated filters with one count and one ordered page", func() {
+			countSQL := "SELECT count(*) FROM `events` WHERE namespace IN (?,?) AND created_at >= ? AND created_at <= ?"
+			pageSQL := "SELECT * FROM `events` WHERE namespace IN (?,?) AND created_at >= ? AND created_at <= ? ORDER BY `name` DESC,`id` DESC LIMIT ? OFFSET ?"
+			mock.ExpectQuery(countSQL).WithArgs("default", "chaos-mesh", event0.CreatedAt, event1.CreatedAt).
+				WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(2))
+			rows := genRows()
+			addRow(rows, event0)
+			mock.ExpectQuery(pageSQL).WithArgs("default", "chaos-mesh", event0.CreatedAt, event1.CreatedAt, 2, 1).
+				WillReturnRows(rows)
+			result, err := es.Query(context.Background(), core.EventQuery{
+				Namespaces: []string{"default", "chaos-mesh"}, Start: &event0.CreatedAt, End: &event1.CreatedAt,
+				Sort: core.EventSortName, Order: core.EventOrderDesc, Window: &core.EventWindow{Offset: 1, Limit: 1}, IncludeTotal: true,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.Events).To(Equal([]*core.Event{event0}))
+			Expect(result.Total).To(HaveValue(Equal(int64(2))))
+			Expect(result.HasMore).To(BeFalse())
+		})
 	})
 
 	Context("List", func() {
@@ -110,7 +133,7 @@ var _ = Describe("Event", func() {
 
 			events, err := es.List(context.TODO())
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(events[0]).Should(Equal(event0))
+			Expect(events).Should(Equal([]*core.Event{event0}))
 		})
 	})
 
@@ -125,12 +148,10 @@ var _ = Describe("Event", func() {
 
 			events, err := es.ListByUID(context.TODO(), "UID0")
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(events[0]).Should(Equal(event0))
+			Expect(events).Should(Equal([]*core.Event{event0}))
 		})
 
-		It("event0 shoud not be found", func() {
-			rows := genRows()
-			addRow(rows, event0)
+		It("event0 should not be found", func() {
 			mock.ExpectQuery(sql).WithArgs(event1.ObjectID).WillReturnRows(sqlmock.NewRows(nil))
 
 			events, err := es.ListByUID(context.TODO(), "UID1")
@@ -151,8 +172,7 @@ var _ = Describe("Event", func() {
 
 			events, err := es.ListByUIDList(context.TODO(), []string{event0.ObjectID, event1.ObjectID})
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(events[0]).Should(Equal(event0))
-			Expect(events[1]).Should(Equal(event1))
+			Expect(events).Should(Equal([]*core.Event{event0, event1}))
 		})
 	})
 
@@ -173,13 +193,12 @@ var _ = Describe("Event", func() {
 			}
 
 			mock.ExpectQuery(sql).
-				WithArgs(event0.ObjectID, event1.ObjectID, event0.Namespace, filter.Start, filter.End, 10).
+				WithArgs(event0.ObjectID, event1.ObjectID, event0.Namespace, event0.CreatedAt.UTC(), event1.CreatedAt.UTC(), 10).
 				WillReturnRows(rows)
 
 			events, err := es.ListByUIDListWithFilter(context.TODO(), []string{event0.ObjectID, event1.ObjectID}, filter)
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(events[0]).Should(Equal(event1))
-			Expect(events[1]).Should(Equal(event0))
+			Expect(events).Should(Equal([]*core.Event{event1, event0}))
 		})
 	})
 
@@ -198,7 +217,7 @@ var _ = Describe("Event", func() {
 			}
 
 			mock.ExpectQuery(sql).
-				WithArgs(event0.Namespace, filter.Start, filter.End, 10).
+				WithArgs(event0.Namespace, event0.CreatedAt.UTC(), event0.CreatedAt.UTC(), 10).
 				WillReturnRows(rows)
 
 			events, err := es.ListByFilter(context.TODO(), filter)
@@ -229,7 +248,7 @@ var _ = Describe("Event", func() {
 
 			events, err := es.ListByExperiment(context.TODO(), "default", "event0", "PodChaos")
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(events[0]).Should(Equal(event0))
+			Expect(events).Should(Equal([]*core.Event{event0}))
 		})
 
 		It("event1 should be found", func() {
@@ -240,7 +259,7 @@ var _ = Describe("Event", func() {
 
 			events, err := es.ListByExperiment(context.TODO(), "chaos-mesh", "event1", "NetworkChaos")
 			Expect(err).ShouldNot(HaveOccurred())
-			Expect(events[0]).Should(Equal(event1))
+			Expect(events).Should(Equal([]*core.Event{event1}))
 		})
 	})
 
@@ -260,11 +279,11 @@ var _ = Describe("Event", func() {
 	})
 
 	Context("Create", func() {
-		sql := "INSERT INTO `events` (`object_id`,`created_at`,`namespace`,`name`,`kind`,`type`,`reason`,`message`) VALUES (?,?,?,?,?,?,?,?)"
+		sql := "INSERT INTO `events` (`source_uid`,`object_id`,`created_at`,`namespace`,`name`,`kind`,`type`,`reason`,`message`) VALUES (?,?,?,?,?,?,?,?,?)"
 
 		It("event0 should be created", func() {
 			mock.ExpectBegin()
-			mock.ExpectExec(sql).WithArgs(event0.ObjectID, event0.CreatedAt, event0.Namespace, event0.Name, event0.Kind, event0.Type, event0.Reason, event0.Message).WillReturnResult(sqlmock.NewResult(1, 1))
+			mock.ExpectExec(sql).WithArgs(nil, event0.ObjectID, event0.CreatedAt, event0.Namespace, event0.Name, event0.Kind, event0.Type, event0.Reason, event0.Message).WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()
 
 			err := es.Create(context.TODO(), event0)

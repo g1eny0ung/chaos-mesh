@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
+import { useEventList } from '@/api/events'
 import {
   useDeleteExperimentsUid,
-  useGetEvents,
   useGetExperimentsUid,
   usePutExperimentsPauseUid,
   usePutExperimentsStartUid,
@@ -55,7 +55,7 @@ export default function Single() {
   const { setConfirm, setAlert } = useComponentActions()
 
   const { data: experiment, isLoading: isLoading1, refetch } = useGetExperimentsUid(uuid!)
-  const { data: events, isLoading: isLoading2 } = useGetEvents({ object_id: uuid, limit: 999 })
+  const { data: events, isLoading: isLoading2 } = useEventList({ object_id: uuid, limit: 999 })
   const loading = isLoading1 || isLoading2
   const { mutateAsync: deleteExperiments } = useDeleteExperimentsUid()
   const { mutateAsync: pauseExperiments } = usePutExperimentsPauseUid()

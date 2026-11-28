@@ -14,7 +14,8 @@
  * limitations under the License.
  *
  */
-import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsUid, useGetEvents } from '@/openapi'
+import { useEventList } from '@/api/events'
+import { useGetArchivesSchedulesUid, useGetArchivesUid, useGetArchivesWorkflowsUid } from '@/openapi'
 import { Stack } from '@mui/joy'
 import { Box, Grid, Grow } from '@mui/material'
 import * as yaml from 'js-yaml'
@@ -55,12 +56,12 @@ const Single = () => {
   })
   const { data: archive, isLoading: loadingArchives } =
     kind === 'workflow' ? workflowArchiveQuery : kind === 'schedule' ? scheduleArchiveQuery : experimentArchiveQuery
-  const { data: events, isLoading: loadingEvents } = useGetEvents(
+  const { data: events, isLoading: loadingEvents } = useEventList(
     {
       object_id: uuid,
       limit: 999,
     },
-    { query: { enabled: kind !== 'workflow' } },
+    kind !== 'workflow',
   )
   const loading = loadingArchives || (kind !== 'workflow' && loadingEvents)
 

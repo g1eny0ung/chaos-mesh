@@ -1,12 +1,12 @@
 # Chaos Mesh Helm Chart
 
-[Chaos Mesh](https://chaos-mesh.org) is a cloud-native Chaos Engineering platform for Kubernetes. This directory contains its Chart API v2 package, installable with Helm 3 or later, for deploying the control plane, node daemon, dashboard, admission webhooks, CRDs, and optional supporting components.
+[Chaos Mesh](https://chaos-mesh.org) is a cloud-native Chaos Engineering platform for Kubernetes. This directory contains its Chart API v2 package, installable with Helm 4, for deploying the control plane, node daemon, dashboard, admission webhooks, CRDs, and optional supporting components.
 
 For production prerequisites and platform-specific runtime settings, read the [official installation guide](https://chaos-mesh.org/docs/production-installation-using-helm/) before installing the chart.
 
 ## Prerequisites
 
-- Helm 3 or later
+- Helm 4.3.1, matching the repository tooling and CI
 - A supported Kubernetes cluster and container runtime
 - Permission to create cluster-scoped resources, including CRDs, ClusterRoles, ClusterRoleBindings, and admission webhook configurations
 - Privileged workloads allowed on the nodes where `chaos-daemon` runs, unless you have deliberately configured a restricted capability set
@@ -103,7 +103,7 @@ The most important top-level settings are summarized below.
 
 | Value | Default | Purpose |
 | --- | --- | --- |
-| `images.registry` | `ghcr.io` | Global registry used unless a component overrides it |
+| `images.registry` | `cr.chaos-mesh.dev` | Global registry used unless a component overrides it |
 | `images.tag` | `latest` | Global image tag used unless a component overrides it |
 | `imagePullSecrets` | `[]` | Registry credentials added to component Pods |
 | `clusterScoped` | `true` | Controls cluster-wide versus namespace-scoped reconciliation and RBAC |
@@ -137,8 +137,12 @@ Key component settings:
 | `dashboard.gcpSecurityMode.enabled` | `false` | Enables GCP authentication |
 | `dashboard.oidcSecurityMode.enabled` | `false` | Enables generic OIDC authentication |
 | `dashboard.ingress.enabled` | `false` | Creates a dashboard Ingress |
+| `dashboard.httpRoute.enabled` | `false` | Creates a dashboard Gateway API HTTPRoute |
 | `dnsServer.create` | `true` | Installs the DNSChaos server |
 | `prometheus.create` | `false` | Installs the bundled Prometheus instance |
+| `serviceMonitor.enabled` | `false` | Creates Prometheus Operator ServiceMonitors |
+| `serviceMonitor.additionalLabels` | `{}` | Extra ServiceMonitor labels, e.g. the one Prometheus selects on |
+| `serviceMonitor.interval` | `""` | Scrape interval; empty uses the operator default |
 | `webhook.certManager.enabled` | `false` | Uses cert-manager for webhook and daemon certificates |
 | `bpfki.create` | `false` | Enables the `chaos-kernel` helper |
 | `chaosDlv.enable` | `false` | Adds the Delve debugging sidecar |
@@ -147,7 +151,7 @@ Component image settings follow the same pattern:
 
 ```yaml
 images:
-  registry: ghcr.io
+  registry: cr.chaos-mesh.dev
   tag: latest
 
 controllerManager:
@@ -156,6 +160,8 @@ controllerManager:
     repository: chaos-mesh/chaos-mesh
     tag: "" # Empty means images.tag.
 ```
+
+`cr.chaos-mesh.dev` is a proxy in front of `ghcr.io` that serves the same images. To pull from GitHub Container Registry directly, set `--set images.registry=ghcr.io`.
 
 ## Common configurations
 
@@ -232,7 +238,38 @@ The referenced Secret must contain a `DATABASE_DATASOURCE` key. `dashboard.env.D
 
 GCP and generic OIDC authentication are configured under `dashboard.gcpSecurityMode` and `dashboard.oidcSecurityMode`. Each supports inline credentials or an existing Secret. The existing GCP Secret must provide `GCP_CLIENT_ID` and `GCP_CLIENT_SECRET`; the OIDC Secret must provide `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, and `OIDC_ISSUER_URL`.
 
-For an OIDC provider that uses a private CA, set `dashboard.oidcSecurityMode.caBundlePEM`. The chart creates and mounts a CA ConfigMap only when this value is non-empty.
+To keep the client ID and issuer URL in values while reading the client secret from a custom Secret key, use `dashboard.envFollowKubernetesPattern`:
+
+```yaml
+dashboard:
+  oidcSecurityMode:
+    enabled: true
+    clientId: dashboard-client
+    issuerUrl: https://issuer.example.com
+  envFollowKubernetesPattern:
+    - name: OIDC_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-auth
+          key: client-secret
+```
+
+`dashboard.envFollowKubernetesPattern` accepts Kubernetes `EnvVar` entries. `dashboard.env` accepts scalar values and converts names to uppercase. Explicit entries in either field replace the corresponding inline `GCP_CLIENT_ID`, `GCP_CLIENT_SECRET`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, or `OIDC_ISSUER_URL` variable. Define each name only once across these two fields.
+
+To import additional environment variables from Secrets or ConfigMaps, set `dashboard.envFrom` to a list of Kubernetes `EnvFromSource` entries:
+
+```yaml
+dashboard:
+  envFrom:
+    - configMapRef:
+        name: dashboard-config
+    - secretRef:
+        name: dashboard-extra
+```
+
+These entries are appended after the authentication `existingSecret` references. Variables in `env`, including generated inline authentication values, take precedence over `envFrom`. Use `envFollowKubernetesPattern` for individual authentication credentials or `existingSecret` for a complete authentication configuration.
+
+For an OIDC provider that uses a private CA, set `dashboard.oidcSecurityMode.caBundlePEM`. The chart creates and mounts a CA Secret only when this value is non-empty.
 
 ### Certificate management
 
@@ -251,6 +288,68 @@ The chart then creates namespaced Issuers and Certificates for the admission web
 ### Pod Security Policy compatibility
 
 `chaosDaemon.podSecurityPolicy` is a legacy compatibility option and defaults to `false`. Enabling it renders a `policy/v1beta1` PodSecurityPolicy, which is unavailable in modern Kubernetes releases. Prefer the security controls supported by your cluster.
+
+### Gateway API HTTPRoute
+
+As an alternative to `dashboard.ingress`, the dashboard can be exposed through a Gateway API `HTTPRoute`. It requires the `gateway.networking.k8s.io/v1` CRDs and an existing Gateway, which `parentRefs` must reference. TLS is configured on the Gateway listener rather than on the route.
+
+```yaml
+dashboard:
+  httpRoute:
+    enabled: true
+    parentRefs:
+      - name: gateway
+        namespace: gateway-system
+        sectionName: https
+    hostnames:
+      - dashboard.example.com
+    paths:
+      - type: PathPrefix
+        value: /
+```
+
+`paths` is a list of up to 64 Gateway API `HTTPPathMatch` objects with `type` and `value` fields. Each entry requires `value`. An omitted `type` defaults to `PathPrefix`. The default list is `[{type: PathPrefix, value: /}]`. An empty list uses the same default. Supported types are `PathPrefix`, `Exact`, and `RegularExpression`. Support for `RegularExpression` depends on the Gateway implementation.
+
+When the Gateway is in another namespace, its listener must allow routes from the release namespace.
+
+### Prometheus Operator ServiceMonitors
+
+The chart annotates its Services with `prometheus.io/scrape`, which only a Prometheus configured for annotation-based service discovery acts on. Prometheus Operator ignores those annotations and discovers targets through `ServiceMonitor` resources, so set `serviceMonitor.enabled` when running the operator. It requires the `monitoring.coreos.com/v1` ServiceMonitor CRD and is disabled by default.
+
+```yaml
+serviceMonitor:
+  enabled: true
+  # The label the Prometheus instance selects ServiceMonitors on.
+  additionalLabels:
+    release: kube-prometheus-stack
+  interval: 30s
+```
+
+One ServiceMonitor is created per component — controller manager, chaos daemon, dashboard, and DNS server — each pointed at that component's metrics port. Components the chart does not install are skipped, and each can be turned off individually:
+
+```yaml
+serviceMonitor:
+  enabled: true
+  dnsServer:
+    enabled: false
+```
+
+`interval`, `scrapeTimeout`, `scheme`, `tlsConfig`, `honorLabels`, `metricRelabelings`, and `relabelings` can be set globally and overridden per component, so one component can be scraped differently from the rest:
+
+```yaml
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  metricRelabelings:
+    - sourceLabels: [__name__]
+      regex: go_.*
+      action: drop
+  chaosDaemon:
+    # The daemon runs on every node; scrape it less often than the rest.
+    interval: 1m
+```
+
+Settings left empty are omitted from the rendered resource so the operator applies its own defaults.
 
 ### Extra objects
 

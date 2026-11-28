@@ -23,8 +23,7 @@
     "noUncheckedSideEffectImports": false,
     // Custom
     "paths": {
-      "@/*": ["./src/*"],
-      "test-utils": ["./src/test-utils.tsx"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],

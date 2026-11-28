@@ -39,6 +39,8 @@ type EventStore interface {
 
 	ListByFilter(context.Context, Filter) ([]*Event, error)
 
+	Query(context.Context, EventQuery) (EventResult, error)
+
 	// Find returns an event by ID.
 	Find(context.Context, uint) (*Event, error)
 
@@ -57,6 +59,7 @@ type EventStore interface {
 
 type Event struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
+	SourceUID *string   `gorm:"size:128;uniqueIndex:event_source_uid,where:source_uid IS NOT NULL" json:"-"`
 	ObjectID  string    `gorm:"index:object_id" json:"object_id"`
 	CreatedAt time.Time `json:"created_at"`
 	Namespace string    `json:"namespace"`
@@ -65,4 +68,47 @@ type Event struct {
 	Type      string    `json:"type"`
 	Reason    string    `json:"reason"`
 	Message   string    `gorm:"type:text;size:32768" json:"message"`
+}
+
+type EventSort string
+
+const (
+	EventSortID        EventSort = "id"
+	EventSortObjectID  EventSort = "object_id"
+	EventSortNamespace EventSort = "namespace"
+	EventSortName      EventSort = "name"
+	EventSortKind      EventSort = "kind"
+	EventSortCreatedAt EventSort = "created_at"
+	EventSortMessage   EventSort = "message"
+)
+
+type EventOrder string
+
+const (
+	EventOrderAsc  EventOrder = "asc"
+	EventOrderDesc EventOrder = "desc"
+)
+
+type EventWindow struct {
+	Offset int
+	Limit  int
+}
+
+type EventQuery struct {
+	Namespaces   []string
+	Names        []string
+	Kinds        []string
+	ObjectIDs    []string
+	Start        *time.Time
+	End          *time.Time
+	Sort         EventSort
+	Order        EventOrder
+	Window       *EventWindow
+	IncludeTotal bool
+}
+
+type EventResult struct {
+	Events  []*Event
+	HasMore bool
+	Total   *int64
 }
