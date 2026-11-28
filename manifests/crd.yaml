@@ -5509,16 +5509,20 @@ spec:
                       required:
                       - duplicate
                       type: object
-                    ipVersion:
-                      description: IPVersion is the address family of the IP set,
-                        when one is specified.
-                      enum:
-                      - ipv4
-                      - ipv6
-                      type: string
                     ipset:
-                      description: The name of target ipset
+                      description: The name of target IPv4 ipset
                       type: string
+                    ipsetOptional:
+                      description: IPSetOptional allows skipping the IPv4 filter when
+                        the IPv4 firewall table is unavailable.
+                      type: boolean
+                    ipsetV6:
+                      description: The name of target IPv6 ipset
+                      type: string
+                    ipsetV6Optional:
+                      description: IPSetV6Optional allows skipping the IPv6 filter
+                        when the IPv6 firewall table is unavailable.
+                      type: boolean
                     loss:
                       description: Loss represents the detail about loss action
                       properties:
@@ -5529,10 +5533,6 @@ spec:
                       required:
                       - loss
                       type: object
-                    optional:
-                      description: Optional allows skipping the rule when the firewall
-                        table for its IP version is unavailable.
-                      type: boolean
                     rate:
                       description: Rate represents the detail about rate control action
                       properties:

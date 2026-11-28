@@ -178,9 +178,13 @@ type RawTrafficControl struct {
 
 	TcParameter `json:",inline"`
 
-	// The name of target ipset
+	// The name of target IPv4 ipset
 	// +optional
 	IPSet string `json:"ipset,omitempty"`
+
+	// The name of target IPv6 ipset
+	// +optional
+	IPSetV6 string `json:"ipsetV6,omitempty"`
 
 	// The name and namespace of the source network chaos
 	Source string `json:"source"`
@@ -189,14 +193,13 @@ type RawTrafficControl struct {
 	// +optional
 	Device string `json:"device,omitempty"`
 
-	// IPVersion is the address family of the IP set, when one is specified.
+	// IPSetOptional allows skipping the IPv4 filter when the IPv4 firewall table is unavailable.
 	// +optional
-	// +kubebuilder:validation:Enum=ipv4;ipv6
-	IPVersion IPVersion `json:"ipVersion,omitempty"`
+	IPSetOptional bool `json:"ipsetOptional,omitempty"`
 
-	// Optional allows skipping the rule when the firewall table for its IP version is unavailable.
+	// IPSetV6Optional allows skipping the IPv6 filter when the IPv6 firewall table is unavailable.
 	// +optional
-	Optional bool `json:"optional,omitempty"`
+	IPSetV6Optional bool `json:"ipsetV6Optional,omitempty"`
 }
 
 // TcParameter represents the parameters for a traffic control chaos

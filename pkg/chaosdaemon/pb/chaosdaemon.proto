@@ -283,9 +283,11 @@ message Tc {
   reserved 6, 7;
   reserved "source_port", "egress_port";
   string device = 9;
-  IpVersion ip_version = 10;
-  // Allows skipping this rule when the filter table for its IP version is unavailable.
-  bool optional = 11;
+  string ipset_v6 = 10;
+  // Allows skipping the IPv4 filter when the IPv4 filter table is unavailable.
+  bool ipset_optional = 11;
+  // Allows skipping the IPv6 filter when the IPv6 filter table is unavailable.
+  bool ipset_v6_optional = 12;
 }
 
 message SetDNSServerRequest {

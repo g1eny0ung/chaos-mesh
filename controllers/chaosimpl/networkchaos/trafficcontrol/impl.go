@@ -295,6 +295,8 @@ func (impl *Impl) ApplyTc(ctx context.Context, m *podnetworkchaosmanager.PodNetw
 	ipSetWithTcPostFix := string(tcType[0:2]) + ipSetPostFix
 	v4IPSets, v6IPSets := ipset.BuildIPSets(targetPods, externalCidrs, networkchaos, ipSetWithTcPostFix, m.Source)
 	v4DNSOnly, v6DNSOnly := ipset.FamilyFromDNSOnly(targetPods, externalCidrs)
+
+	var v4SetName, v6SetName string
 	if len(v4IPSets) > 0 {
 		v4SetIPSet := ipset.BuildSetIPSet(v4IPSets, networkchaos, ipSetWithTcPostFix, m.Source)
 		impl.Log.Info("apply traffic control with filter", "sources", m.Source, "v4SetIpset", v4SetIPSet, "v4IPSets", v4IPSets)
@@ -302,15 +304,7 @@ func (impl *Impl) ApplyTc(ctx context.Context, m *podnetworkchaosmanager.PodNetw
 			m.T.Append(s)
 		}
 		m.T.Append(v4SetIPSet)
-		m.T.Append(v1alpha1.RawTrafficControl{
-			Type:        tcType,
-			TcParameter: spec.TcParameter,
-			Source:      m.Source,
-			IPSet:       v4SetIPSet.Name,
-			Device:      device,
-			IPVersion:   v1alpha1.IPv4,
-			Optional:    v4DNSOnly,
-		})
+		v4SetName = v4SetIPSet.Name
 	}
 
 	if len(v6IPSets) > 0 {
@@ -320,14 +314,19 @@ func (impl *Impl) ApplyTc(ctx context.Context, m *podnetworkchaosmanager.PodNetw
 			m.T.Append(s)
 		}
 		m.T.Append(v6SetIPSet)
+		v6SetName = v6SetIPSet.Name
+	}
+
+	if v4SetName != "" || v6SetName != "" {
 		m.T.Append(v1alpha1.RawTrafficControl{
-			Type:        tcType,
-			TcParameter: spec.TcParameter,
-			Source:      m.Source,
-			IPSet:       v6SetIPSet.Name,
-			Device:      device,
-			IPVersion:   v1alpha1.IPv6,
-			Optional:    v6DNSOnly,
+			Type:            tcType,
+			TcParameter:     spec.TcParameter,
+			Source:          m.Source,
+			IPSet:           v4SetName,
+			IPSetV6:         v6SetName,
+			Device:          device,
+			IPSetOptional:   v4DNSOnly,
+			IPSetV6Optional: v6DNSOnly,
 		})
 	}
 

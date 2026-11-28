@@ -230,6 +230,12 @@ func (s *DaemonServer) setGlobalTcs(log logr.Logger, cli tcClient, tcs []*pb.Tc,
 	return nil
 }
 
+type tcFilterGroup struct {
+	tcs   []*pb.Tc
+	useV4 bool
+	useV6 bool
+}
+
 func (s *DaemonServer) setFilterTcs(
 	log logr.Logger,
 	tcCli tcClient,
@@ -238,72 +244,111 @@ func (s *DaemonServer) setFilterTcs(
 	device string,
 	baseIndex int,
 ) error {
-	var hasOptional bool
+	var anyOptional bool
 	for _, tcs := range filterTc {
-		if allTcsOptional(tcs) {
-			hasOptional = true
+		if tcGroupHasV4(tcs[0]) && allTcsMatch(tcs, func(tc *pb.Tc) bool { return tc.IpsetOptional }) {
+			anyOptional = true
+			break
+		}
+		if len(tcs[0].IpsetV6) > 0 && allTcsMatch(tcs, func(tc *pb.Tc) bool { return tc.IpsetV6Optional }) {
+			anyOptional = true
 			break
 		}
 	}
 
-	if hasOptional {
-		unavailable := make(map[pb.IpVersion]error)
-		probed := make(map[pb.IpVersion]bool)
-		var skippedErr error
-		filtered := make(map[string][]*pb.Tc, len(filterTc))
+	unavailable := make(map[pb.IpVersion]error)
+	probed := make(map[pb.IpVersion]bool)
+	probeOnce := func(version pb.IpVersion) (error, error) {
+		if !probed[version] {
+			probed[version] = true
+			unavailErr, fatalErr := iptablesCli.probeFamily(version)
+			if fatalErr != nil {
+				return nil, fatalErr
+			}
+			if unavailErr != nil {
+				unavailable[version] = unavailErr
+			}
+		}
+		return unavailable[version], nil
+	}
 
-		for key, tcs := range filterTc {
-			version := tcs[0].IpVersion
-			if !probed[version] {
-				probed[version] = true
-				unavailErr, fatalErr := iptablesCli.probeFamily(version)
+	var skippedErr error
+	groups := make([]tcFilterGroup, 0, len(filterTc))
+	for _, tcs := range filterTc {
+		tc := tcs[0]
+		useV4 := tcGroupHasV4(tc)
+		useV6 := len(tc.IpsetV6) > 0
+
+		if anyOptional {
+			v4Optional := useV4 && allTcsMatch(tcs, func(item *pb.Tc) bool { return item.IpsetOptional })
+			v6Optional := useV6 && allTcsMatch(tcs, func(item *pb.Tc) bool { return item.IpsetV6Optional })
+
+			if useV4 {
+				unavailErr, fatalErr := probeOnce(pb.IpVersion_IPv4)
 				if fatalErr != nil {
 					return fatalErr
 				}
 				if unavailErr != nil {
-					unavailable[version] = unavailErr
+					if !v4Optional {
+						return unavailErr
+					}
+					if skippedErr == nil {
+						skippedErr = unavailErr
+					}
+					useV4 = false
 				}
 			}
 
-			if unavailErr := unavailable[version]; unavailErr != nil {
-				if !allTcsOptional(tcs) {
-					return unavailErr
+			if useV6 {
+				unavailErr, fatalErr := probeOnce(pb.IpVersion_IPv6)
+				if fatalErr != nil {
+					return fatalErr
 				}
-				if skippedErr == nil {
-					skippedErr = unavailErr
+				if unavailErr != nil {
+					if !v6Optional {
+						return unavailErr
+					}
+					if skippedErr == nil {
+						skippedErr = unavailErr
+					}
+					useV6 = false
 				}
-				continue
 			}
-
-			filtered[key] = tcs
 		}
 
-		if len(filtered) == 0 {
-			if baseIndex == 0 && skippedErr != nil {
-				return skippedErr
-			}
-			return nil
+		if !useV4 && !useV6 {
+			continue
 		}
-		filterTc = filtered
+		groups = append(groups, tcFilterGroup{
+			tcs:   tcs,
+			useV4: useV4,
+			useV6: useV6,
+		})
+	}
+
+	if len(groups) == 0 {
+		if baseIndex == 0 && skippedErr != nil {
+			return skippedErr
+		}
+		return nil
 	}
 
 	parent := baseIndex
-	band := 3 + len(filterTc) // 3 handlers for normal sfq on prio qdisc
+	band := 3 + len(groups) // 3 handlers for normal sfq on prio qdisc
 	if err := tcCli.addPrio(device, parent, band); err != nil {
 		log.Error(err, "error while adding prio")
 		return err
 	}
 
 	parent++
-	index := 0
 	currentHandler := parent + 3 // 3 handlers for sfq on prio qdisc
 
 	// iptables chain has been initialized by previous grpc request to set iptables
 	// and iptables rules are recovered by previous call too, so there is no need
 	// to remove these rules here
 	chains := []*pb.Chain{}
-	for _, tcs := range filterTc {
-		for i, tc := range tcs {
+	for index, group := range groups {
+		for i, tc := range group.tcs {
 			parentArg := fmt.Sprintf("parent %d:%d", parent, index+4)
 			if i > 0 {
 				parentArg = fmt.Sprintf("parent %d:", currentHandler)
@@ -319,27 +364,38 @@ func (s *DaemonServer) setFilterTcs(
 			}
 		}
 
-		tc := tcs[0]
-		name := fmt.Sprintf("TC-TABLES-%d", index)
-		if tc.IpVersion == pb.IpVersion_IPv6 {
-			name = name + "/6"
-		}
-		ch := &pb.Chain{
-			Name:      name,
-			Direction: pb.Chain_OUTPUT,
-			Target:    fmt.Sprintf("CLASSIFY --set-class %d:%d", parent, index+4),
-			Device:    device,
-			IpVersion: tc.IpVersion,
-		}
-		if len(tc.Ipset) > 0 {
-			ch.Ipsets = []string{tc.Ipset}
+		tc := group.tcs[0]
+		target := fmt.Sprintf("CLASSIFY --set-class %d:%d", parent, index+4)
+
+		if group.useV4 {
+			ch := &pb.Chain{
+				Name:      fmt.Sprintf("TC-TABLES-%d", index),
+				Direction: pb.Chain_OUTPUT,
+				Target:    target,
+				Device:    device,
+				Protocol:  tc.Protocol,
+				IpVersion: pb.IpVersion_IPv4,
+			}
+			if len(tc.Ipset) > 0 {
+				ch.Ipsets = []string{tc.Ipset}
+			}
+			chains = append(chains, ch)
 		}
 
-		ch.Protocol = tc.Protocol
-
-		chains = append(chains, ch)
-
-		index++
+		if group.useV6 {
+			ch := &pb.Chain{
+				Name:      fmt.Sprintf("TC-TABLES-%d/6", index),
+				Direction: pb.Chain_OUTPUT,
+				Target:    target,
+				Device:    device,
+				Protocol:  tc.Protocol,
+				IpVersion: pb.IpVersion_IPv6,
+			}
+			if len(tc.IpsetV6) > 0 {
+				ch.Ipsets = []string{tc.IpsetV6}
+			}
+			chains = append(chains, ch)
+		}
 	}
 	if err := iptablesCli.setIptablesChains(chains); err != nil {
 		log.Error(err, "error while setting iptables")
@@ -620,12 +676,16 @@ func convertTbfToArgs(tbf *pb.Tbf) string {
 	return args
 }
 
-func allTcsOptional(tcs []*pb.Tc) bool {
+func tcGroupHasV4(tc *pb.Tc) bool {
+	return len(tc.Ipset) > 0 || (len(tc.IpsetV6) == 0 && len(tc.Protocol) > 0)
+}
+
+func allTcsMatch(tcs []*pb.Tc, predicate func(*pb.Tc) bool) bool {
 	if len(tcs) == 0 {
 		return false
 	}
 	for _, tc := range tcs {
-		if !tc.Optional {
+		if !predicate(tc) {
 			return false
 		}
 	}
@@ -633,17 +693,8 @@ func allTcsOptional(tcs []*pb.Tc) bool {
 }
 
 func abstractTcFilter(tc *pb.Tc) string {
-	filter := tc.Ipset
-
-	if len(tc.Protocol) > 0 {
-		filter += "-" + tc.Protocol
+	if len(tc.Ipset) == 0 && len(tc.IpsetV6) == 0 && len(tc.Protocol) == 0 {
+		return ""
 	}
-
-	// Group by IP version only when a filter is present, so a global TC rule
-	// without ipset/protocol is not misclassified as a filtered rule.
-	if len(filter) > 0 && tc.IpVersion == pb.IpVersion_IPv6 {
-		filter += "-6"
-	}
-
-	return filter
+	return tc.Ipset + "\x00" + tc.IpsetV6 + "\x00" + tc.Protocol
 }

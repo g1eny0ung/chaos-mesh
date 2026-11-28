@@ -130,6 +130,25 @@ var _ = Describe("Traffic control rules", func() {
 		Expect(impl.Recover(ctx, 1, records, chaos)).To(Equal(v1alpha1.NotInjected))
 	})
 
+	It("combines dual-stack targets into a single traffic control rule with both ipsets", func() {
+		target := &corev1.Pod{}
+		Expect(kube.Get(ctx, targetKey, target)).To(Succeed())
+		target.Status.PodIPs = []corev1.PodIP{{IP: "192.0.2.11"}, {IP: "2001:db8::11"}}
+		Expect(kube.Status().Update(ctx, target)).To(Succeed())
+
+		Expect(impl.Apply(ctx, 0, records, chaos)).To(Equal(waitForApplySync))
+		child := &v1alpha1.PodNetworkChaos{}
+		Expect(kube.Get(ctx, sourceKey, child)).To(Succeed())
+		Expect(child.Spec.TrafficControls).To(HaveLen(1))
+		rule := child.Spec.TrafficControls[0]
+		Expect(rule.IPSet).NotTo(BeEmpty())
+		Expect(rule.IPSetV6).NotTo(BeEmpty())
+		Expect(rule.IPSetOptional).To(BeFalse())
+		Expect(rule.IPSetV6Optional).To(BeFalse())
+		Expect(child.Spec.IPSets).To(ContainElement(HaveField("Cidrs", ContainElement("192.0.2.11/32"))))
+		Expect(child.Spec.IPSets).To(ContainElement(HaveField("Cidrs", ContainElement("2001:db8::11/128"))))
+	})
+
 	It("rejects unsupported actions before creating a child", func() {
 		chaos.Spec.Action = v1alpha1.PartitionAction
 		phase, err := impl.Apply(ctx, 0, records, chaos)

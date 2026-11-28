@@ -10,7 +10,7 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 
 ### Added
 
-- Add IPv6 and dual-stack support for NetworkChaos [#4966](https://github.com/chaos-mesh/chaos-mesh/pull/4966)
+- Add IPv6 and dual-stack support for NetworkChaos (when upgrading, update CRDs first, wait for `chaos-daemon` rollout, then upgrade `chaos-controller-manager`) [#4966](https://github.com/chaos-mesh/chaos-mesh/pull/4966)
 - PodChaos container-kill now supports targeting init containers when container names are explicitly specified. Only init containers with `restartPolicy: Always` are eligible [#4803](https://github.com/chaos-mesh/chaos-mesh/pull/4803)
 - Support `serviceAccountName` for Workflow Task pods [#5162](https://github.com/chaos-mesh/chaos-mesh/pull/5162)
 - Support `nodeSelector` and `tolerations` for Workflow Task pods [#4790](https://github.com/chaos-mesh/chaos-mesh/pull/4790)

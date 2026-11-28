@@ -270,22 +270,19 @@ func parseIPVersion(version v1alpha1.IPVersion) (pb.IpVersion, error) {
 func (r *Reconciler) SetTcs(ctx context.Context, pod *corev1.Pod, chaos *v1alpha1.PodNetworkChaos, chaosdaemonClient chaosdaemonclient.ChaosDaemonClientInterface) error {
 	tcs := []*pb.Tc{}
 	for _, tc := range chaos.Spec.TrafficControls {
-		ipVersion, err := parseIPVersion(tc.IPVersion)
-		if err != nil {
-			return err
-		}
 		if tc.Type == v1alpha1.Bandwidth {
 			tbf, err := netem.FromBandwidth(tc.Bandwidth)
 			if err != nil {
 				return err
 			}
 			tcs = append(tcs, &pb.Tc{
-				Type:      pb.Tc_BANDWIDTH,
-				Tbf:       tbf,
-				Ipset:     tc.IPSet,
-				Device:    tc.Device,
-				IpVersion: ipVersion,
-				Optional:  tc.Optional,
+				Type:            pb.Tc_BANDWIDTH,
+				Tbf:             tbf,
+				Ipset:           tc.IPSet,
+				IpsetV6:         tc.IPSetV6,
+				Device:          tc.Device,
+				IpsetOptional:   tc.IPSetOptional,
+				IpsetV6Optional: tc.IPSetV6Optional,
 			})
 		} else if tc.Type == v1alpha1.Netem {
 			netem, err := mergeNetem(tc.TcParameter)
@@ -293,12 +290,13 @@ func (r *Reconciler) SetTcs(ctx context.Context, pod *corev1.Pod, chaos *v1alpha
 				return err
 			}
 			tcs = append(tcs, &pb.Tc{
-				Type:      pb.Tc_NETEM,
-				Netem:     netem,
-				Ipset:     tc.IPSet,
-				Device:    tc.Device,
-				IpVersion: ipVersion,
-				Optional:  tc.Optional,
+				Type:            pb.Tc_NETEM,
+				Netem:           netem,
+				Ipset:           tc.IPSet,
+				IpsetV6:         tc.IPSetV6,
+				Device:          tc.Device,
+				IpsetOptional:   tc.IPSetOptional,
+				IpsetV6Optional: tc.IPSetV6Optional,
 			})
 		} else {
 			return errors.New("unknown tc type")

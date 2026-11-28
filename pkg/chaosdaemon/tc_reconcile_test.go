@@ -90,10 +90,10 @@ var _ = Describe("Traffic control reconciliation", func() {
 		))
 	})
 
-	It("installs IPv6 filtered rules via ip6tables and keeps filterless IPv6 rules global", func(ctx SpecContext) {
+	It("shares a single prio band for dual-stack filters and handles IPv6-only filters", func(ctx SpecContext) {
 		request.Tcs = []*pb.Tc{
-			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "5ms"}, IpVersion: pb.IpVersion_IPv6},
-			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "7ms"}, Ipset: "test-peers6", IpVersion: pb.IpVersion_IPv6},
+			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "5ms"}},
+			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "7ms"}, Ipset: "test-peers4", IpsetV6: "test-peers6"},
 		}
 		Expect(server.SetTcs(ctx, request)).NotTo(BeNil())
 		Expect(commands[3:]).To(ConsistOf(
@@ -103,17 +103,58 @@ var _ = Describe("Traffic control reconciliation", func() {
 			"tc qdisc add dev eth0 parent 2:2 handle 4: sfq",
 			"tc qdisc add dev eth0 parent 2:3 handle 5: sfq",
 			"tc qdisc add dev eth0 parent 2:4 handle 6: netem delay 7ms",
+			"iptables -w -N TC-TABLES-0", "iptables -w -F TC-TABLES-0", "iptables -w -S TC-TABLES-0",
+			"iptables -w -A TC-TABLES-0 -o eth0 -m set --match-set test-peers4 dst,dst -j CLASSIFY --set-class 2:4 -w 5",
+			"iptables -w -S CHAOS-OUTPUT", "iptables -w -A CHAOS-OUTPUT -j TC-TABLES-0",
 			"ip6tables -w -N TC-TABLES-0/6", "ip6tables -w -F TC-TABLES-0/6", "ip6tables -w -S TC-TABLES-0/6",
 			"ip6tables -w -A TC-TABLES-0/6 -o eth0 -m set --match-set test-peers6 dst,dst -j CLASSIFY --set-class 2:4 -w 5",
 			"ip6tables -w -S CHAOS6-OUTPUT", "ip6tables -w -A CHAOS6-OUTPUT -j TC-TABLES-0/6",
 		))
+
+		commands = nil
+		request.Tcs = []*pb.Tc{
+			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "7ms"}, IpsetV6: "only-peers6"},
+		}
+		Expect(server.SetTcs(ctx, request)).NotTo(BeNil())
+		Expect(commands[3:]).To(ConsistOf(
+			"tc qdisc add dev eth0 root handle 1: prio bands 4 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1",
+			"tc qdisc add dev eth0 parent 1:1 handle 2: sfq",
+			"tc qdisc add dev eth0 parent 1:2 handle 3: sfq",
+			"tc qdisc add dev eth0 parent 1:3 handle 4: sfq",
+			"tc qdisc add dev eth0 parent 1:4 handle 5: netem delay 7ms",
+			"ip6tables -w -N TC-TABLES-0/6", "ip6tables -w -F TC-TABLES-0/6", "ip6tables -w -S TC-TABLES-0/6",
+			"ip6tables -w -A TC-TABLES-0/6 -o eth0 -m set --match-set only-peers6 dst,dst -j CLASSIFY --set-class 1:4 -w 5",
+			"ip6tables -w -S CHAOS6-OUTPUT", "ip6tables -w -A CHAOS6-OUTPUT -j TC-TABLES-0/6",
+		))
 	})
 
-	It("skips an optional IPv6 filter when ip6tables is unavailable and fails when all optional filters are unavailable", func(ctx SpecContext) {
+	It("allocates one band per dual-stack filter group so 7 groups stay within Linux's 16-band prio limit", func(ctx SpecContext) {
+		request.Tcs = make([]*pb.Tc, 0, 7)
+		for i := range 7 {
+			request.Tcs = append(request.Tcs, &pb.Tc{
+				Device:  "eth0",
+				Type:    pb.Tc_NETEM,
+				Netem:   &pb.Netem{Time: "5ms"},
+				Ipset:   "peers4-" + string(rune('a'+i)),
+				IpsetV6: "peers6-" + string(rune('a'+i)),
+			})
+		}
+		Expect(server.SetTcs(ctx, request)).NotTo(BeNil())
+		Expect(commands).To(ContainElement("tc qdisc add dev eth0 root handle 1: prio bands 10 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1"))
+	})
+
+	It("skips an optional IPv6 filter on a shared band when ip6tables is unavailable and fails when both families are unavailable", func(ctx SpecContext) {
 		failures["ip6tables -w -t filter -S"] = "ip6tables: Address family not supported by protocol"
 		request.Tcs = []*pb.Tc{
-			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "7ms"}, Ipset: "peers4", IpVersion: pb.IpVersion_IPv4, Optional: true},
-			{Device: "eth0", Type: pb.Tc_NETEM, Netem: &pb.Netem{Time: "7ms"}, Ipset: "peers6", IpVersion: pb.IpVersion_IPv6, Optional: true},
+			{
+				Device:          "eth0",
+				Type:            pb.Tc_NETEM,
+				Netem:           &pb.Netem{Time: "7ms"},
+				Ipset:           "peers4",
+				IpsetV6:         "peers6",
+				IpsetOptional:   true,
+				IpsetV6Optional: true,
+			},
 		}
 		Expect(server.SetTcs(ctx, request)).NotTo(BeNil())
 		Expect(commands).To(ContainElement("iptables -w -A TC-TABLES-0 -o eth0 -m set --match-set peers4 dst,dst -j CLASSIFY --set-class 1:4 -w 5"))
